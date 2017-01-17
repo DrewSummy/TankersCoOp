@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Completed;
 
 namespace Completed
 {
@@ -7,19 +8,22 @@ namespace Completed
     public class Gate : MonoBehaviour
     {
 
-        public RoomManager parentRoomScript;
-        public AudioSource gateAudioSource;
-        public AudioClip closeAudio;
-        public AudioClip lastRoomAudio;
-        private bool audioPlayed = false;
-        private float gateHeight = 6f;
-        private Vector3 originalPos;
-        private Quaternion originalRot;
-        public Transform gate;
-        public BoxCollider boundary;
-        public bool triggered = false;
-        private bool lastRoomAudioBool = true;
+        public RoomManager parentRoomScript;    // Reference to RoomManager of the parent room.
+        public AudioSource gateAudioSource;     // Reference to the audio source used to play gate sounds.
+        public AudioClip closeAudio;            // Reference to the audio clip used to play the gate audio source.
+        public AudioClip lastRoomAudio;         // Reference to the audio clip used to play the gate audio source.
+        private bool audioPlayed = false;       // Boolean for whether the audio from gateAudioSource played.
+        private float gateHeight = 6f;          // The height of the gate.
+        private Vector3 originalPos;            // The original position of the gate.
+        private Quaternion originalRot;         // The original rotation of the gate.
+        public Transform gate;                  // Reference to the gate transform.
+        public BoxCollider boundary;            // Reference to the boundary for triggering the gate.
+        public bool triggered = false;          // Boolean for whether the gate was triggered.
 
+        private bool lastRoomAudioBool;         // Boolean for whether this is a gate of the last room.
+
+
+        //TODO: why are there two box colliders
 
         private void Awake()
         {
@@ -79,6 +83,36 @@ namespace Completed
                 gate.transform.position = originalPos + Vector3.down * 4;
             }
         }
+        public IEnumerator lowerDoorSlowCorrected()
+        {
+            // How fast it shakes.
+            float speed = 40f;
+            // How much it shakes.
+            float amount = .08f;
+
+            if (!audioPlayed)
+            {
+                gateAudioSource.Play();
+                audioPlayed = true;
+            }
+
+            float lowerSpeed = gateHeight / (closeAudio.length + 1.0f);
+            while (gate.position.y > -gateHeight / 2)
+            {
+                float Angle2Amount = (Mathf.Cos(Time.time * 30) * 180) / Mathf.PI * amount;
+                gate.localRotation = Quaternion.Euler(Angle2Amount, 0, 0);
+
+                // Lowering
+                Vector3 lowering = Vector3.down * lowerSpeed * Time.deltaTime;
+                gate.Translate(lowering);
+                // Rotating
+                float AngleAmount = (Mathf.Cos(Time.time * speed) * 180) / Mathf.PI * amount;
+                gate.localRotation = Quaternion.Euler(Angle2Amount, AngleAmount, 0);
+                yield return new WaitForSeconds(.01f);
+            }
+            gate.localRotation = originalRot;
+            gate.transform.position = originalPos + Vector3.down * 4;
+        }
 
         // Lowers a door quickly.
         public void lowerDoorFast()
@@ -98,7 +132,7 @@ namespace Completed
             {
                 float Angle2Amount = (Mathf.Cos(Time.time * 30) * 180) / Mathf.PI * amount;
                 gate.localRotation = Quaternion.Euler(Angle2Amount, 0, 0);
-                
+
                 // Lowering
                 Vector3 lowering = Vector3.down * lowerSpeed * Time.deltaTime;
                 gate.Translate(lowering);
@@ -111,6 +145,35 @@ namespace Completed
                 gate.localRotation = originalRot;
                 gate.transform.position = originalPos + Vector3.down * 4;
             }
+        }
+        public IEnumerator lowerDoorFastCorrected()
+        {
+            float speed = 40f; // How fast it shakes.
+            float amount = .08f; // How much it shakes.
+
+            if (!audioPlayed)
+            {
+                gateAudioSource.pitch = 2f;
+                gateAudioSource.Play();
+                audioPlayed = true;
+            }
+
+            float lowerSpeed = 4 * gateHeight / (closeAudio.length + 1.0f);
+            while (gate.position.y > -gateHeight / 2)
+            {
+                float Angle2Amount = (Mathf.Cos(Time.time * 30) * 180) / Mathf.PI * amount;
+                gate.localRotation = Quaternion.Euler(Angle2Amount, 0, 0);
+
+                // Lowering
+                Vector3 lowering = Vector3.down * lowerSpeed * Time.deltaTime;
+                gate.Translate(lowering);
+                // Rotating
+                float AngleAmount = (Mathf.Cos(Time.time * speed) * 180) / Mathf.PI * amount;
+                gate.localRotation = Quaternion.Euler(Angle2Amount, AngleAmount, 0);
+                yield return new WaitForSeconds(.01f);
+            }
+            gate.localRotation = originalRot;
+            gate.transform.position = originalPos + Vector3.down * 4;
         }
 
         // Lowers the last room's door.
@@ -133,21 +196,39 @@ namespace Completed
                     gateAudioSource.clip = closeAudio;
                 }
             }
-            else
-            {
-                    lowerDoorSlow();
-            }
-        }
 
-    protected void OnCollisionEnter(Collision collisionInfo)
+            //lowerDoorSlow();
+            StartCoroutine(lowerDoorSlowCorrected());
+        }
+        //TODO: public IEnumerator lowerDoorLastRoomCorrected()
+
+        protected void OnCollisionEnter(Collision collisionInfo)
         {
             // The object has collided with another projectile.
             if (collisionInfo.transform.tag == "Player")
             {
                 if (parentRoomScript.roomCompleted)
                 {
+                    //TODO: comment this out and test
                     triggered = true;
                     boundary.enabled = false;
+                }
+                else
+                {
+                    parentRoomScript.startBeginningBattleCorrected();
+                }
+            }
+        }
+
+        protected void OnCollisionExit(Collision collisionInfo)
+        {
+            // The object has collided with another projectile.
+            if (collisionInfo.transform.tag == "Player")
+            {
+                if (parentRoomScript.roomCompleted)
+                {
+                    //temp
+                    GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().movePlayer();
                 }
             }
         }

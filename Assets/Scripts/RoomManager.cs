@@ -15,6 +15,7 @@ namespace Completed
         public GameObject wallOpen;                                              // The GameObject of the open wall.
         public GameObject wallClosed;                                            // The GameObject of the closed wall.
         public GameObject m_camera;
+        public Vector2 coordinate;
 
         private Transform m_room;                                                // Store a reference to the room transform.
         private int m_level;                                                     // Store a reference to our RoomManager which will set up the room.
@@ -22,22 +23,25 @@ namespace Completed
         private bool isDoorLowered = false;                                      // The bool for is the doors are all lowered.
         private bool isPlayer1;                                                  // The bool for if player 2 is alive.
         private bool isPlayer2;                                                  // The bool for if player 2 is alive.
-        private GameObject player1;
+        private GameObject player1;                                              // Reference to the player 1 game object.
         //private GameObject player2;
-        public GameObject[] enemyList;// = new List<GameObject>();             // A list of enemies for the level.
+        private TankPlayer player1Script;
+        //private TankPlayer player2Script;
+        public GameObject[] enemyList;                                           // An array of enemies for the level.
         private List<Vector3> playerSpawnLocations = new List<Vector3>();        // A list of player spawn locations.
         private List<Vector3> enemySpawnLocations = new List<Vector3>();         // A list of enemy spawn locations.
         private string exitTag = "Exit";                                         // String to apply the tag on the exit.
         private string wallTag = "Wall";
         private string blockTag = "Block";
+        private string blockRemovableTag = "BlockRemovable";
         private Transform enemyHolder;                                           // A variable to store a reference to the transform of the enemy object.
-        private Transform projectileHolder;
+        private Transform projectileHolder;                                      // A variable to store a reference to the transform of the projectile holder object.
         private Transform wallHolder;                                            // A variable to store a reference to the transform of the wall holder object.
         private Transform courseHolder;                                          // A variable to store a reference to the transform of the obstacle course object.
         private float wallThickness = 1f;                                        // Thickness of outside walls.
         private float blockThickness = 2.5f;                                     // Thickness of blocks.
         private int m_RoomLength = 50;                                           // Length of each room declared elsewhere also.
-        private float gateHeight = 6f;
+        private float gateHeight = 6f;                                           // Height of each gate.
         private struct obstacleCourse                                            // A struct for an obstacle course.
         {
             public int[,] room;
@@ -55,24 +59,30 @@ namespace Completed
         private List<obstacleCourse> obstacleCourses = new List<obstacleCourse>();// A list of obstacle courses.
         private bool[] m_NEWSWall = new bool[4];                                 // An array of bools to represent if the wall is open.
 
-        private Gate doorScript;
-        private bool battleOver = false;
-        private bool proceedEndingSequence = true;
-        public bool battleBegin = false;
-        private bool proceedBeginningSequence = false;
-        public bool roomCompleted = false;
-        private bool battleEnsuing = false;
-        private bool roomIdle = false;
-        private Transform lightHolder;
-        private Light example;
-        private bool lightsEquiped = false;
-        private Transform[] NEWSRoom;
-        public Transform roomTo;
-        public bool needToTravel = true;
-        public LevelManager levelScript;
-        public int[] roomCoord = new int[2];
-        private bool[] hasTriggeredNEWS = new bool[4];
-        public bool isLastRoom = false;
+        private Gate doorScript;                                                 // Store a reference to the Gate.
+        private bool battleOver = false;                                         // Boolean for if the battle is over.
+        private bool proceedEndingSequence = true;                               // Boolean for if the ending sequence should proceed.
+        public bool battleBegin = false;                                         // Boolean for if the battle needs to begin.
+        private bool proceedBeginningSequence = false;                           // Boolean for if the beginning sequence should proceed.
+        public bool roomCompleted = false;                                       // Boolean for if the room is completed.
+        private bool battleEnsuing = false;                                      // Boolean for if battle is going on.
+        private bool roomIdle = false;                                           // Boolean for if the room is in idle.
+        private Transform lightHolder;                                           // A variable to store a reference to the transform of the light holder object.
+        private Light example;                                                   // Boolean for if the.
+        private bool lightsEquipped = false;                                     // TODO: not used. Boolean for if the the lights are equiped.
+        private Transform[] NEWSRoom;                                            // sdsdsdStore a reference to our TankPlayer of player 1.
+        public Transform roomTo;                                                 // TODO: might not need public. A variable to store a reference to the transform of the next room object.
+        //public bool needToTravel = true;                                         // Boolean for if 
+        public LevelManager levelScript;                                         // Store a reference to the LevelManager which will set up the level.
+        public int[] roomCoord = new int[2];                                     // Array of ints representing this rooms coordinates.
+        private bool[] hasTriggeredNEWS = new bool[4];                           // Array of booleans representing which of hte surrounding rooms are triggered.
+        public bool isLastRoom = false;                                          // Boolean for if this is the last room.
+
+
+        private bool endBattleCalled = true;
+        public GameMaster GM;
+        private int enemyCount = 0;
+        private Object enemyCounterLock = new Object();
 
         // Instantiates the 2D arrays representing the room's obstacle course.
         private void SetObstacleCourses()
@@ -274,107 +284,21 @@ namespace Completed
         }
 
 
-        private void startEndingBattle()
-        {
-            if (proceedEndingSequence)
-            {
-                // Not getting every projectile, might want to kill every projectile during ending sequence
-                player1.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
-                player1.GetComponent<Tank>().TransferProjectiles();
-
-
-                // Disable projectiles.
-                for (int proj = 0; proj < projectileHolder.GetComponentsInChildren<Projectile>().Length; proj++)
-                {
-                    Projectile currentProj = projectileHolder.GetComponentsInChildren<Projectile>()[proj];
-                    currentProj.GetComponent<Projectile>().DisableProjectile();
-                }
-
-                //wait
-
-                proceedEndingSequence = false;
-            }
-                removeDoorsAndObstaclesAndProjectiles();
-        }
-
-        // Helper for the end of a battle.
-        private void removeDoorsAndObstaclesAndProjectiles()
-        {
-            // Lower doors.
-            for (int door = 0; door < m_doors.Length; door++)
-            {
-                if (m_NEWSWall[door])
-                {
-                    doorScript = m_doors[door].GetComponent<Gate>();
-                    if (isLastRoom)
-                    {
-                        doorScript.lowerDoorLastRoom();
-                    }
-                    else if (NEWSRoom[door].GetComponent<RoomManager>().roomCompleted)
-                    {
-                        doorScript.lowerDoorFast();
-                    }
-                    else
-                    {
-                        doorScript.lowerDoorSlow();
-                    }
-
-                    // Also remove the boundaries of neighboring, completed rooms.
-                    if (NEWSRoom[door].GetComponent<RoomManager>().roomCompleted)
-                    {
-                        if (door == 0)
-                        {
-                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[3].GetComponent<Gate>().boundary.enabled = false;
-                        }
-                        if (door == 1)
-                        {
-                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[2].GetComponent<Gate>().boundary.enabled = false;
-                        }
-                        if (door == 2)
-                        {
-                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[1].GetComponent<Gate>().boundary.enabled = false;
-                        }
-                        if (door == 3)
-                        {
-                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[0].GetComponent<Gate>().boundary.enabled = false;
-                        }
-                    }
-                }
-            }
-
-            // Remove obstacles.
-            foreach (Transform block in courseHolder) if (block.CompareTag(blockTag))
-                {
-                    float speed = 40f; //how fast it shakes
-                                     
-                    //TODO: audio                                     
-                    /*if (!audioPlayed)
-                    {
-                    gateAudioSource.Play();
-                    audioPlayed = true;
-                    }
-                    float lowerSpeed = gateHeight / (closeAudio.length + 2.0f);
-                    */
-
-                    if (block.position.y > -20)
-                    {
-                        Vector3 lowering = Vector3.down * speed * Time.deltaTime;
-                        block.Translate(lowering);
-                    }
-                }
-            isDoorLowered = true;
-        }
-        
-        
-        private void startBeginningBattle()
+        public void startBeginningBattle()
         {
             // Place enemy tanks.
             if (!proceedBeginningSequence)
             {
                 StartCoroutine(BeginSetUp());
 
+                StartCoroutine(materializeRoom());
+
                 // Set the camera's battling variable to true;
                 m_camera.GetComponent<CameraControl>().battling = true;
+
+                // Update the GUI.
+                updateGUIMiniMap();
+                GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().movePlayer();
 
                 proceedBeginningSequence = true;
                 battleEnsuing = true;
@@ -382,22 +306,29 @@ namespace Completed
             }
         }
 
-        IEnumerator BeginSetUp()
+
+        private IEnumerator BeginSetUp()
         {
             // Place the unenabled enemies and players.
             //TODO: make the colors of the enemies happen on awake not enable
             PlaceEnemies();
             PlacePlayers();
 
-            // Place the enemy sprite HUD based on the enemies in the room.
-            GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().PlaceEnemies(enemyHolder);
+            if (isLastRoom)
+            {
+                StartCoroutine(endBattleLastRoom());
+            }
+            else
+            {
+                // Place the enemy sprite HUD based on the enemies in the room.
+                GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().PlaceEnemies(enemyHolder);
 
-            GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().PlayCountDown();
-            yield return new WaitForSeconds(4f);
+                GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().PlayCountDown();
+                yield return new WaitForSeconds(4f);
 
-            EnableTanks();
+                EnableTanks();
+            }
         }
-
 
 
         private void PlaceEnemies()
@@ -414,13 +345,18 @@ namespace Completed
 
                 // Disable until battle starts.
                 enemy.GetComponent<Tank>().enabled = false;
+
+                // Set the TankEnemy's parentRoom.
+                enemy.GetComponent<TankEnemy>().parentRoom = this;
+
+                enemyCount++;
             }
         }
 
 
         public void PlacePlayers()
         {
-            //TODO: somehow make sure there are only 2 spawn points
+            //TODO: need player1
             int placePlayerFirst = Random.Range(1, 2);
             for (int location = 0; location < playerSpawnLocations.Count; location++)
             {
@@ -434,12 +370,13 @@ namespace Completed
                     }
                     player1.transform.position = playerSpawnLocations[location];
                     player1.GetComponent<Tank>().SetLeftoverProjectileHolder(player1.GetComponent<Tank>().projectileHolder);
-                    player1.GetComponent<Tank>().body.rotation = Quaternion.LookRotation(Vector3.back);// player1.GetComponent<Tank>().body.forward);
+                    player1.GetComponent<Tank>().body.rotation = Quaternion.LookRotation(Vector3.back);
 
-                    // Disable until battle starts.
-                    player1.GetComponent<TankPlayer>().disabled = true;
-
+                    // Prevent players from moving or shooting until battle starts.
+                    //player1.GetComponent<TankPlayer>().disabled = true;
+                    player1.GetComponent<TankPlayer>().rotateOnly(true);
                     placePlayerFirst = 2;
+
                 }
                 else
                 {
@@ -454,7 +391,7 @@ namespace Completed
                     }*/
                     placePlayerFirst = 1;
                 }
-                
+
             }
         }
 
@@ -466,9 +403,9 @@ namespace Completed
                 enemy.GetComponent<Tank>().enabled = true;
             }
 
-            
-            player1.GetComponent<TankPlayer>().disabled = false;
-            //player2.GetComponent<Tank>().disableMovement = false;
+            // Prevent player tanks from moving or shooting.
+            player1.GetComponent<TankPlayer>().rotateOnly(false);
+            player1.GetComponent<TankPlayer>().disableShoot(false);
         }
 
 
@@ -480,6 +417,7 @@ namespace Completed
 
         private void exitRoomCheck()
         {
+            //TODO: put roomTo here
             // If every gate has been traveled through, there is no need to still check exit room.
             List<Transform> walls = new List<Transform>();
             foreach (Transform wall in wallHolder) if (wall.CompareTag(wallTag))
@@ -636,7 +574,7 @@ namespace Completed
                             + m_room.transform.position,
                             Quaternion.identity) as GameObject;
                         block.transform.SetParent(courseHolder);
-                        //TODO: figure out how to remove the blocks when the level is complete
+                        block.tag = blockRemovableTag;
                     }
                     else if (grid[row, column] == 4)
                     {
@@ -646,7 +584,7 @@ namespace Completed
                             + m_room.transform.position,
                             Quaternion.identity) as GameObject;
                         block.transform.SetParent(courseHolder);
-                        //TODO: figure out how to remove the blocks when the level is complete
+                        block.tag = blockRemovableTag;
                     }
                     else if (grid[row, column] == 5)
                     {
@@ -661,7 +599,7 @@ namespace Completed
                 }
             }
         }
-        
+
         // Give the object that levels texture and randomize the offset and scale.
         private void Texturize(GameObject objectToChange, string objectType)
         {
@@ -700,10 +638,13 @@ namespace Completed
         {
             //TODO: make it based on level
         }
-        
+
         // Sets up room by taking in the transform of the room, the level, block and floor materials, and NEWSWall.
-        public void SetUpRoom(Transform room, int level, Material[] blockM, Material[] floorM, bool[] NEWSWall)
+        public void SetUpRoom(Transform room, int level, Material[] blockM, Material[] floorM, bool[] NEWSWall, GameMaster gM)
         {
+            // Some general stuff like reference to player and doors.
+            callStart();
+
             // Get a reference to the transform of the room.
             m_room = room;
 
@@ -717,6 +658,9 @@ namespace Completed
             // Take the array of bools
             m_NEWSWall = NEWSWall;
 
+            // Set GM.
+            GM = gM;
+
             // Load in the GameObjects.
             blockTall = Resources.Load("Blocks/BlockTall") as GameObject;
             blockShort = Resources.Load("Blocks/BlockShort") as GameObject;
@@ -725,7 +669,7 @@ namespace Completed
             wallClosed = Resources.Load("WallClosed") as GameObject;
 
             // Fill enemyList.
-            enemyList = Resources.LoadAll<GameObject>("TankEnemy");
+            enemyList = Resources.LoadAll<GameObject>("TankResources/TankEnemy");
 
             // Create enemyHolder for this room.
             enemyHolder = new GameObject("EnemyHolder").transform;
@@ -909,7 +853,7 @@ namespace Completed
                 placeSouthWall.tag = wallTag;
             }
         }
-        
+
         // Creates an obstacle course after the room is set up.
         public void CreateObstacleCourse()
         {
@@ -931,10 +875,10 @@ namespace Completed
         public void CreateStartingRoomWithInstructions()
         {
             //TODO: add the instructions
-            GameObject instructionCourse = new GameObject();
-            instructionCourse.transform.position = 
-                new Vector3(m_RoomLength / 2 + m_room.position.x, 0, m_RoomLength / 2 + m_room.position.z);
-            instructionCourse.transform.SetParent(courseHolder);
+            //GameObject instructionCourse = new GameObject();
+            //instructionCourse.transform.position = 
+            //new Vector3(m_RoomLength / 2 + m_room.position.x, 0, m_RoomLength / 2 + m_room.position.z);
+            //instructionCourse.transform.SetParent(courseHolder);
             playerSpawnLocations.Add(new Vector3(25f, 0, 25f) + m_room.transform.position);
             enemySpawnLocations.Add(new Vector3(10f, 0f, 10f) + m_room.transform.position);
         }
@@ -967,7 +911,18 @@ namespace Completed
             battleOver = true;
             battleEnsuing = false;
             StartCoroutine(FlickerLights());
-            lightsEquiped = true;
+            lightsEquipped = true;
+
+            // Prevent players from shooting momentarily. Wait 1 second.
+            player1.GetComponent<TankPlayer>().disableShoot(true);
+            StartCoroutine(wait(1));
+            player1.GetComponent<TankPlayer>().disableShoot(true);
+        }
+
+        // Helper function for endBattle.
+        IEnumerator wait(int t)
+        {
+            yield return new WaitForSeconds(t);
         }
 
 
@@ -990,13 +945,76 @@ namespace Completed
             {
                 lightHolder.GetComponentsInChildren<Light>()[i].enabled = true;
             }
+
+            lightsEquipped = true;
         }
-        
+
+
+        public void disappearRoom()
+        {
+            //TODO: try with just enabling and disabling, figure out materials that have transparancy and opacity later
+            //TODO: put this into making the levels rather than a whole new function
+            if (isLastRoom)
+            {
+                for (int i = 0; i < courseHolder.GetComponentsInChildren<MeshRenderer>().Length; i++)
+                {
+                    courseHolder.GetComponentsInChildren<MeshRenderer>()[i].enabled = false;
+                }
+            }
+            else
+            {
+                foreach (Transform child in courseHolder) if (child.GetComponent<Renderer>())
+                    {
+                        //TODO: get materialze to vary opacity
+                        child.GetComponent<Renderer>().enabled = false;
+                    }
+            }
+
+            for (int i = 0; i < wallHolder.GetComponentsInChildren<MeshRenderer>().Length; i++)
+            {
+                wallHolder.GetComponentsInChildren<MeshRenderer>()[i].enabled = false;
+            }
+
+            floor.GetComponent<MeshRenderer>().enabled = false;
+        }
+
+
+        private IEnumerator materializeRoom()
+        {
+            //TODO: make more interesting, maybe have it rise from the ground or materialize based on level
+            if (isLastRoom)
+            {
+                for (int i = 0; i < courseHolder.GetComponentsInChildren<MeshRenderer>().Length; i++)
+                {
+                    courseHolder.GetComponentsInChildren<MeshRenderer>()[i].enabled = true;
+                }
+            }
+            else
+            {
+                foreach (Transform child in courseHolder) if (child.GetComponent<Renderer>())
+                    {
+                        //TODO: get materialze to vary opacity
+                        child.GetComponent<Renderer>().enabled = true;
+                    }
+            }
+
+            for (int i = 0; i < wallHolder.GetComponentsInChildren<MeshRenderer>().Length; i++)
+            {
+                wallHolder.GetComponentsInChildren<MeshRenderer>()[i].enabled = true;
+            }
+
+            floor.GetComponent<MeshRenderer>().enabled = true;
+
+            //This is here to keep function an enumerator, eventually will make things materialize slowly
+            yield return new WaitForSeconds(.1f);
+        }
+
 
         public void PassNEWSRooms(Transform[] NEWS)
         {
             NEWSRoom = NEWS;
         }
+
 
         public void GetNEWSRooms()
         {
@@ -1004,17 +1022,135 @@ namespace Completed
             NEWSRoom = levelScript.SendNEWS(m_room);
         }
 
+
+        private void startEndingBattle()
+        {
+            if (proceedEndingSequence)
+            {
+                removeProjectiles();
+
+                //wait
+                //TODO: pause, shake screen, individually blow up every projectile
+                StartCoroutine("EndingEffects");
+
+                proceedEndingSequence = false;
+            }
+            removeDoors();
+            removeObstacles();
+        }
+        
+
+        // Helpers for the end of a battle.
+        private void removeDoors()
+        {
+            for (int door = 0; door < m_doors.Length; door++)
+            {
+                if (m_NEWSWall[door])
+                {
+                    doorScript = m_doors[door].GetComponent<Gate>();
+                    if (isLastRoom)
+                    {
+                        doorScript.lowerDoorLastRoom();
+                    }
+                    else if (NEWSRoom[door].GetComponent<RoomManager>().roomCompleted)
+                    {
+                        doorScript.lowerDoorFast();
+                    }
+                    else
+                    {
+                        doorScript.lowerDoorSlow();
+                    }
+
+                    // Also remove the boundaries of neighboring, completed rooms.
+                    if (NEWSRoom[door].GetComponent<RoomManager>().roomCompleted)
+                    {
+                        if (door == 0)
+                        {
+                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[3].GetComponent<Gate>().boundary.enabled = false;
+                        }
+                        if (door == 1)
+                        {
+                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[2].GetComponent<Gate>().boundary.enabled = false;
+                        }
+                        if (door == 2)
+                        {
+                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[1].GetComponent<Gate>().boundary.enabled = false;
+                        }
+                        if (door == 3)
+                        {
+                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[0].GetComponent<Gate>().boundary.enabled = false;
+                        }
+                    }
+                }
+            }
+        }
+        private void removeObstacles()
+        {
+            // Remove obstacles.
+            foreach (Transform block in courseHolder) if (block.CompareTag(blockRemovableTag))
+                {
+                    float speed = 40f; //how fast it shakes
+
+                    //TODO: audio                                     
+                    /*if (!audioPlayed)
+                    {
+                    gateAudioSource.Play();
+                    audioPlayed = true;
+                    }
+                    float lowerSpeed = gateHeight / (closeAudio.length + 2.0f);
+                    */
+
+                    if (block.position.y > -20)
+                    {
+                        Vector3 lowering = Vector3.down * speed * Time.deltaTime;
+                        block.Translate(lowering);
+                    }
+                }
+        }
+
+        private void removeProjectiles()
+        {
+
+            // Not getting every projectile, might want to kill every projectile during ending sequence.
+            if (player1Script.alive)
+            {
+                //TODO: set player1Script perhaps in start().
+                player1.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
+                player1.GetComponent<Tank>().TransferProjectiles();
+            }
+
+
+            // Disable projectiles.
+            int length = projectileHolder.GetComponentsInChildren<Projectile>().Length;
+            for (int proj = 0; proj < length; proj++)
+            {
+                Projectile currentProj = projectileHolder.GetComponentsInChildren<Projectile>()[proj];
+                currentProj.GetComponent<Projectile>().DisableProjectile();
+            }
+
+            isDoorLowered = true;
+        }
+
+
+        private void updateGUIMiniMap()
+        {
+            GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().visitedRoom(coordinate);
+        }
+
+        /*
         void Update()
         {
             if (battleBegin)
             {
                 startBeginningBattle();
             }
+            
             else if (battleOver)
             {
-                startEndingBattle();
-                roomIdle = true;
-                
+
+                //startEndingBattle();
+                //roomIdle = true;
+
             }
             else if (battleEnsuing)
             {
@@ -1028,18 +1164,203 @@ namespace Completed
             {
                 exitRoomCheck();
             }
-        }
+        }*/
 
 
-        void Start()
+        // Helper function for setUpRoom().
+        private void callStart()
         {
             player1 = GameObject.FindGameObjectWithTag("Player");
+            player1Script = player1.GetComponent<TankPlayer>();
 
-            for(int wall = 0; wall < hasTriggeredNEWS.Length; wall++)
+            for (int wall = 0; wall < hasTriggeredNEWS.Length; wall++)
             {
                 hasTriggeredNEWS[wall] = false;
             }
         }
+
+        // Called by TankEnemy. This starts endBattleCorrected().
+        public void enemyDecrement()
+        {
+            lock(enemyCounterLock)
+            {
+                enemyCount--;
+
+                if (enemyCount == 0)
+                {
+                    StartCoroutine(endBattleCorrected());
+                }
+            }
+        }
+
+        // replacement for startBeginningBattle
+        // the problem is player1's projectileHolder isn't set up yet
+        public void startBeginningBattleCorrected()
+        {
+            if (!roomCompleted & !battleEnsuing)
+            {
+                StartCoroutine(BeginSetUp());
+                StartCoroutine(materializeRoom());
+
+                // Set the camera's battling variable to true;
+                m_camera.GetComponent<CameraControl>().battling = true;
+
+                // Update the GUI.
+                updateGUIMiniMap();
+                GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().movePlayer();
+                
+                battleEnsuing = true;
+            }
+        }
+        
+        //TODO: how to properly run RoomManager
+        // call startBeginningBattle() [rename to startBattle]
+        // have a function enemyDead(this) called by enemyTanks
+        // in function if enemyCount == 0, call endBattle
+        // endbattle should be one function with coroutines
+
+        private IEnumerator endBattleLastRoom()
+        {
+            removeDoorsCorrected();
+            //TODO: should play ending audio (special audio for last room)
+
+            // Wait for camera to stop shaking.
+            yield return m_camera.GetComponent<CameraControl>().shakeCamera();
+            // Set the camera's battling variable to false;
+            m_camera.GetComponent<CameraControl>().battling = false;
+
+            //TODO: make roomIdle obsolete
+            roomIdle = true;
+            roomCompleted = true;
+        }
+
+        // Function called when enemyCount == 0.
+        private IEnumerator endBattleCorrected()
+        {
+            // Disable shooting for player1.
+            player1.GetComponent<TankPlayer>().disableShoot(true);
+
+            // Remove projectiles from the player and put them into their animation.
+            removeProjectiles();
+
+            // Ending coroutines.
+            removeDoorsCorrected();
+            StartCoroutine(removeObstaclesCorrected());
+            StartCoroutine(FlickerLights());
+            //TODO: should play ending audio
+            
+            // Wait for camera to stop shaking.
+            yield return m_camera.GetComponent<CameraControl>().shakeCamera();
+            // Set the camera's battling variable to false;
+            m_camera.GetComponent<CameraControl>().battling = false;
+            
+            // Undisable shooting.
+            player1.GetComponent<TankPlayer>().disableShoot(false);
+
+            //TODO: make roomIdle obsolete
+            roomIdle = true;
+            roomCompleted = true;
+
+            /* startEndingBattle()
+
+            if (proceedEndingSequence)
+            {
+                removeProjectiles();
+
+                //wait
+                //TODO: pause, shake screen, individually blow up every projectile
+                StartCoroutine("EndingEffects");
+
+                proceedEndingSequence = false;
+            }
+            removeDoors();
+            removeObstacles();
+            */
+
+            /* endBattle
+
+            // Set the camera's battling variable to true;
+            m_camera.GetComponent<CameraControl>().battling = false;
+
+            roomIdle = true;
+            roomCompleted = true;
+            battleOver = true;
+            battleEnsuing = false;
+            StartCoroutine(FlickerLights());
+            lightsEquipped = true;*/
+        }
+
+        // Helpers for the end of a battle.
+        //TODO: make lowerDoorFast() and lowerDoorLastRoom() a coroutine
+        private void removeDoorsCorrected()
+        {
+            for (int door = 0; door < m_doors.Length; door++)
+            {
+                if (m_NEWSWall[door])
+                {
+                    doorScript = m_doors[door].GetComponent<Gate>();
+                    if (isLastRoom)
+                    {
+                        doorScript.lowerDoorLastRoom();
+                    }
+                    else if (NEWSRoom[door].GetComponent<RoomManager>().roomCompleted)
+                    {
+                        StartCoroutine(doorScript.lowerDoorFastCorrected());
+                    }
+                    else
+                    {
+                        StartCoroutine(doorScript.lowerDoorSlowCorrected());
+                    }
+
+                    // Also remove the boundaries of neighboring, completed rooms.
+                    if (NEWSRoom[door].GetComponent<RoomManager>().roomCompleted)
+                    {
+                        if (door == 0)
+                        {
+                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[3].GetComponent<Gate>().boundary.enabled = false;
+                        }
+                        if (door == 1)
+                        {
+                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[2].GetComponent<Gate>().boundary.enabled = false;
+                        }
+                        if (door == 2)
+                        {
+                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[1].GetComponent<Gate>().boundary.enabled = false;
+                        }
+                        if (door == 3)
+                        {
+                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[0].GetComponent<Gate>().boundary.enabled = false;
+                        }
+                    }
+                }
+            }
+        }
+        private IEnumerator removeObstaclesCorrected()
+        {
+            Transform temp = new GameObject().transform;
+            float speed = 40f;
+
+            // Remove obstacles.
+            foreach (Transform block in courseHolder) if (block.CompareTag(blockRemovableTag))
+                {
+                    block.SetParent(temp);
+                    //TODO: audio                                     
+                    /*if (!audioPlayed)
+                    {
+                    gateAudioSource.Play();
+                    audioPlayed = true;
+                    }
+                    float lowerSpeed = gateHeight / (closeAudio.length + 2.0f);
+                    */
+                }
+
+            while (temp.position.y > -20)
+            {
+                Vector3 lowering = Vector3.down * speed * Time.deltaTime;
+                temp.Translate(lowering);
+                yield return new WaitForSeconds(.01f);
+            }
+        }
+
     }
 }
- 

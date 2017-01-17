@@ -37,15 +37,15 @@ namespace Completed
         public GameObject blockTall;                                             // The GameObject of the tall block.
         public GameObject blockShort;                                            // Store a reference to our RoomManager which will set up the room.
         public RoomManager m_roomScript;                                         // The GameObject of the exit.
-        public GameMaster GameScript;
-        public bool coop = false;
-        public GameObject m_camera;
+        public GameMaster GameScript;                                            // Reference to the parent tank game object.
+        public bool coop = false;                                                // Reference to the parent tank game object.
+        public GameObject m_camera;                                              // Reference to the parent tank game object.
 
-        private bool[,] floorChart = new bool[11, 11];                     // An array of arrays of bools if a room is enabled.
-        private Transform[,] roomGrid = new Transform[11, 11];
+        public bool[,] floorChart = new bool[11, 11];                            // An array of arrays of bools if a room is enabled.
+        private Transform[,] roomGrid = new Transform[11, 11];                   // An array of arrays of transforms for each room.
         private int Level;                                                       // Current level number.
-        private Vector2 firstRoomCoordinate;
-        private Vector2 lastRoomCoordinate;                                      // A Vector2 for the last room.
+        public Vector2 firstRoomCoordinate;                                      // A Vector2 for the first room.
+        public Vector2 lastRoomCoordinate;                                       // A Vector2 for the last room.
         private Transform roomHolder;                                            // A variable to store a reference to the transform of the Room object.
         private Transform obstacleHolder;                                        // A variable to store a reference to the transform of the Obstacle object.
         private List<float> textureDistributions = new List<float>();            // A list of likelihoods for each obstacle to show up depending on the level.
@@ -58,23 +58,31 @@ namespace Completed
         private string playerSpawnTag = "PlayerSpawn";                           // String to apply the tag on player spawns.
         private string enemySpawnTag = "EnemySpawn";                             // String to apply the tag on enemy spawns.
         private string exitTag = "Exit";                                         // String to apply the tag on the exit.
-
-        private Transform currentRoom;
-        private GameObject player1;
+        private Transform currentRoom;                                           // The transform for the current room.
+        private GameObject player1;                                              // Reference to the player 1 game object.
         //private GameObject player2;
         //private Vector3 player2Position;
-        private bool needToStartRoom = true;
-        public GUI_Pause pause;
+        private bool needToStartRoom = true;                                     // Boolean of whether the first room needs to start. TODO: should be obsolete
+
+        public GameMaster GM;
+
+
+        // GUI stuff
+        public GUI_Pause pause;                                                  // Reference to the GUI for pausing the game.
+        public List<Vector2> roomsVisited;
+        public List<Vector2> roomsUnvisited;
+        //firstRoomCoordinate;
+        //lastRoomCoordinate;
 
 
         // Helper function to print out room grid and see what it looks like.
         private void PrintRoomGrid()
         {
-            for (int column = 0; column < roomGrid.GetLength(1); column++)
+            for (int row = 0; row < roomGrid.GetLength(0); row++)
             {
                 // create a string of x's and o's to represent enabled and unenabled rooms
                 string printThis = "";
-                for (int row = 0; row < roomGrid.GetLength(0); row++)
+                for (int column = 0; column < roomGrid.GetLength(1); column++)
                 {
                     if (roomGrid[row, column] != null)
                     {
@@ -90,7 +98,7 @@ namespace Completed
         }
 
 
-        private void FindOccupiedRoom()
+        public void FindOccupiedRoom()
         {
             // Do some math and get the room coordinate player1 is in.
             int stepLength = m_RoomLength + 2 * (int)wallThickness;
@@ -170,21 +178,13 @@ namespace Completed
         private void InitializeList()
         {
             // Set floorChart to all false and roomGrid to null.
-            for (int column = 0; column < floorChart.GetLength(1); column++)
+            for (int row = 0; row < floorChart.GetLength(0); row++)
             {
-                for (int row = 0; row < floorChart.GetLength(0); row++)
+                for (int column = 0; column < floorChart.GetLength(1); column++)
                 {
                     floorChart[row, column] = false;
                 }
-            }
-
-            for (int column = 0; column < roomGrid.GetLength(1); column++)
-            {
-                for (int row = 0; row < roomGrid.GetLength(0); row++)
-                {
-                    //roomGrid[row, column] = Transform.;
-                }
-            }
+            }            
         }
 
         // Enable some rooms in the floorChart based on the level.
@@ -196,11 +196,13 @@ namespace Completed
             {
                 numberOfRooms = floorChart.GetLength(0) * floorChart.GetLength(1);
             }
-            numberOfRooms = 15;
+            numberOfRooms = 4;
+            numberOfRooms = 100;
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));
             floorChart[(int)firstRoomCoordinate.x, (int)firstRoomCoordinate.y] = true;
+
 
             // Go through all but the last room and instantiate them.
             for (int rooms = 1; rooms < numberOfRooms; rooms++)
@@ -260,11 +262,11 @@ namespace Completed
         // Helper function to print out floor chart and see what it looks like.
         private void PrintFloorChart()
         {
-            for (int column = 0; column < floorChart.GetLength(1); column++)
+            for (int row = 0; row < floorChart.GetLength(0); row++)
             {
                 // create a string of x's and o's to represent enabled and unenabled rooms
                 string printThis = "";
-                for (int row = 0; row < floorChart.GetLength(0); row++)
+                for (int column = 0; column < floorChart.GetLength(1); column++)
                 {
                     if (floorChart[row, column])
                     {
@@ -284,10 +286,11 @@ namespace Completed
         {
             // Set up the floor chart.
             InstantiateFloorChart(level);
+
             // Iterate through the floorChart and place rooms when enabled.
-            for (int column = 0; column < floorChart.GetLength(1); column++)
+            for (int row = 0; row < floorChart.GetLength(0); row++)
             {
-                for (int row = 0; row < floorChart.GetLength(0); row++)
+                for (int column = 0; column < floorChart.GetLength(1); column++)
                 {
                     if (floorChart[row, column])
                     {
@@ -300,47 +303,56 @@ namespace Completed
 
                         // Add the script to roomHolder.
                         roomHolder.gameObject.AddComponent<RoomManager>();
-                        
+
+                        // Set the coordinate.
+                        roomHolder.gameObject.GetComponent<RoomManager>().coordinate = new Vector2(row, column);
+
                         // If this is the starting room and level 1, TODO: place the instructions as the obstacle course.
                         if (new Vector2(row, column) == firstRoomCoordinate && level == 1)
                         {
                             // Call the RoomManager function for a room with instructions and instantiate respective variables.
                             roomHolder.GetComponent<RoomManager>().SetUpRoom
-                                (roomHolder, Level, blockMaterials, floorMaterials, NEWSWall(row, column));
+                                (roomHolder, Level, blockMaterials, floorMaterials, NEWSWall(row, column), GM);
                             roomHolder.GetComponent<RoomManager>().CreateStartingRoomWithInstructions();
                             roomHolder.GetComponent<RoomManager>().levelScript = this;
                             roomHolder.GetComponent<RoomManager>().m_camera = m_camera;
-    }
+                        }
                         // If this is the starting room, place nothing.
                         //TODO: could be vector2
                         else if (new Vector2(row, column) == firstRoomCoordinate)
                         {
                             // Call the RoomManager function for an empty room and instantiate respective variables.
                             roomHolder.GetComponent<RoomManager>().SetUpRoom
-                                (roomHolder, Level, blockMaterials, floorMaterials, NEWSWall(row, column));
+                                (roomHolder, Level, blockMaterials, floorMaterials, NEWSWall(row, column), GM);
                             roomHolder.GetComponent<RoomManager>().CreateStartingRoom();
                             roomHolder.GetComponent<RoomManager>().levelScript = this;
                             roomHolder.GetComponent<RoomManager>().m_camera = m_camera;
+
                         }
                         // If this is the last room, place the exit. Otherwise place an obstacle course.
                         else if (new Vector2(row, column) == lastRoomCoordinate)
                         {
                             // Call the RoomManager function for the last room with an exit and instantiate respective variables.
                             roomHolder.GetComponent<RoomManager>().SetUpRoom
-                                (roomHolder, Level, blockMaterials, floorMaterials, NEWSWall(row, column));
+                                (roomHolder, Level, blockMaterials, floorMaterials, NEWSWall(row, column), GM);
                             roomHolder.GetComponent<RoomManager>().CreateLastRoom();
                             roomHolder.GetComponent<RoomManager>().levelScript = this;
                             roomHolder.GetComponent<RoomManager>().m_camera = m_camera;
                             roomHolder.GetComponent<RoomManager>().isLastRoom = true;
+
+                            roomHolder.GetComponent<RoomManager>().disappearRoom();
                         }
                         else
                         {
                             // Call the RoomManager function for a room with an obstacle course.
                             roomHolder.GetComponent<RoomManager>().SetUpRoom
-                                (roomHolder, Level, blockMaterials, floorMaterials, NEWSWall(row, column));
+                                (roomHolder, Level, blockMaterials, floorMaterials, NEWSWall(row, column), GM);
                             roomHolder.GetComponent<RoomManager>().CreateObstacleCourse();
                             roomHolder.GetComponent<RoomManager>().levelScript = this;
                             roomHolder.GetComponent<RoomManager>().m_camera = m_camera;
+                            
+                            roomHolder.GetComponent<RoomManager>().disappearRoom();
+
                         }
                         // Give each room the roomCoord.
                         int[] toSend = new int[2];
@@ -352,9 +364,9 @@ namespace Completed
             }
 
             // Now pass NEWSRoom to each room.
-            for (int column = 0; column < floorChart.GetLength(1); column++)
+            for (int row = 0; row < floorChart.GetLength(0); row++)
             {
-                for (int row = 0; row < floorChart.GetLength(0); row++)
+                for (int column = 0; column < floorChart.GetLength(1); column++)
                 {
                     if (floorChart[row, column])
                     {
@@ -436,9 +448,29 @@ namespace Completed
 
             // Sets up each room dependent on floorChart.
             SetUpFloor(level);
-
+            
 
             pause.enabled = true;
+
+
+
+
+
+
+
+
+            // Equate this to the special floorChart for the GUI minimap
+            // Initiate GUI.
+            GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().beginMap(floorChart, lastRoomCoordinate, firstRoomCoordinate);
+
+            // Start the first room with the camera on it.
+            Transform firstRoom = roomGrid[(int)firstRoomCoordinate.x, (int)firstRoomCoordinate.y];
+            //Debug.Log(firstRoomCoordinate);
+            //startRoom(firstRoom);
+            m_camera.GetComponent<CameraControl>().PlaceOnFirstRoom(firstRoomCoordinate);
+
+            //temp
+            firstRoom.GetComponent<RoomManager>().startBeginningBattleCorrected();
         }
 
         public void startRoom(Transform room)
@@ -451,8 +483,6 @@ namespace Completed
             else
             {
                 RoomScript.battleBegin = true;
-                //This happens too late vvv
-                //RoomScript.PassNEWSRooms(FindCurrentNEWS());
             }
 
         }
@@ -463,19 +493,6 @@ namespace Completed
             //player1Script = player1.GetComponent<TankPlayer>();
 
 
-        }
-
-        void Update()
-        {
-            if (needToStartRoom)
-            {
-                // Start the first room with the camera on it.
-                Transform firstRoom = roomGrid[(int)firstRoomCoordinate.x, (int)firstRoomCoordinate.y];
-                startRoom(firstRoom);
-                m_camera.GetComponent<CameraControl>().PlaceOnFirstRoom(firstRoom);
-
-                needToStartRoom = false;
-            }
         }
     }
 }
