@@ -7,6 +7,7 @@ namespace Completed
 {
     public class GUI_Menu : MonoBehaviour
     {
+        //TODO: can't press before lowered
 
         public GameMaster GM;
         public Transform panel;                                    //
@@ -49,6 +50,10 @@ namespace Completed
         private float finalHorPos = 100;
         private float finalVertPos = 470;
 
+        //TODO: when one is called stop the other coroutine rather than wait until the other is done
+        private Coroutine raise;
+        private Coroutine lower;
+
 
         // Use this for initialization
         public void initialDisplay()
@@ -62,6 +67,7 @@ namespace Completed
         {
             yield return displayLogo();
             displayMenu();
+            yield return fadeFromBlack();
         }
 
         // Displays the logo.
@@ -71,7 +77,25 @@ namespace Completed
             panelLogo.gameObject.SetActive(true);
             yield return new WaitForSeconds(1f);
             //TODO: yield return playLogoAudio();
-            
+
+            // Fade from black.
+            yield return fadeLogoFromBlack();
+
+            // Hold the logo and play audio.
+            yield return new WaitForSeconds(1f);
+            //TODO: audio, maybe the logo pronounced wrong
+
+            // Fade to black.
+            yield return fadeLogoToBlack();
+
+            // Hold black background then set inactive.
+            yield return new WaitForSeconds(1f);
+            panelLogo.gameObject.SetActive(false);
+        }
+
+        // Fade the logo from black.
+        private IEnumerator fadeLogoFromBlack()
+        {
             // Increment alpha until visible.
             float alpha = 0;
             float increment = .03f;
@@ -84,39 +108,75 @@ namespace Completed
             }
             alpha = 1;
             imageAlpha.color = new Color(1, 1, 1, alpha);
+        }
 
-            // Hold the logo and play audio.
-            yield return new WaitForSeconds(1f);
-            //TODO: audio, maybe the logo pronounced wrong
-
+        // Fade the logo to black.
+        private IEnumerator fadeLogoToBlack()
+        {
             // Decrement the alpha until invisible.
-            increment = .08f;
+            float alpha = 1;
+            float increment = .08f;
+            Image imageAlpha = logo;
             while (alpha > 0)
             {
                 alpha -= increment;
                 imageAlpha.color = new Color(1, 1, 1, alpha);
                 yield return new WaitForSeconds(.01f);
             }
-
-            // Hold black background then set inactive.
-            yield return new WaitForSeconds(1f);
-            panelLogo.gameObject.SetActive(false);
         }
+
+        // Fade panel from black.
+        private IEnumerator fadeToBlack()
+        {
+            // Increment alpha until visible.
+            float alpha = 0;
+            float increment = .03f;
+            Image imageAlpha = panel.GetComponent<Image>();
+            imageAlpha.color = Color.black;
+            while (alpha < 1)
+            {
+                alpha += increment;
+                imageAlpha.color = new Color(0, 0, 0, alpha);
+                yield return new WaitForSeconds(.01f);
+            }
+            alpha = 1;
+            imageAlpha.color = new Color(0, 0, 0, alpha);
+        }
+
+        // Fade panel to black.
+        private IEnumerator fadeFromBlack()
+        {
+            // Decrement the alpha until invisible.
+            float alpha = 1;
+            float increment = .08f;
+            Image imageAlpha = panel.GetComponent<Image>();
+            while (alpha > 0)
+            {
+                alpha -= increment;
+                imageAlpha.color = new Color(0, 0, 0, alpha);
+                yield return new WaitForSeconds(.01f);
+            }
+            alpha = 0;
+            imageAlpha.color = new Color(0, 0, 0, alpha);
+        }
+
 
         // Displays the menu.
         private void displayMenu()
         {
-            // Set the panel active.
+            // Set the panel active and start as black.
+            panel.GetComponent<Image>().color = Color.black;
             panel.gameObject.SetActive(true);
 
             // Initialize holders and et cetra.
             initializeHoldersEtc();
 
-            // Select Solo.
+            // Select Solo and begin display.
             solo.Select();
             menu.GetComponent<Menu>().beginDisplay();
-            
-            //yield return new WaitForSeconds(.01f);
+
+            //TOOD: fade from black
+
         }
 
         // Initialize holders and et cetra before anything else.
@@ -260,26 +320,14 @@ namespace Completed
         // Called by when this camera isn't necessary.
         private void startGame()
         {
-            panel.GetComponent<Image>().color = new Color(0, 0, 0, 0);
             StartCoroutine(startGameCoroutine());
         }
 
         // Helper for disableCamera.
         private IEnumerator startGameCoroutine()
         {
-            // Increment alpha until black.
-            float alpha = 0;
-            float increment = .01f;
-            Image imageAlpha = panel.GetComponent<Image>();
-            while (alpha < 1)
-            {
-                alpha += increment;
-                imageAlpha.color = new Color(0, 0, 0, alpha);
-                yield return new WaitForSeconds(.01f);
-            }
-
-            // Reset the alpha value of the panel back to 0.
-            panel.GetComponent<Image>().color = new Color(0, 0, 0, 0);
+            // Fade to black.
+            yield return fadeToBlack();
             
             // Call the GameMaster function to start a game.
             GM.CreateSoloGame();

@@ -91,22 +91,13 @@ namespace Completed
         }
 
         public void PlaceOnFirstRoom(Vector2 firstRoomCoord)//Transform room)
-        {/*
-            Vector3 aboveRoom = new Vector3(Mathf.Floor((room.position.x + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2,
-                0,
-                Mathf.Floor((room.transform.position.z + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2);*/
-
-            /*Vector3 aboveRoom = new Vector3(firstRoomCoord.x * stepLength + stepLength / 2 - 1,
-                0,
-                firstRoomCoord.y * stepLength + stepLength / 2 - 1);*/
-
-            float x = firstRoomCoord.x * (m_RoomLength + 2 * m_WallThickness);
-            float z = firstRoomCoord.y * (m_RoomLength + 2 * m_WallThickness);
-            Vector3 aboveRoom = new Vector3(Mathf.Floor((x + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2,
-                0,
-                Mathf.Floor((z + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2);
+        {
+            //TODO: place player first
+            m_target = new Vector3(Mathf.Floor((m_Tank.transform.position.x + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2,
+            0,
+            Mathf.Floor((m_Tank.transform.position.z + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2);
             
-            transform.position = aboveRoom + battleOffset;
+            transform.position = m_target + patrolOffset;
         }
 
         public IEnumerator shakeCamera()

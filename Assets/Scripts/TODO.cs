@@ -42,6 +42,7 @@ flashing red UI image over entire canvas when player dies/loses
 
 idea:
     minigame: pushbattle where bullets don't kill they just push
+    : players get hit and a hole is placed where the player got hit so that the player would fall through
     
 
 

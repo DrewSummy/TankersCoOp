@@ -107,7 +107,7 @@ namespace Completed
 
             //TODO: the same for player 2
 
-            int nonEmptyProj = P1ProjectileCount;// P1ProjectileMax - P1ProjectileCount;
+            int nonEmptyProj = P1ProjectileCount;
 
             for (int bullet = 0; bullet < P1ProjectileMax; bullet++)
             {

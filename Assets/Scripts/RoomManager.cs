@@ -1086,9 +1086,11 @@ namespace Completed
         }
         private void removeObstacles()
         {
+            Debug.Log("remove");
             // Remove obstacles.
             foreach (Transform block in courseHolder) if (block.CompareTag(blockRemovableTag))
                 {
+                    Debug.Log(block.name);
                     float speed = 40f; //how fast it shakes
 
                     //TODO: audio                                     
@@ -1136,36 +1138,7 @@ namespace Completed
         {
             GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().visitedRoom(coordinate);
         }
-
-        /*
-        void Update()
-        {
-            if (battleBegin)
-            {
-                startBeginningBattle();
-            }
-            
-            else if (battleOver)
-            {
-
-                //startEndingBattle();
-                //roomIdle = true;
-
-            }
-            else if (battleEnsuing)
-            {
-                if (enemyHolder.childCount == 0)
-                {
-                    endBattle();
-                }
-            }
-
-            if (roomIdle)
-            {
-                exitRoomCheck();
-            }
-        }*/
-
+        
 
         // Helper function for setUpRoom().
         private void callStart()
@@ -1337,12 +1310,16 @@ namespace Completed
         }
         private IEnumerator removeObstaclesCorrected()
         {
+            Debug.Log("remo");
             Transform temp = new GameObject().transform;
             float speed = 40f;
 
             // Remove obstacles.
             foreach (Transform block in courseHolder) if (block.CompareTag(blockRemovableTag))
                 {
+                    ///////////////////////////////////
+                    //TODO: this isn't removing every block.
+                    Debug.Log(block.name);
                     block.SetParent(temp);
                     //TODO: audio                                     
                     /*if (!audioPlayed)

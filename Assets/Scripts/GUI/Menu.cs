@@ -20,7 +20,7 @@ public class Menu : MonoBehaviour {
     private float containerSpeedFast = 12f;
     private float containerSpeedSlow = 4f;
     private bool idle = false;
-    private float idleRadius = .085f;
+    private float idleRadius = .5f;
     public bool containerMoving = false;                    // Used to make sure that inputs are not taken while the container is unavailable.
 
     //TODO: add clicking audio when raising container
@@ -246,23 +246,21 @@ public class Menu : MonoBehaviour {
     public IEnumerator lowerContainer()
     {
         idle = false;
+        containerMoving = true;
         while (menu.transform.position.y > conHeight3)
         {
-            Debug.Log("moving");
             menu.GetComponent<Rigidbody>().velocity = containerSpeedFast * Vector3.down;
             //menu.GetComponent<Rigidbody>().AddForce(Vector3.down * 350);
             yield return new WaitForSeconds(.01f);
         }
         while (menu.transform.position.y > conHeight2)
         {
-            Debug.Log("moving");
             menu.GetComponent<Rigidbody>().velocity = containerSpeedSlow * Vector3.down;
             //menu.GetComponent<Rigidbody>().AddForce(Vector3.up * 100);
             yield return new WaitForSeconds(.01f);
         }
         menu.GetComponent<Rigidbody>().velocity = Vector3.zero;
         idle = true;
-        Debug.Log("done");
         // Reset containerMoving to false so that it can move again.
         containerMoving = false;
     }
@@ -275,11 +273,16 @@ public class Menu : MonoBehaviour {
         menu.GetComponent<Rigidbody>().velocity = Vector3.zero;
         yield return new WaitForSeconds(.01f);
 
-        float time = 0;
+        float time = Mathf.PI / 4;
         while (idle)
         {
-            menu.GetComponent<Rigidbody>().position = idleRadius * Mathf.Sin(2 * time) * Vector3.up + Vector3.up * conHeight2;
+            menu.GetComponent<Rigidbody>().position = idleRadius * Mathf.Cos(2 * time) * Vector3.up + Vector3.up * conHeight2;
             time += .01f;
+            if (time >= Mathf.PI)
+            {
+                yield return new WaitForSeconds(.5f);
+                time = 0;
+            }
 
             yield return new WaitForSeconds(.01f);
         }

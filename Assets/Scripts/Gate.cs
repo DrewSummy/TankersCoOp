@@ -45,11 +45,6 @@ namespace Completed
             gateAudioSource.playOnAwake = false;
         }
 
-        void Update()
-        {
-
-        }
-
         // Lowers a door slowly.
         public void lowerDoorSlow()
         {

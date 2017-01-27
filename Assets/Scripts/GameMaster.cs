@@ -58,10 +58,10 @@ namespace Completed
             PlacePlayers();
 
             // Call the InitGame function to initialize the first level.
-            displaymenuGUI();
+            //displaymenuGUI();
 
             //Temporary for testing.
-            //CreateSoloGame();
+            CreateSoloGame();
         }
 
         private void PlacePlayers()
@@ -96,9 +96,10 @@ namespace Completed
             menuGUI.gameObject.SetActive(false);
             // Create a thread to only start setting up the level when the GUIs are prepared.
             prepareGUIs();
+
+            // Fade from black.
             createLevel();
         }
-
         
         // Helper for CreateSoloGame().
         private void prepareGUIs()
@@ -131,5 +132,7 @@ namespace Completed
 
             return SendPlayersPositions;
         }
+
+
     }
 }

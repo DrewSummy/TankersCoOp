@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;       //Allows us to use Lists.
 using Random = UnityEngine.Random;      //Tells Random to use the Unity Engine random number generator.
 using System.Collections;
+using UnityEngine.UI;
 
 namespace Completed
 
@@ -40,6 +41,7 @@ namespace Completed
         public GameMaster GameScript;                                            // Reference to the parent tank game object.
         public bool coop = false;                                                // Reference to the parent tank game object.
         public GameObject m_camera;                                              // Reference to the parent tank game object.
+        public Transform panel;
 
         public bool[,] floorChart = new bool[11, 11];                            // An array of arrays of bools if a room is enabled.
         private Transform[,] roomGrid = new Transform[11, 11];                   // An array of arrays of transforms for each room.
@@ -452,25 +454,41 @@ namespace Completed
 
             pause.enabled = true;
 
-
-
-
-
-
-
-
+            
             // Equate this to the special floorChart for the GUI minimap
             // Initiate GUI.
             GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().beginMap(floorChart, lastRoomCoordinate, firstRoomCoordinate);
-
-            // Start the first room with the camera on it.
-            Transform firstRoom = roomGrid[(int)firstRoomCoordinate.x, (int)firstRoomCoordinate.y];
-            //Debug.Log(firstRoomCoordinate);
-            //startRoom(firstRoom);
-            m_camera.GetComponent<CameraControl>().PlaceOnFirstRoom(firstRoomCoordinate);
+            
 
             //temp
+            Transform firstRoom = roomGrid[(int)firstRoomCoordinate.x, (int)firstRoomCoordinate.y];
             firstRoom.GetComponent<RoomManager>().startBeginningBattleCorrected();
+
+            // Start the first room with the camera on it.
+            m_camera.GetComponent<CameraControl>().m_Tank = player1;
+            m_camera.GetComponent<CameraControl>().PlaceOnFirstRoom(firstRoomCoordinate);
+
+            //TODO:fade from black to start
+            StartCoroutine(fadeFromBlack());
+        }
+
+
+        // Fade panel to black.
+        private IEnumerator fadeFromBlack()
+        {
+            // Decrement the alpha until invisible.
+            float alpha = 1;
+            float increment = .08f;
+            Image imageAlpha = panel.GetComponent<Image>();
+            imageAlpha.color = Color.black;
+            while (alpha > 0)
+            {
+                alpha -= increment;
+                imageAlpha.color = new Color(0, 0, 0, alpha);
+                yield return new WaitForSeconds(.01f);
+            }
+            alpha = 0;
+            imageAlpha.color = new Color(0, 0, 0, alpha);
         }
 
         public void startRoom(Transform room)
