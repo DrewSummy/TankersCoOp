@@ -276,7 +276,7 @@ namespace Completed
             {
                 menu.GetComponent<Menu>().containerMoving = true;
                 Debug.Log("selected CoopPlay");
-                StartCoroutine(temporarySettings1AndCoopPlay());//TODO: should play coop game
+                startGameCoop();
             }
         }
         public void coopBackOnClick()
@@ -312,7 +312,6 @@ namespace Completed
 
         private IEnumerator temporarySettings1AndCoopPlay()
         {
-
             yield return menu.GetComponent<Menu>().lowerContainer();
             yield return menu.GetComponent<Menu>().idleContainer();
         }
@@ -322,16 +321,32 @@ namespace Completed
         {
             StartCoroutine(startGameCoroutine());
         }
+        private void startGameCoop()
+        {
+            StartCoroutine(startGameCoopCoroutine());
+        }
 
         // Helper for disableCamera.
         private IEnumerator startGameCoroutine()
         {
             // Fade to black.
             yield return fadeToBlack();
-            
+
             // Call the GameMaster function to start a game.
             GM.CreateSoloGame();
-            
+
+            // Set menus inactive.
+            menu.SetActive(false);
+            panel.gameObject.SetActive(false);
+        }
+        private IEnumerator startGameCoopCoroutine()
+        {
+            // Fade to black.
+            yield return fadeToBlack();
+
+            // Call the GameMaster function to start a game.
+            GM.CreateCoopGame();
+
             // Set menus inactive.
             menu.SetActive(false);
             panel.gameObject.SetActive(false);

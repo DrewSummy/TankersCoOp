@@ -509,24 +509,19 @@ namespace Completed
             }
             return false;
         }
-
-
-
-
-
-
-
-
+        
         public void MapAndUnmap()
         {
             if (!selected)
             {
+                Debug.Log("hit");
                 placeFull();
                 clearSample();
                 selected = true;
             }
             else
             {
+                Debug.Log("miss");
                 clearFull();
                 placeSample();
                 selected = false;

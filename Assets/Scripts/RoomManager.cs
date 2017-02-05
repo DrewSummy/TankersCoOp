@@ -16,6 +16,7 @@ namespace Completed
         public GameObject wallClosed;                                            // The GameObject of the closed wall.
         public GameObject m_camera;
         public Vector2 coordinate;
+        public bool coop;
 
         private Transform m_room;                                                // Store a reference to the room transform.
         private int m_level;                                                     // Store a reference to our RoomManager which will set up the room.
@@ -24,9 +25,9 @@ namespace Completed
         private bool isPlayer1;                                                  // The bool for if player 2 is alive.
         private bool isPlayer2;                                                  // The bool for if player 2 is alive.
         private GameObject player1;                                              // Reference to the player 1 game object.
-        //private GameObject player2;
+        private GameObject player2;
         private TankPlayer player1Script;
-        //private TankPlayer player2Script;
+        private TankPlayer player2Script;
         public GameObject[] enemyList;                                           // An array of enemies for the level.
         private List<Vector3> playerSpawnLocations = new List<Vector3>();        // A list of player spawn locations.
         private List<Vector3> enemySpawnLocations = new List<Vector3>();         // A list of enemy spawn locations.
@@ -357,10 +358,10 @@ namespace Completed
         public void PlacePlayers()
         {
             //TODO: need player1
-            int placePlayerFirst = Random.Range(1, 2);
+            int placePlayer = Random.Range(1, 2);
             for (int location = 0; location < playerSpawnLocations.Count; location++)
             {
-                if (placePlayerFirst == 1)
+                if (placePlayer == 1)
                 {
                     // Remove projectiles.
                     for (int proj = 0; proj < player1.GetComponent<Tank>().projectileHolder.GetComponentsInChildren<Projectile>().Length; proj++)
@@ -373,23 +374,27 @@ namespace Completed
                     player1.GetComponent<Tank>().body.rotation = Quaternion.LookRotation(Vector3.back);
 
                     // Prevent players from moving or shooting until battle starts.
-                    //player1.GetComponent<TankPlayer>().disabled = true;
                     player1.GetComponent<TankPlayer>().rotateOnly(true);
-                    placePlayerFirst = 2;
-
+                    // Now place player 2 if not placed.
+                    placePlayer = 2;
                 }
                 else
                 {
                     //TODO: implement with player2
-                    //player1.transform.position = playerSpawnLocations[location];
-                    //player1.GetComponent<Tank>().SetLeftoverProjectileHolder(player1.GetComponent<Tank>().projectileHolder);
                     // Remove projectiles.
-                    /*for (int proj = 0; proj < player2.GetComponent<Tank>().projectileHolder.GetComponentsInChildren<Projectile>().Length; proj++)
+                    for (int proj = 0; proj < player2.GetComponent<Tank>().projectileHolder.GetComponentsInChildren<Projectile>().Length; proj++)
                     {
-                        Projectile currentProj = player2.GetComponent<Tank>().projectileHolder.GetComponentsInChildren<Projectile>()[proj];
-                        currentProj.GetComponent<Projectile>().KillProjectile();
-                    }*/
-                    placePlayerFirst = 1;
+                        Projectile currentProj = player1.GetComponent<Tank>().projectileHolder.GetComponentsInChildren<Projectile>()[proj];
+                        currentProj.GetComponent<ProjectilePlayer>().RemoveProjectile();
+                    }
+                    player2.transform.position = playerSpawnLocations[location];
+                    player2.GetComponent<Tank>().SetLeftoverProjectileHolder(player1.GetComponent<Tank>().projectileHolder);
+                    player2.GetComponent<Tank>().body.rotation = Quaternion.LookRotation(Vector3.back);
+
+                    // Prevent players from moving or shooting until battle starts.
+                    player2.GetComponent<TankPlayer>().rotateOnly(true);
+                    // Now place player 1 if not placed.
+                    placePlayer = 1;
                 }
 
             }
@@ -406,6 +411,8 @@ namespace Completed
             // Prevent player tanks from moving or shooting.
             player1.GetComponent<TankPlayer>().rotateOnly(false);
             player1.GetComponent<TankPlayer>().disableShoot(false);
+            player2.GetComponent<TankPlayer>().rotateOnly(false);
+            player2.GetComponent<TankPlayer>().disableShoot(false);
         }
 
 
@@ -868,6 +875,7 @@ namespace Completed
         public void CreateStartingRoom()
         {
             playerSpawnLocations.Add(new Vector3(25f, 0, 25f) + m_room.transform.position);
+            playerSpawnLocations.Add(new Vector3(45f, 0, 45f) + m_room.transform.position);
             enemySpawnLocations.Add(new Vector3(10f, 0f, 10f) + m_room.transform.position);
         }
 
@@ -880,7 +888,8 @@ namespace Completed
             //new Vector3(m_RoomLength / 2 + m_room.position.x, 0, m_RoomLength / 2 + m_room.position.z);
             //instructionCourse.transform.SetParent(courseHolder);
             playerSpawnLocations.Add(new Vector3(25f, 0, 25f) + m_room.transform.position);
-            enemySpawnLocations.Add(new Vector3(10f, 0f, 10f) + m_room.transform.position);
+            playerSpawnLocations.Add(new Vector3(25f, 0, 45f) + m_room.transform.position);
+            //enemySpawnLocations.Add(new Vector3(10f, 0f, 10f) + m_room.transform.position);
         }
 
         // Creates a last room after the room is set up.
@@ -1143,8 +1152,10 @@ namespace Completed
         // Helper function for setUpRoom().
         private void callStart()
         {
-            player1 = GameObject.FindGameObjectWithTag("Player");
+            player1 = GameObject.FindGameObjectsWithTag("Player")[0];
+            if (coop) player2 = GameObject.FindGameObjectsWithTag("Player")[1];
             player1Script = player1.GetComponent<TankPlayer>();
+            if (coop) player2Script = player2.GetComponent<TankPlayer>(); ;
 
             for (int wall = 0; wall < hasTriggeredNEWS.Length; wall++)
             {
@@ -1310,7 +1321,6 @@ namespace Completed
         }
         private IEnumerator removeObstaclesCorrected()
         {
-            Debug.Log("remo");
             Transform temp = new GameObject().transform;
             float speed = 40f;
 

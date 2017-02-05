@@ -164,7 +164,6 @@ namespace Completed
 
             // Store the value for selecting.
             m_SelectValue1 = Input.GetButtonDown(m_SelectName1);
-
         }
 
         private void FixedUpdate()
@@ -305,6 +304,7 @@ namespace Completed
         {
             if (m_SelectValue1)
             {
+                Debug.Log("huh");
                 miniMapGUI.MapAndUnmap();
             }
         }

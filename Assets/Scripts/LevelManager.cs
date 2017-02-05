@@ -62,7 +62,7 @@ namespace Completed
         private string exitTag = "Exit";                                         // String to apply the tag on the exit.
         private Transform currentRoom;                                           // The transform for the current room.
         private GameObject player1;                                              // Reference to the player 1 game object.
-        //private GameObject player2;
+        private GameObject player2;
         //private Vector3 player2Position;
         private bool needToStartRoom = true;                                     // Boolean of whether the first room needs to start. TODO: should be obsolete
 
@@ -309,6 +309,9 @@ namespace Completed
                         // Set the coordinate.
                         roomHolder.gameObject.GetComponent<RoomManager>().coordinate = new Vector2(row, column);
 
+                        // Set coop.
+                        roomHolder.gameObject.GetComponent<RoomManager>().coop = coop;
+
                         // If this is the starting room and level 1, TODO: place the instructions as the obstacle course.
                         if (new Vector2(row, column) == firstRoomCoordinate && level == 1)
                         {
@@ -508,9 +511,7 @@ namespace Completed
         void Start()
         {
             player1 = GameObject.FindGameObjectWithTag("Player");
-            //player1Script = player1.GetComponent<TankPlayer>();
-
-
+            player2 = GameObject.FindGameObjectWithTag("Player");
         }
     }
 }
