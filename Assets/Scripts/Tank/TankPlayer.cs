@@ -18,16 +18,17 @@ namespace Completed
         private string m_AimVerticalName;           // The name of the vector for aiming.
         private float m_AimHorizontalValue;         // The value of the vector for aiming.
         private float m_AimVerticalValue;           // The value of the vector for aiming.
+        private Vector3 m_AimRotation;              // The target direction for the tower to point.
         private string m_FireName;                  // The name of the float for shooting.
-        private float m_FireValue;                  // The value of the float for the trigger.
+        public float m_FireValue;                  // The value of the float for the trigger.
         private string m_PauseName;                 // The name of the bool for pausing.
         private bool m_PauseValue;                  // The value of the bool for the pause.
-        private Vector3 m_AimRotation;              // The target direction for the tower to point.
-        private bool m_SelectValue1;
-        private string m_SelectName1;                 // The name of the bool for pausing.
-        private bool m_HasShot;                     // The boolean used to permit the tank to shoot once per trigger pull.
+        private bool m_SelectValue;
+        private string m_SelectName;                // The name of the bool for pausing.
+        public bool m_HasShot;                     // The boolean used to permit the tank to shoot once per trigger pull.
         private bool m_HasPaused;                   // The boolean used to permit the player from pausing repeatedly.
         private bool paused;                        // The boolean for if the game is paused.
+        private bool selected;
         private float joystickMagnitude1;           // The magnitude of the joystick for moving.
         private GUI_MiniMap miniMapGUI;
         private GUI_Pause pauseGUI;
@@ -60,8 +61,7 @@ namespace Completed
             m_DriveVerticalValue = 0f;
             m_FireValue = 0f;
             m_PauseValue = false;
-
-            m_SelectValue1 = false;
+            m_SelectValue = false;
 
 
             // Also reset the input values.
@@ -79,7 +79,7 @@ namespace Completed
             m_DriveVerticalName = "DriveVertical" + m_PlayerNumber;
             m_FireName = "Fire" + m_PlayerNumber;
             m_PauseName = "Pause" + m_PlayerNumber;
-            m_SelectName1 = "Select" + m_PlayerNumber;
+            m_SelectName = "Select" + m_PlayerNumber;
 
             // Get access to GUIS.
             //TOOD: rename GUIS to include "GUI"
@@ -158,12 +158,13 @@ namespace Completed
 
             // Store the value for firing.
             m_FireValue = Input.GetAxis(m_FireName);
+            Debug.Log(Input.GetAxis(m_FireName));
 
             // Store the value for pauseing.
             m_PauseValue = Input.GetButtonDown(m_PauseName);
 
             // Store the value for selecting.
-            m_SelectValue1 = Input.GetButtonDown(m_SelectName1);
+            m_SelectValue = Input.GetButtonDown(m_SelectName);
         }
 
         private void FixedUpdate()
@@ -289,23 +290,32 @@ namespace Completed
                     }
                 }
             }
-            // Input.GetAxisRaw("Fire1") != 1
             else
             {
                 m_HasShot = false;
             }
-
-
-
-            //TODO: https://www.youtube.com/watch?v=J9ErQDWR44k
         }
 
         private void Select()
         {
-            if (m_SelectValue1)
+            if (!selected)
             {
-                Debug.Log("huh");
-                miniMapGUI.MapAndUnmap();
+                if (m_SelectValue)
+                {
+                    Debug.Log(m_SelectName);
+                    miniMapGUI.MapAndUnmap();
+
+                    selected = true;
+                }
+            }
+            else
+            {
+                if (m_SelectValue)
+                {
+                    miniMapGUI.MapAndUnmap();
+
+                    selected = false;
+                }
             }
         }
 

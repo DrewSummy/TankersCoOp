@@ -22,6 +22,7 @@ namespace Completed
         private GameObject P1;
         public GameObject killCountText;
         public Material[] tankColors;
+        public bool isCoop;
 
         private bool enabled = false;                              // Bool for when pause is usable.
 

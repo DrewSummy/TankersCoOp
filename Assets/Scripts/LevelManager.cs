@@ -199,7 +199,7 @@ namespace Completed
                 numberOfRooms = floorChart.GetLength(0) * floorChart.GetLength(1);
             }
             numberOfRooms = 4;
-            numberOfRooms = 100;
+            //numberOfRooms = 100;
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));
