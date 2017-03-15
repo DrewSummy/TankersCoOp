@@ -21,7 +21,6 @@ namespace Completed
         public GameObject[] countDownSprites;       // The GameObjects with the countdown sprites.
         public AudioSource HUDAudio;                // Reference to the audio source used to play HUD sounds.
         public AudioClip countdown;                 // Reference to the audio clip used to play the HUD audio source.
-        public bool isCoop;
         public bool player1Alive;
         public bool player2Alive;
 
@@ -30,15 +29,11 @@ namespace Completed
 
         private int P1ProjectileMax;                // The maximum number of player 1's projectiles at a time.
         private int P1ProjectileCount;              // The current amount of player 1's projectiles available to fire.
-        private int P2ProjectileMax;                // The maximum number of player 1's projectiles at a time.
-        private int P2ProjectileCount;              // The current amount of player 1's projectiles available to fire.
-        private RectTransform projectileHolderP1;         // Transform for holding projectiles and projectileEmptys.
-        private RectTransform projectileHolderP2;
+        private RectTransform projectileHolder;         // Transform for holding projectiles and projectileEmptys.
         private Transform enemyHolder;              // Transform for holding tanks.
         private Transform countdownHolder;          // Transform for holding countDownSprites.
         private Transform bannerHolder;
         private GameObject P1;                      // Reference to the player 1 game object.
-        private GameObject P2;                      // Reference to the player 1 game object.
 
         //TODO: choose colors based on player tank color
 
@@ -55,18 +50,11 @@ namespace Completed
         private void callStart()
         {
             P1 = GameObject.FindGameObjectWithTag("Player");
-            if (isCoop)
-            {
-                P2 = GameObject.FindGameObjectsWithTag("Player")[1];
-            }
 
-            // Create the projectile holders.
-            projectileHolderP1 = new GameObject("ProjectileHolderP1").AddComponent<RectTransform>();
-            projectileHolderP1.SetParent(projectilePanel.transform);
-            projectileHolderP1.position = projectilePanel.transform.position + new Vector3(60, 80, 0);
-            projectileHolderP2 = new GameObject("ProjectileHolderP2").AddComponent<RectTransform>();
-            projectileHolderP2.SetParent(projectilePanel.transform);
-            projectileHolderP2.position = projectilePanel.transform.position + new Vector3(projectilePanel.GetComponent<RectTransform>().rect.width + 20, 80, 0);
+            // Create the projectile holder.
+            projectileHolder = new GameObject("ProjectileHolder").AddComponent<RectTransform>();
+            projectileHolder.SetParent(projectilePanel.transform);
+            projectileHolder.position = projectilePanel.transform.position + new Vector3(60, 80, 0);
 
             // Create the enemy holder.
             enemyHolder = new GameObject("EnemyHolder").AddComponent<RectTransform>();
@@ -108,10 +96,7 @@ namespace Completed
             callStart();
 
             PlaceP1Projectiles();
-            if (isCoop)
-            {
-                PlaceP2Projectiles();
-            }
+            //PlaceP2Projectiles();
         }
 
         private void PlaceP1Projectiles()
@@ -129,8 +114,8 @@ namespace Completed
                 if (bullet < nonEmptyProj)
                 {
                     GameObject projectileImage = Instantiate(projectile) as GameObject;
-                    projectileImage.transform.SetParent(projectileHolderP1);
-                    projectileImage.transform.position = projectileHolderP1.position + new Vector3(bullet * 25, 0, 0);
+                    projectileImage.transform.SetParent(projectileHolder);
+                    projectileImage.transform.position = projectileHolder.position + new Vector3(bullet * 25, 0, 0);
                     // The first child is the shadow.
                     Color c = Color.white;
                     projectileImage.GetComponentsInChildren<Image>()[1].color = c;
@@ -138,40 +123,8 @@ namespace Completed
                 else
                 {
                     GameObject projectileImage = Instantiate(projectileEmpty) as GameObject;
-                    projectileImage.transform.SetParent(projectileHolderP1);
-                    projectileImage.transform.position = projectileHolderP1.position + new Vector3(bullet * 25, 0, 0);
-                    // The first child is the shadow. Make the alpha value of the color 110.
-                    Color c = new Color(Color.white.r, Color.white.g, Color.white.b, 110f / 255f);
-                    projectileImage.GetComponentsInChildren<Image>()[1].color = c;
-                }
-            }
-        }
-        private void PlaceP2Projectiles()
-        {
-            // Update player 1's projectiles.
-            P2ProjectileMax = P2.GetComponent<TankPlayer>().getProjectileAmount();
-            P2ProjectileCount = P2.GetComponent<TankPlayer>().getProjectileCount();
-
-            //TODO: the same for player 2
-
-            int nonEmptyProj = P2ProjectileCount;
-
-            for (int bullet = 0; bullet < P1ProjectileMax; bullet++)
-            {
-                if (bullet < nonEmptyProj)
-                {
-                    GameObject projectileImage = Instantiate(projectile) as GameObject;
-                    projectileImage.transform.SetParent(projectileHolderP2);
-                    projectileImage.transform.position = projectileHolderP2.position + new Vector3(-bullet * 25, 0, 0);
-                    // The first child is the shadow.
-                    Color c = Color.white;
-                    projectileImage.GetComponentsInChildren<Image>()[1].color = c;
-                }
-                else
-                {
-                    GameObject projectileImage = Instantiate(projectileEmpty) as GameObject;
-                    projectileImage.transform.SetParent(projectileHolderP2);
-                    projectileImage.transform.position = projectileHolderP2.position + new Vector3(-bullet * 25, 0, 0);
+                    projectileImage.transform.SetParent(projectileHolder);
+                    projectileImage.transform.position = projectileHolder.position + new Vector3(bullet * 25, 0, 0);
                     // The first child is the shadow. Make the alpha value of the color 110.
                     Color c = new Color(Color.white.r, Color.white.g, Color.white.b, 110f / 255f);
                     projectileImage.GetComponentsInChildren<Image>()[1].color = c;
@@ -181,17 +134,12 @@ namespace Completed
 
         public void UpdateP1Projectiles()
         {
-            foreach (Transform projectile in projectileHolderP1.transform)
-            {
-                GameObject.Destroy(projectile.gameObject);
-            }
-            foreach (Transform projectile in projectileHolderP2.transform)
+            foreach (Transform projectile in projectileHolder.transform)
             {
                 GameObject.Destroy(projectile.gameObject);
             }
 
             PlaceP1Projectiles();
-            PlaceP2Projectiles();
         }
 
         public void PlaceEnemies(Transform eH)

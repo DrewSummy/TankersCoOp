@@ -50,7 +50,7 @@ namespace Completed
         private GameObject tank; // Instance of player.
 
         private Vector2 topRight;                                                 //TODO: keeps track of the top and right most coordinate to adjust the full map to be in the furthest top right position
-        private int timesSelected = 0;
+
 
         private void callAwake()
         {
@@ -512,7 +512,6 @@ namespace Completed
         
         public void MapAndUnmap()
         {
-            Debug.Log(timesSelected++);
             if (!selected)
             {
                 Debug.Log("hit");

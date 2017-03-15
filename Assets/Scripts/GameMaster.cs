@@ -71,7 +71,7 @@ namespace Completed
 
             // Load in the Tank being used from the Resources folder in assets.
             // Player1
-            player1 = Resources.Load("TankResources/PlayerTank1") as GameObject;
+            player1 = Resources.Load("TankResources/PlayerTank") as GameObject;
             GameObject Player1 = Instantiate(player1) as GameObject;
             Player1.transform.SetParent(playerHolder);
             player1.name = "Player1";
@@ -82,7 +82,7 @@ namespace Completed
             if (coop)
             {
                 // Load in the Tank being used from the Resources folder in assets.
-                player2 = Resources.Load("TankResources/PlayerTank2") as GameObject;
+                player2 = Resources.Load("TankResources/PlayerTank") as GameObject;
                 GameObject Player2 = Instantiate(player2) as GameObject;
                 Player2.transform.SetParent(playerHolder);
                 player2.name = "Player2";
@@ -141,14 +141,9 @@ namespace Completed
         // Helper for CreateSoloGame().
         private void prepareGUIs()
         {
-            // Enable the GUIs and set coop to true.
-            HUDGUI.isCoop = coop;
+            // Enable the GUIs.
             HUDGUI.enableHUD();
-            Debug.Log("here");
-            pauseGUI.isCoop = coop;
             pauseGUI.enablePause();
-            //GUIMap
-
             camera.SetActive(true);
         }
 
