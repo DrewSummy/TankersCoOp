@@ -380,19 +380,21 @@ namespace Completed
                 }
                 else
                 {
-                    //TODO: implement with player2
-                    // Remove projectiles.
-                    for (int proj = 0; proj < player2.GetComponent<Tank>().projectileHolder.GetComponentsInChildren<Projectile>().Length; proj++)
+                    // Remove projectiles if player2 exists.
+                    if (coop)
                     {
-                        Projectile currentProj = player1.GetComponent<Tank>().projectileHolder.GetComponentsInChildren<Projectile>()[proj];
-                        currentProj.GetComponent<ProjectilePlayer>().RemoveProjectile();
-                    }
-                    player2.transform.position = playerSpawnLocations[location];
-                    player2.GetComponent<Tank>().SetLeftoverProjectileHolder(player1.GetComponent<Tank>().projectileHolder);
-                    player2.GetComponent<Tank>().body.rotation = Quaternion.LookRotation(Vector3.back);
+                        for (int proj = 0; proj < player2.GetComponent<Tank>().projectileHolder.GetComponentsInChildren<Projectile>().Length; proj++)
+                        {
+                            Projectile currentProj = player1.GetComponent<Tank>().projectileHolder.GetComponentsInChildren<Projectile>()[proj];
+                            currentProj.GetComponent<ProjectilePlayer>().RemoveProjectile();
+                        }
+                        player2.transform.position = playerSpawnLocations[location];
+                        player2.GetComponent<Tank>().SetLeftoverProjectileHolder(player1.GetComponent<Tank>().projectileHolder);
+                        player2.GetComponent<Tank>().body.rotation = Quaternion.LookRotation(Vector3.back);
 
-                    // Prevent players from moving or shooting until battle starts.
-                    player2.GetComponent<TankPlayer>().rotateOnly(true);
+                        // Prevent players from moving or shooting until battle starts.
+                        player2.GetComponent<TankPlayer>().rotateOnly(true);
+                    }
                     // Now place player 1 if not placed.
                     placePlayer = 1;
                 }
@@ -408,11 +410,14 @@ namespace Completed
                 enemy.GetComponent<Tank>().enabled = true;
             }
 
-            // Prevent player tanks from moving or shooting.
+            // Allow player tanks to move and shoot.
             player1.GetComponent<TankPlayer>().rotateOnly(false);
             player1.GetComponent<TankPlayer>().disableShoot(false);
-            player2.GetComponent<TankPlayer>().rotateOnly(false);
-            player2.GetComponent<TankPlayer>().disableShoot(false);
+            if (coop)
+            {
+                player2.GetComponent<TankPlayer>().rotateOnly(false);
+                player2.GetComponent<TankPlayer>().disableShoot(false);
+            }
         }
 
 

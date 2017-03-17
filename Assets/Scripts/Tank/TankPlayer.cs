@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;       //Allows us to use Lists.
+using TeamUtility.IO;
 
 namespace Completed
 {
@@ -24,7 +25,7 @@ namespace Completed
         private bool m_PauseValue;                  // The value of the bool for the pause.
         private Vector3 m_AimRotation;              // The target direction for the tower to point.
         private bool m_SelectValue1;
-        private string m_SelectName1;                 // The name of the bool for pausing.
+        private string m_SelectName;                 // The name of the bool for pausing.
         private bool m_HasShot;                     // The boolean used to permit the tank to shoot once per trigger pull.
         private bool m_HasPaused;                   // The boolean used to permit the player from pausing repeatedly.
         private bool paused;                        // The boolean for if the game is paused.
@@ -73,13 +74,13 @@ namespace Completed
             base.Start();
 
             // The axes names are based on player number.
-            m_AimHorizontalName = "AimHorizontal" + m_PlayerNumber;
-            m_AimVerticalName = "AimVertical" + m_PlayerNumber;
-            m_DriveHorizontalName = "DriveHorizontal" + m_PlayerNumber;
-            m_DriveVerticalName = "DriveVertical" + m_PlayerNumber;
-            m_FireName = "Fire" + m_PlayerNumber;
-            m_PauseName = "Pause" + m_PlayerNumber;
-            m_SelectName1 = "Select" + m_PlayerNumber;
+            m_AimHorizontalName = "Right Stick Vertical";//"AimHorizontal" + m_PlayerNumber;
+            m_AimVerticalName = "Right Stick Horizontal";// "AimVertical" + m_PlayerNumber;
+            m_DriveHorizontalName = "Left Stick Horizontal";// "DriveHorizontal" + m_PlayerNumber;
+            m_DriveVerticalName = "Left Stick Vertical";// "DriveVertical" + m_PlayerNumber;
+            m_FireName = "Right Trigger";// "Fire" + m_PlayerNumber;
+            m_PauseName = "Start";// "Pause" + m_PlayerNumber;
+            m_SelectName = "Back";// "Select" + m_PlayerNumber;
 
             // Get access to GUIS.
             //TOOD: rename GUIS to include "GUI"
@@ -125,8 +126,8 @@ namespace Completed
         {
             // Store the value of the input axes while exculding deadzones.
             // Get magnitude of joysticks inputs.
-            joystickMagnitude1 = Mathf.Pow(Input.GetAxis(m_DriveVerticalName), 2) + Mathf.Pow(Input.GetAxis(m_DriveHorizontalName), 2);
-            float joystickMagnitude2 = Mathf.Pow(Input.GetAxis(m_AimVerticalName), 2) + Mathf.Pow(Input.GetAxis(m_AimHorizontalName), 2);
+            joystickMagnitude1 = Mathf.Pow(InputManager.GetAxis(m_DriveVerticalName), 2) + Mathf.Pow(InputManager.GetAxis(m_DriveHorizontalName), 2);
+            float joystickMagnitude2 = Mathf.Pow(InputManager.GetAxis(m_AimVerticalName), 2) + Mathf.Pow(InputManager.GetAxis(m_AimHorizontalName), 2);
 
             // Create a deadzone so that small values are discarded.
             // Driving.
@@ -139,8 +140,8 @@ namespace Completed
             else
             {
                 // Get the horizontal and vertical components.
-                m_DriveHorizontalValue = Input.GetAxis(m_DriveHorizontalName);
-                m_DriveVerticalValue = Input.GetAxis(m_DriveVerticalName);
+                m_DriveHorizontalValue = -InputManager.GetAxis(m_DriveHorizontalName);
+                m_DriveVerticalValue = -InputManager.GetAxis(m_DriveVerticalName);
             }
             // Aiming.
             if (joystickMagnitude2 < .1)
@@ -152,18 +153,18 @@ namespace Completed
             else
             {
                 // Get the horizontal and vertical components.
-                m_AimHorizontalValue = Input.GetAxis(m_AimHorizontalName);
-                m_AimVerticalValue = Input.GetAxis(m_AimVerticalName);
+                m_AimHorizontalValue = InputManager.GetAxis(m_AimHorizontalName);
+                m_AimVerticalValue = InputManager.GetAxis(m_AimVerticalName);
             }
 
             // Store the value for firing.
-            m_FireValue = Input.GetAxis(m_FireName);
+            m_FireValue = InputManager.GetAxis(m_FireName);
 
             // Store the value for pauseing.
-            m_PauseValue = Input.GetButtonDown(m_PauseName);
+            m_PauseValue = InputManager.GetButtonDown(m_PauseName);
 
             // Store the value for selecting.
-            m_SelectValue1 = Input.GetButtonDown(m_SelectName1);
+            m_SelectValue1 = InputManager.GetButtonDown(m_SelectName);
         }
 
         private void FixedUpdate()
@@ -177,7 +178,7 @@ namespace Completed
 
             // Adjust the rotation of tower in FixedUpdate.
             Aim();
-
+            
             // Shoot bullets from the tower in FixedUpdate if m_FireValue exceeds .9.
             if (!aimOnly)
             {
@@ -304,7 +305,6 @@ namespace Completed
         {
             if (m_SelectValue1)
             {
-                Debug.Log("huh");
                 miniMapGUI.MapAndUnmap();
             }
         }

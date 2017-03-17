@@ -60,8 +60,8 @@ namespace Completed
             //displaymenuGUI();
 
             //Temporary for testing.
-            //CreateSoloGame();
-            CreateCoopGame();
+            CreateSoloGame();
+            //CreateCoopGame();
         }
 
         private void PlacePlayers()

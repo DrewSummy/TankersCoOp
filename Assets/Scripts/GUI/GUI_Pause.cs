@@ -127,7 +127,6 @@ namespace Completed
         // OnClick button for resume. Needs to be here because it calls Unpause.
         public void resume()
         {
-            Debug.Log("pressed resume");
             Unpause();
         }
 
