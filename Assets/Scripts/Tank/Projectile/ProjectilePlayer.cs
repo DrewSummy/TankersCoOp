@@ -27,8 +27,11 @@ public class ProjectilePlayer : Projectile
     {
         base.KillProjectile();
 
-        parentTank.GetComponent<Tank>().increaseProjCount();
-        GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateP1Projectiles();
+        if(!transfered)
+        {
+            parentTank.GetComponent<Tank>().increaseProjCount();
+        }
+        GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
     }
 
     // Obsolete: use DisableProjectile(). Used by RoomManager to remove extra projectiles.
@@ -36,8 +39,10 @@ public class ProjectilePlayer : Projectile
     {
         base.RemoveProjectile();
 
-        parentTank.GetComponent<Tank>().increaseProjCount();
-        GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateP1Projectiles();
+        {
+            parentTank.GetComponent<Tank>().increaseProjCount();
+        }
+        GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
     }
 
     // Used by RoomManager to remove extra projectiles. Launches projectiles randomly at the end of a level.
@@ -45,7 +50,9 @@ public class ProjectilePlayer : Projectile
     {
         base.DisableProjectile();
 
-        parentTank.GetComponent<Tank>().increaseProjCount();
-        GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateP1Projectiles();
+        {
+            parentTank.GetComponent<Tank>().increaseProjCount();
+        }
+        GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
     }
 }

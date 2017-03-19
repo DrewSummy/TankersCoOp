@@ -211,6 +211,13 @@ namespace Completed
                 else
                 {
                     parentRoomScript.startBeginningBattleCorrected();
+                    // Reset the current room of the tanks.
+                    foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
+                    {
+                        Debug.Log(tank.name);
+                        //tank.GetComponent<TankPlayer>().currentRoom = parentRoomScript.gameObject;
+                    }
+
                 }
             }
         }
@@ -222,8 +229,16 @@ namespace Completed
             {
                 if (parentRoomScript.roomCompleted)
                 {
-                    //temp
+                    // Update the minimap.
                     GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().movePlayer();
+
+                    // Reset the current room of the tank.
+                    if (!collisionInfo.transform.GetComponent<TankPlayer>().battling)
+                    {
+                        collisionInfo.transform.GetComponent<TankPlayer>().currentRoom = parentRoomScript.gameObject;
+                        Debug.Log(parentRoomScript.gameObject.name);
+                    }
+
                 }
             }
         }

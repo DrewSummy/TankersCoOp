@@ -60,8 +60,8 @@ namespace Completed
             //displaymenuGUI();
 
             //Temporary for testing.
-            CreateSoloGame();
-            //CreateCoopGame();
+            //CreateSoloGame();
+            CreateCoopGame();
         }
 
         private void PlacePlayers()
@@ -154,6 +154,12 @@ namespace Completed
             levelScript.coop = coop;
             levelScript.m_camera = camera;
             levelScript.SetupScene(Level);
+
+            // Pass the LevelManager to each tank.
+            foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
+            {
+                tank.GetComponent<TankPlayer>().LM = levelScript;
+            }
         }
 
         // Don't know what this is for.

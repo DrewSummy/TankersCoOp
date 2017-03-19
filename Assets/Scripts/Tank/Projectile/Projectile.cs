@@ -22,6 +22,7 @@ public class Projectile : MonoBehaviour
     private Tank tankScript;                       // Reference to Tank to be able to call DestroyTank().
     private bool disabled = false;                 // Boolean for whether the projectile is disabled.
     private GameObject currentTrail;
+    public bool transfered = false;
 
     //TODO: make the bullet rotate around the center of the sphere collider, maybe make an empty parent gameObject as the parent
 
@@ -111,6 +112,7 @@ public class Projectile : MonoBehaviour
             if (!disabled)
             {
                 // Drop the current smoke trail.
+                //TODO: this is causing error when tanks die
                 currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
 
                 //if (ProjectileRigidbody) ProjectileRigidbody.freezeRotation = true;

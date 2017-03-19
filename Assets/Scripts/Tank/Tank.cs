@@ -11,6 +11,7 @@ abstract public class Tank : MonoBehaviour {
     protected int projectileAmount = 5;         // The maximum number of projectiles at a time.
     protected int projectileCount = 5;          // The current amount of projectiles available to fire. Starts at 5.
     public Material tankColor;                  // The material for the tank.
+    public bool alive = true;
 
 
     protected float m_Speed = 12f;              // How fast the tank drives.
@@ -127,7 +128,7 @@ abstract public class Tank : MonoBehaviour {
     {
         lock (projCounterLock)
         {
-            if (projectileCount < projectileAmount)
+            if (projectileCount < projectileAmount && alive)
             {
                 projectileCount++;
             }
@@ -162,8 +163,8 @@ abstract public class Tank : MonoBehaviour {
         int projAmount = projectileHolder.GetComponentsInChildren<Projectile>().Length;
         for (int proj = 0; proj < projAmount; proj++)
         {
-            //Projectile currentProj = projectileHolder.GetComponentsInChildren<Projectile>()[proj];
-            //currentProj.transform.SetParent(leftoverProjectileHolder);
+            projectileHolder.GetComponentInChildren<Projectile>().transfered = true;
+            Debug.Log(projectileHolder.GetComponentInChildren<Projectile>().transfered);
             projectileHolder.GetComponentInChildren<Projectile>().transform.SetParent(leftoverProjectileHolder);
         }
     }

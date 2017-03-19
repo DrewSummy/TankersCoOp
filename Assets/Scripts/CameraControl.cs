@@ -5,9 +5,12 @@ namespace Completed
 {
     public class CameraControl : MonoBehaviour
     {
-        public GameObject m_Tank;                   // Reference to the player's transform.
-        private TankPlayer tankScript;
+        public GameObject m_Player1;                   // Reference to the player's transform.
+        public GameObject m_Player2;                   // Reference to the player's transform.
+        private TankPlayer playerScript1;
+        private TankPlayer playerScript2;
         public bool battling = false;
+        public bool gameOver = false;
 
         private Vector3 m_CameraPosRel;             // The offset of the camera from the tank.
         private float m_RoomLength = 50;            // The length of a side of the square room.
@@ -33,8 +36,19 @@ namespace Completed
 
         private void Start()
         {
-            m_Tank = GameObject.FindWithTag("Player");
-            tankScript = m_Tank.GetComponent<TankPlayer>();
+            foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
+            {
+                if (tank.GetComponent<TankPlayer>().m_PlayerNumber == 1)
+                {
+                    m_Player1 = tank;
+                }
+                else
+                {
+                    m_Player2 = tank;
+                }
+            }
+            playerScript1 = m_Player1.GetComponent<TankPlayer>();
+            playerScript2 = m_Player2.GetComponent<TankPlayer>();
             // TODD: set up a better method for angling the camera
             transform.rotation = m_cameraAngle;
 
@@ -52,9 +66,9 @@ namespace Completed
 
         private void UpdateTargetPos()
         {
-            m_target = new Vector3(Mathf.Floor((m_Tank.transform.position.x + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2,
+            m_target = new Vector3(Mathf.Floor((m_Player1.transform.position.x + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2,
                 0,
-                Mathf.Floor((m_Tank.transform.position.z + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2);
+                Mathf.Floor((m_Player1.transform.position.z + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2);
         }
 
         private void ZoomOut()
@@ -65,8 +79,8 @@ namespace Completed
 
         private void FixedUpdate()
         {
-            // Move the camera depending on the tank's position.if (tankScript.alive)
-            if (tankScript.alive)
+            // Move the camera depending on the tank's position.if (playerScript1.alive)
+            if (!gameOver)
             {
                 Move();
             }
@@ -93,9 +107,9 @@ namespace Completed
         public void PlaceOnFirstRoom(Vector2 firstRoomCoord)//Transform room)
         {
             //TODO: place player first
-            m_target = new Vector3(Mathf.Floor((m_Tank.transform.position.x + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2,
+            m_target = new Vector3(Mathf.Floor((m_Player1.transform.position.x + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2,
             0,
-            Mathf.Floor((m_Tank.transform.position.z + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2);
+            Mathf.Floor((m_Player1.transform.position.z + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2);
             
             transform.position = m_target + patrolOffset;
         }

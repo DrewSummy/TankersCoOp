@@ -8,7 +8,8 @@ namespace Completed
     public class TankPlayer : Tank
     {
 
-        public int m_PlayerNumber = 1;              // Used to identify which tank belongs to which player.  This is set by this tank's manager.
+        public int m_PlayerNumber = 1;              // Used to identify which tank belongs to which player. This is set by this tank's manager.
+        public TankPlayer teammate = null;
 
         private Vector3 m_TargetDirection;          // The direction the tank points toward for driving.
         private float m_DriveVerticalValue;         // The vertical component of the drive direction
@@ -37,9 +38,16 @@ namespace Completed
         public int killAmount = 0;                  // The number of kills by this tank, kept track of for GUI_Pause.
         public int[] killCounter;                   // An array of number of kills for each type of tank.
         private bool aimOnly = true;                // Boolean for whether the tank is enabled.
-        public bool alive = true;
+        public GameObject currentRoom;
+        private int maxTimeApart = 3;               // Max amount of time players can be seperated.
+        private bool startedTimer = false;
+        private Vector3 center = new Vector3(25f, 0, 25f);    // Distance to center of room for teleporting.
+        public bool battling = false;               // Boolean indicating the tank is battling; needed for relocating.
+        public LevelManager LM;
 
-        
+
+        private int counter = 0;
+
 
         new void Awake()
         {
@@ -113,13 +121,22 @@ namespace Completed
 
         private void Update()
         {
-            TakeControllerInputs();
+            if (alive)
+            {
+                TakeControllerInputs();
+            }
 
             // Give audio to the movement of the car.
             //EngineAudio();
 
             // Pausing; must be called in Update because of timescale manipulation.
             Pause();
+
+            //TODO: correct room locations of players.
+            if (!battling && teammate != null && m_PlayerNumber == 1)
+            {
+                checkTeammateRoom();
+            }
         }
 
         private void TakeControllerInputs()
@@ -147,8 +164,6 @@ namespace Completed
             if (joystickMagnitude2 < .1)
             {
                 // This is in the deadzone.
-                m_AimHorizontalValue = 0;
-                m_AimVerticalValue = 0;
             }
             else
             {
@@ -276,7 +291,7 @@ namespace Completed
                     {
                         Fire();
 
-                        GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateP1Projectiles();
+                        GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
 
                         // Tank shot.
                         m_HasShot = true;
@@ -333,16 +348,25 @@ namespace Completed
 
         public override void DestroyTank()
         {
+            // Immaterialize the tank.
+            for (int i = 0; i < GetComponentsInChildren<MeshRenderer>().Length; i++)
+            {
+                GetComponentsInChildren<MeshRenderer>()[i].enabled = false;
+            }
+            GetComponent<BoxCollider>().enabled = false;
+
             // Set alive to be false. Other scripts depend on this.
             alive = false;
 
             // Give projectiles to the room's projectileHolder.
             TransferProjectiles();
 
-            // Set the gameObject in active.
-            //this.gameObject.SetActive(false);
+            // Decrease LevelManager's player counter.
+            LM.playerDied();
 
-            //GetComponent<Rigidbody>().AddExplosionForce(5, transform.position, 4, 3.0F);
+            // Set projectile count to 0.
+            projectileCount = 0;
+            GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
         }
 
 
@@ -417,17 +441,65 @@ namespace Completed
             {
                 projectileCount = 0;
                 aimOnly = true; //TODO: maybe this should be different like a new variable enabled (keeps tank from aiming as well)
-                GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateP1Projectiles();
             }
             else
             {
                 projectileCount = projectileAmount;
                 aimOnly = false;
-                GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateP1Projectiles();
-
-                //TODO: add back projectiles slowly
-                //maybe use a for loop with enumerator wait
             }
+            Debug.Log(projectileCount);
+            GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
+        }
+
+        // Relocates player2 to player1's room if they are apart for too long.
+        private void checkTeammateRoom()
+        {
+            if (teammate.currentRoom != currentRoom && !startedTimer)
+            {
+                startedTimer = true;
+                Debug.Log("start timer");
+                StartCoroutine(relocate());
+            }
+        }
+
+        // Helper function for checkTeammateRoom.
+        private IEnumerator relocate()
+        {
+            // Start a timer and if the players are seperated after maxTimeApart, relocate player2.
+            int timer = 0;
+            while (teammate.currentRoom != currentRoom && timer < 3)
+            {
+                Debug.Log(timer);
+                //TODO: show some type of counter, maybe sound or light blinking under tank
+                yield return new WaitForSeconds(1);
+                timer++;
+            }
+            if (teammate.currentRoom != currentRoom && timer == maxTimeApart)
+            {
+                // Relocate.
+                teammate.transform.position = currentRoom.transform.position + center;
+                teammate.currentRoom = currentRoom;
+            }
+            startedTimer = false;
+        }
+
+        // Respawns the player.
+        public void respawn()
+        {
+            // Materialize the tank.
+            for (int i = 0; i < GetComponentsInChildren<MeshRenderer>().Length; i++)
+            {
+                GetComponentsInChildren<MeshRenderer>()[i].enabled = true;
+            }
+            GetComponent<BoxCollider>().enabled = true;
+
+            alive = true;
+            transform.position = teammate.currentRoom.transform.position + center;
+            currentRoom = teammate.currentRoom;
+            
+            // Set projectile count to projectileAmount.
+            projectileCount = projectileAmount;
+            GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
         }
     }
 }

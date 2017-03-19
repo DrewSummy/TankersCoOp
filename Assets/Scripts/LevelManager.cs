@@ -39,7 +39,7 @@ namespace Completed
         public GameObject blockShort;                                            // Store a reference to our RoomManager which will set up the room.
         public RoomManager m_roomScript;                                         // The GameObject of the exit.
         public GameMaster GameScript;                                            // Reference to the parent tank game object.
-        public bool coop = false;                                                // Reference to the parent tank game object.
+        public bool coop;// = false;                                                // Reference to the parent tank game object.
         public GameObject m_camera;                                              // Reference to the parent tank game object.
         public Transform panel;
 
@@ -65,6 +65,7 @@ namespace Completed
         private GameObject player2;
         //private Vector3 player2Position;
         private bool needToStartRoom = true;                                     // Boolean of whether the first room needs to start. TODO: should be obsolete
+        private int playersLeft;
 
         public GameMaster GM;
 
@@ -198,7 +199,7 @@ namespace Completed
             {
                 numberOfRooms = floorChart.GetLength(0) * floorChart.GetLength(1);
             }
-            numberOfRooms = 4;
+            numberOfRooms = 2;
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));
@@ -447,6 +448,24 @@ namespace Completed
         // SetupScene initializes our level and calls the previous functions to lay out the game board
         public void SetupScene(int level)
         {
+            // Get the players.
+            playersLeft = 1;
+            foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
+            {
+                if (tank.GetComponent<TankPlayer>().m_PlayerNumber == 1)
+                {
+                    player1 = tank;
+                }
+                if (coop)
+                {
+                    playersLeft = 2;
+                    if (tank.GetComponent<TankPlayer>().m_PlayerNumber == 2)
+                    {
+                        player2 = tank;
+                    }
+                }
+            }
+
             // Reset our list of spawn positions and clear floorChart.
             InitializeList();
 
@@ -462,12 +481,22 @@ namespace Completed
             GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().beginMap(floorChart, lastRoomCoordinate, firstRoomCoordinate);
             
 
-            //temp
+            // Set the first room coordinates.
             Transform firstRoom = roomGrid[(int)firstRoomCoordinate.x, (int)firstRoomCoordinate.y];
             firstRoom.GetComponent<RoomManager>().startBeginningBattleCorrected();
+            // Link the players to their room and eachother.
+            player1.GetComponent<TankPlayer>().currentRoom = firstRoom.gameObject;
+            if (coop)
+            {
+                player1.GetComponent<TankPlayer>().teammate = player2.GetComponent<TankPlayer>();
+                player2.GetComponent<TankPlayer>().teammate = player1.GetComponent<TankPlayer>();
+                player2.GetComponent<TankPlayer>().currentRoom = firstRoom.gameObject;
+            }
 
             // Start the first room with the camera on it.
-            m_camera.GetComponent<CameraControl>().m_Tank = player1;
+            //TODO: redundantly setting camera's tanks
+            m_camera.GetComponent<CameraControl>().m_Player1 = player1;
+            m_camera.GetComponent<CameraControl>().m_Player2 = player2;
             m_camera.GetComponent<CameraControl>().PlaceOnFirstRoom(firstRoomCoordinate);
 
             //TODO:fade from black to start
@@ -507,10 +536,44 @@ namespace Completed
 
         }
 
-        void Start()
+        // Called by player to decrease the player count and end game when there are no players.
+        public void playerDied()
         {
-            player1 = GameObject.FindGameObjectWithTag("Player");
-            player2 = GameObject.FindGameObjectWithTag("Player");
+            if (playersLeft-- <= 0)
+            {
+                gameOver();
+            }
+        }
+
+        // Resets the player count when
+        public void resetPlayers()
+        {
+            // Reset to the correct playersLeft.
+            if (coop)
+            {
+                playersLeft = 2;
+            }
+            else
+            {
+                playersLeft = 1;
+            }
+
+            // If a player isn't alive, respawn the player.
+            foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
+            {
+                if (!tank.GetComponent<TankPlayer>().alive)
+                {
+                    tank.GetComponent<TankPlayer>().respawn();
+                }
+            }
+        }
+
+        // Called when all plaayers hav died.
+        private void gameOver()
+        {
+            //TODO: this should also create some GUI and disable pause
+            Debug.Log("GameOver");
+            m_camera.GetComponent<CameraControl>().gameOver = true;
         }
     }
 }

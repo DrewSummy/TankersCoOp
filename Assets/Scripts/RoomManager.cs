@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Random = UnityEngine.Random;      //Tells Random to use the Unity Engine random number generator.
 
 namespace Completed
 {
@@ -418,6 +419,7 @@ namespace Completed
                 player2.GetComponent<TankPlayer>().rotateOnly(false);
                 player2.GetComponent<TankPlayer>().disableShoot(false);
             }
+            GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
         }
 
 
@@ -894,7 +896,7 @@ namespace Completed
             //instructionCourse.transform.SetParent(courseHolder);
             playerSpawnLocations.Add(new Vector3(25f, 0, 25f) + m_room.transform.position);
             playerSpawnLocations.Add(new Vector3(25f, 0, 45f) + m_room.transform.position);
-            //enemySpawnLocations.Add(new Vector3(10f, 0f, 10f) + m_room.transform.position);
+            enemySpawnLocations.Add(new Vector3(10f, 0f, 10f) + m_room.transform.position);
         }
 
         // Creates a last room after the room is set up.
@@ -927,10 +929,23 @@ namespace Completed
             StartCoroutine(FlickerLights());
             lightsEquipped = true;
 
-            // Prevent players from shooting momentarily. Wait 1 second.
+            // Prevent players from shooting momentarily and set them to not battling.. Wait 1 second.
             player1.GetComponent<TankPlayer>().disableShoot(true);
+            player1.GetComponent<TankPlayer>().battling = false;
+            if (coop)
+            {
+                Debug.Log("disable");
+                player2.GetComponent<TankPlayer>().disableShoot(true);
+                player2.GetComponent<TankPlayer>().battling = false;
+            }
+            GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
             StartCoroutine(wait(1));
-            player1.GetComponent<TankPlayer>().disableShoot(true);
+            player1.GetComponent<TankPlayer>().disableShoot(false);
+            if (coop)
+            {
+                player2.GetComponent<TankPlayer>().disableShoot(false);
+            }
+            GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
         }
 
         // Helper function for endBattle.
@@ -1134,6 +1149,15 @@ namespace Completed
                 player1.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
                 player1.GetComponent<Tank>().TransferProjectiles();
             }
+            if (coop)
+            {
+                if (player2Script.alive)
+                {
+                    //TODO: set player2Script perhaps in start().
+                    player2.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
+                    player2.GetComponent<Tank>().TransferProjectiles();
+                }
+            }
 
 
             // Disable projectiles.
@@ -1188,6 +1212,12 @@ namespace Completed
         {
             if (!roomCompleted & !battleEnsuing)
             {
+                // Set this as the current room for the tanks and the tanks to battling.
+                foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
+                {
+                    tank.GetComponent<TankPlayer>().currentRoom = gameObject;
+                    tank.GetComponent<TankPlayer>().battling = true;
+                }
                 StartCoroutine(BeginSetUp());
                 StartCoroutine(materializeRoom());
 
@@ -1221,20 +1251,31 @@ namespace Completed
             //TODO: make roomIdle obsolete
             roomIdle = true;
             roomCompleted = true;
+
+            // Set the tanks to not battling.
+            foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
+            {
+                tank.GetComponent<TankPlayer>().battling = false;
+            }
         }
 
         // Function called when enemyCount == 0.
         private IEnumerator endBattleCorrected()
         {
-            // Disable shooting for player1.
-            player1.GetComponent<TankPlayer>().disableShoot(true);
-
             // Remove projectiles from the player and put them into their animation.
             removeProjectiles();
 
+            // Disable shooting.
+            Debug.Log("disabled");
+            player1.GetComponent<TankPlayer>().disableShoot(true);
+            if (coop)
+            {
+                player2.GetComponent<TankPlayer>().disableShoot(true);
+            }
+
             // Ending coroutines.
             removeDoorsCorrected();
-            StartCoroutine(removeObstaclesCorrected());
+            removeObstaclesCorrected();
             StartCoroutine(FlickerLights());
             //TODO: should play ending audio
             
@@ -1245,38 +1286,24 @@ namespace Completed
             
             // Undisable shooting.
             player1.GetComponent<TankPlayer>().disableShoot(false);
+            if (coop)
+            {
+                player2.GetComponent<TankPlayer>().disableShoot(false);
+            }
 
             //TODO: make roomIdle obsolete
             roomIdle = true;
             roomCompleted = true;
 
-            /* startEndingBattle()
-
-            if (proceedEndingSequence)
+            // Set the tanks to not battling.
+            player1.GetComponent<TankPlayer>().battling = false;
+            if (coop)
             {
-                removeProjectiles();
-
-                //wait
-                //TODO: pause, shake screen, individually blow up every projectile
-                StartCoroutine("EndingEffects");
-
-                proceedEndingSequence = false;
+                player2.GetComponent<TankPlayer>().battling = false;
             }
-            removeDoors();
-            removeObstacles();
-            */
 
-            /* endBattle
-
-            // Set the camera's battling variable to true;
-            m_camera.GetComponent<CameraControl>().battling = false;
-
-            roomIdle = true;
-            roomCompleted = true;
-            battleOver = true;
-            battleEnsuing = false;
-            StartCoroutine(FlickerLights());
-            lightsEquipped = true;*/
+            // Reset the players using LevelManager.
+            levelScript.resetPlayers();
         }
 
         // Helpers for the end of a battle.
@@ -1324,35 +1351,28 @@ namespace Completed
                 }
             }
         }
-        private IEnumerator removeObstaclesCorrected()
+        private void removeObstaclesCorrected()
         {
-            Transform temp = new GameObject().transform;
-            float speed = 40f;
-
             // Remove obstacles.
-            foreach (Transform block in courseHolder) if (block.CompareTag(blockRemovableTag))
-                {
-                    ///////////////////////////////////
-                    //TODO: this isn't removing every block.
-                    Debug.Log(block.name);
-                    block.SetParent(temp);
-                    //TODO: audio                                     
-                    /*if (!audioPlayed)
-                    {
-                    gateAudioSource.Play();
-                    audioPlayed = true;
-                    }
-                    float lowerSpeed = gateHeight / (closeAudio.length + 2.0f);
-                    */
-                }
+            foreach (Transform block in courseHolder)
+            {
+                StartCoroutine(removeSingleObstacle(block));
+            }
+        }
+        // Helper to remove one obstacle.
+        private IEnumerator removeSingleObstacle(Transform b)
+        {
+            float speed = 40f;
+            float delay = Random.Range(0, 1f);
+            Debug.Log(delay);
 
-            while (temp.position.y > -20)
+            yield return new WaitForSeconds(delay);
+            while (b.position.y > -20)
             {
                 Vector3 lowering = Vector3.down * speed * Time.deltaTime;
-                temp.Translate(lowering);
+                b.Translate(lowering);
                 yield return new WaitForSeconds(.01f);
             }
         }
-
     }
 }
