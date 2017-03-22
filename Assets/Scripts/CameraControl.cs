@@ -86,6 +86,7 @@ namespace Completed
             }
             else
             {
+                //TODO: this is searching for the player still and so it moves off screen
                 ZoomOut();
             }
         }

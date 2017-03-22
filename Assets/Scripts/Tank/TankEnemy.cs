@@ -24,14 +24,40 @@ public class TankEnemy : Tank
     private float fireFreq = 3.0f;
     private bool canFire = true; //TODO: make it not be able to shoot for like a second
 
+    private int roomLength = 50;                // Integer for the length of the room.
+    private string playerTag = "Player";        // String representing the tag of a player.
+    private string blockTag = "Player";         // String representing the tag of a block.
 
+
+    // Hunting Variables
+    private float fireRate = 4.5f;               // Float for how quickly shells can be fired in succession.
+    private float fireCounter = 0f;               // Float for how quickly shells can be fired in succession.
+    private float huntTime = 6.0f;              // Float for how long hunting lasts without seeing a player.
+    private float huntingCounter = 0;           // Float for how long hunting has gone without seeing the player.
+
+    // Waypoint Variables
+    public GameObject[] waypoints;              // Array of GameObject waypoints established by the room.
+    private float minWPDist = 3.0f;             // Float for the minimum distance required to reach a waypoint.
+    private int currentWaypoint = -1;           // Integer representing the current waypoint to move to.
+
+    // State Variables
+    public enum State
+    {
+        PATROL,
+        HUNT
+    }
+
+    public State state;
 
 
 
     // Use this for initialization
-    protected new void Start()
+    private new void Start()
     {
         base.Start();
+
+        // The FSM begins on Patrol.
+        state = TankEnemy.State.PATROL;
 
         // Change the speed and rotate speed of the tank.
         m_Speed = 6f;
@@ -47,39 +73,186 @@ public class TankEnemy : Tank
         // Get the script of the projectile and record its speed.
         projectileScript = projectile.GetComponent<ProjectileEnemy>();
         projectileSpeed = projectileScript.SendProjectileVelocity();
+
+        //TODO: need to find first appropriate currentWaypoint
     }
 
-    // Update is called once per frame
-    protected void Update()
+    // Called by the room to start the TankEnemy.
+    public void startTankEnemy()
     {
-        if (player1Script.alive)
+        StartCoroutine("FSM");
+    }
+
+    // Finite State Machine representing the actions TankEnemy goes through
+    IEnumerator FSM()
+    {
+        while (alive)
         {
-            // Keep track of the vector towards player 1.
-            vectorTowardPlayer1 = -(player1.transform.position - tower.position);
-            vectorTowardPlayer1.y = 0;
-            distancePlayer1 = Vector3.Distance(player1.transform.position, tower.position);
-
-            player1Pos = player1.transform.position;
-
-            // Keep track of player 1's veloctiy.
-            player1Velocity = player1Script.SendVelocity();
-
-            // Update the vector that hits player 1.
-            player1Hit = distancePlayer1 * player1Velocity / projectileSpeed;
+            switch (state)
+            {
+                case State.PATROL:
+                    Patrol();
+                    break;
+                case State.HUNT:
+                    Hunt();
+                    break;
+            }
+            yield return null;
         }
     }
 
-    protected void FixedUpdate()
+    // State for patrolling.
+    private void Patrol()
     {
-        if (!hasBegun)
+        if (playerInSight())
         {
-            //InvokeRepeating("Fire", 1, 1);
-            //InvokeRepeating("ChangeRandomDirection", 0, 1);
-            hasBegun = true;
+            state = TankEnemy.State.HUNT;
+            currentWaypoint = -1;
+            Debug.Log("hunt");
         }
-        //AimPredict();
-        FirePredict();
+        else if (Vector3.Distance(body.position, waypoints[currentWaypoint].transform.position) >= minWPDist)
+        {
+            // Move toward the current waypoint.
+            moveTo(waypoints[currentWaypoint]);
+        }
+        else
+        {
+            // Travel to a neighboring waypoint.
+            selectWaypoint();
+        }
     }
+
+    // State for hunting.
+    private void Hunt()
+    {
+        huntingCounter += Time.deltaTime;
+        fireCounter += Time.deltaTime;
+
+        if (huntingCounter > huntTime)
+        {
+            huntingCounter = 0;
+            selectWaypoint();
+            state = TankEnemy.State.PATROL;
+        }
+        else if (playerInSight())
+        {
+            //TODO: incorporate fire rate
+            if (fireCounter > fireRate)
+            {
+                Fire();
+                fireCounter = 0;
+            }
+            huntingCounter = 0;
+        }
+    }
+
+    // Selects the first currentWayPoint randomly based on closeness.
+    public void selectWaypoint()
+    {
+        // Sum up the distances to each waypoint. Then, randomly select a waypoint by choosing a random
+        // float below that sum and find which waypoint this corresponds to by repeatedly subtracting 
+        // each distance until negative. This means closer waypoints are more likely to be selected. 
+        float distanceSum = 0;
+        bool[] wpOptions = new bool[waypoints.Length];
+        for (int i = 0; i < waypoints.Length; i++)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(body.position, body.position - waypoints[i].transform.position, out hit, roomLength)
+                && hit.transform.tag != blockTag
+                && i != currentWaypoint)
+            {
+                distanceSum += Vector3.Distance(body.position, waypoints[i].transform.position);
+                wpOptions[i] = true;
+            }
+        }
+        float weightedRand = Random.Range(0, distanceSum);
+        for (int i = 0; i < waypoints.Length; i++)
+        {
+            if (wpOptions[i])
+            {
+                weightedRand -= Vector3.Distance(body.position, waypoints[i].transform.position);
+                if (weightedRand <= 0)
+                {
+                    currentWaypoint = i;
+                    return;
+                }
+            }
+        }
+    }
+
+    //TODO: make these better
+    // Returns true if a player is infront of TankEnemy.
+    private bool playerInSight()
+    {
+        //TODO: tower isn't ready
+        RaycastHit hit;
+        return (Physics.Raycast(tower.position, -tower.forward, out hit, roomLength) && hit.transform.tag == playerTag);
+    }
+
+    // Moves body toward a waypoint.
+    private void moveTo(GameObject wp)
+    {
+        // Only drives toward at a less than 5 degree angle.
+
+        rotateTo(wp);
+        vectorTowardPlayer1 = body.position - wp.transform.position;
+
+        // Keep track of the direction the tank is pointed toward.
+        m_CurrentDirection = -body.eulerAngles;
+
+        // trueAngle is used because CurrentDirection has a value like (0,-270,0) where it measures the angle from rotating around the y axis.
+        // angleTargetToDirection gets a float value to later check if the tank is facing the direction the joystick is pressed.
+        Vector3 trueAngle = new Vector3(-Mathf.Sin(m_CurrentDirection.y * Mathf.PI / 180), 0, Mathf.Cos(m_CurrentDirection.y * Mathf.PI / 180));
+
+
+        // If the tank isn't facing the direction the joystick is pointing, the speed equals 0.
+        float speed = 0;
+        if (Vector3.Angle(trueAngle, -vectorTowardPlayer1) < 5)
+        {
+            speed = m_Speed;
+        }
+        else if (175 < Vector3.Angle(trueAngle, -vectorTowardPlayer1))
+        {
+            speed = -m_Speed;
+        }
+        Vector3 movement = body.forward * speed * Time.deltaTime;
+
+        m_RidgidbodyTank.MovePosition(m_RidgidbodyTank.position + movement);
+    }
+
+    // Rotates body toward a waypoint.
+    protected void rotateTo(GameObject wp)
+    {
+        // Keep track of the direction toward the player.
+        Vector3 m_TargetDirection = body.position - wp.transform.position;
+
+        float step = m_RotateSpeed * Time.deltaTime;
+        Vector3 newDir = Vector3.RotateTowards(body.forward, m_TargetDirection, step, .01F);
+
+        if (newDir == Vector3.zero)
+        {
+            // Don't rotate at all
+        }
+        // Turn forward or backward depending on which is closer.
+        else if (Vector3.Angle(body.forward, m_TargetDirection) < 90)
+        {
+            // Rotate towards forwards.
+            body.rotation = Quaternion.LookRotation(newDir);
+        }
+        else
+        {
+            // Rotate towards backwards.
+            newDir = Vector3.RotateTowards(body.forward, -m_TargetDirection, step, .01F);
+            body.rotation = Quaternion.LookRotation(newDir);
+        }
+    }
+
+
+
+
+
+
+
 
     protected new void Fire()
     {
@@ -449,75 +622,6 @@ public class TankEnemy : Tank
 
         float angle = Mathf.Acos((Vector3.Dot(from, to) / (from.magnitude + to.magnitude))) * 180 / Mathf.PI;
         return angle;
-    }
-
-    private void ChangeRandomDirection()
-    {
-        randomDirection = new Vector3(Random.Range(-100f, 100f), 0, Random.Range(-100f, 100f));
-    }
-
-    protected void RotateRandomDirection()
-    {
-        //TODO: only hovers around certain direction, fix this
-        Vector3 m_TargetDirection = randomDirection;
-
-        float step = m_RotateSpeed * Time.deltaTime;
-        Vector3 newDir = Vector3.RotateTowards(body.forward, m_TargetDirection, step, .01F);
-        if (newDir == Vector3.zero)
-        {
-            // Don't rotate at all
-        }
-        // Turn forward or backward depending on which is closer.
-        else if (Vector3.Angle(body.forward, m_TargetDirection) < 90)
-        {
-            // Rotate towards forwards.
-            body.rotation = Quaternion.LookRotation(newDir);
-
-            drivingForward = true;
-        }
-        else
-        {
-            // Rotate towards backwards.
-            newDir = Vector3.RotateTowards(body.forward, -m_TargetDirection, step, .01F);
-            body.rotation = Quaternion.LookRotation(newDir);
-
-            drivingForward = false;
-        }
-    }
-
-    void OnCollisionEnter(Collision collisionInfo)
-    {
-        if (drivingForward)
-        {
-            drivingForward = false;
-        }
-        else
-        {
-            drivingForward = true;
-        }
-    }
-
-    protected void DriveRandomDirection()
-    {
-        RotateRandomDirection();
-
-        bool hasBeenCalled = false;
-        if (!hasBeenCalled)
-        {
-            InvokeRepeating("ChangeRandomDirection", 0, 3);
-            hasBeenCalled = true;
-        }
-    }
-
-    private void DriveMeander()
-    {
-        //TODO: figure out how to cycle through actions
-        bool hasBeenCalled = false;
-        if (!hasBeenCalled)
-        {
-            InvokeRepeating("DriveRandomDirection", 0, 3);
-            hasBeenCalled = true;
-        }
     }
 
     protected void ColorizeTank()

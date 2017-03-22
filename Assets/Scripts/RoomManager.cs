@@ -79,6 +79,7 @@ namespace Completed
         public int[] roomCoord = new int[2];                                     // Array of ints representing this rooms coordinates.
         private bool[] hasTriggeredNEWS = new bool[4];                           // Array of booleans representing which of hte surrounding rooms are triggered.
         public bool isLastRoom = false;                                          // Boolean for if this is the last room.
+        private GameObject[] waypoints;
 
 
         private bool endBattleCalled = true;
@@ -346,10 +347,14 @@ namespace Completed
                 enemy.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
 
                 // Disable until battle starts.
-                enemy.GetComponent<Tank>().enabled = false;
+                //enemy.GetComponent<Tank>().enabled = false;
 
                 // Set the TankEnemy's parentRoom.
                 enemy.GetComponent<TankEnemy>().parentRoom = this;
+
+                // Give the enemies the waypoints.
+                enemy.GetComponent<TankEnemy>().waypoints = waypoints;
+                enemy.GetComponent<TankEnemy>().selectWaypoint();
 
                 enemyCount++;
             }
@@ -406,9 +411,11 @@ namespace Completed
 
         private void EnableTanks()
         {
+            // Start each EnemyTank.
             foreach (Transform enemy in enemyHolder)
             {
-                enemy.GetComponent<Tank>().enabled = true;
+                enemy.GetComponent<TankEnemy>().enabled = true;
+                enemy.GetComponent<TankEnemy>().startTankEnemy();
             }
 
             // Allow player tanks to move and shoot.
@@ -897,6 +904,18 @@ namespace Completed
             playerSpawnLocations.Add(new Vector3(25f, 0, 25f) + m_room.transform.position);
             playerSpawnLocations.Add(new Vector3(25f, 0, 45f) + m_room.transform.position);
             enemySpawnLocations.Add(new Vector3(10f, 0f, 10f) + m_room.transform.position);
+
+
+            GameObject wp1 = new GameObject();
+            wp1.transform.position = new Vector3(5f, 0, 10f) + m_room.transform.position;
+            GameObject wp2 = new GameObject();
+            wp2.transform.position = new Vector3(25f, 0, 20f) + m_room.transform.position;
+            GameObject wp3 = new GameObject();
+            wp3.transform.position = new Vector3(35f, 0, 10f) + m_room.transform.position;
+            waypoints = new GameObject[3];
+            waypoints[0] = wp1;
+            waypoints[1] = wp2;
+            waypoints[2] = wp3;
         }
 
         // Creates a last room after the room is set up.

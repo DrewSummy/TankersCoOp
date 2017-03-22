@@ -539,10 +539,11 @@ namespace Completed
         // Called by player to decrease the player count and end game when there are no players.
         public void playerDied()
         {
-            if (playersLeft-- <= 0)
+            if (--playersLeft <= 0)
             {
                 gameOver();
             }
+            Debug.Log(playersLeft);
         }
 
         // Resets the player count when

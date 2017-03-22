@@ -50,6 +50,8 @@ abstract public class Tank : MonoBehaviour {
         // Empty game object for holding projectiles. This needs to be in awake so that RoomManager can use it.
         projectileHolder = new GameObject("Projectile Holder").transform;
         projectileHolder.transform.SetParent(gameObject.transform);
+
+        Start();
     }
 
     protected void OnEnable()

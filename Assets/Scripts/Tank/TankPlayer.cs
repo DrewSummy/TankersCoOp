@@ -447,7 +447,6 @@ namespace Completed
                 projectileCount = projectileAmount;
                 aimOnly = false;
             }
-            Debug.Log(projectileCount);
             GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
         }
 
