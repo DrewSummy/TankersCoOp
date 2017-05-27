@@ -462,6 +462,7 @@ namespace Completed
                     if (tank.GetComponent<TankPlayer>().m_PlayerNumber == 2)
                     {
                         player2 = tank;
+                        Debug.Log("hyere");
                     }
                 }
             }
@@ -496,7 +497,10 @@ namespace Completed
             // Start the first room with the camera on it.
             //TODO: redundantly setting camera's tanks
             m_camera.GetComponent<CameraControl>().m_Player1 = player1;
-            m_camera.GetComponent<CameraControl>().m_Player2 = player2;
+            if (coop)
+            {
+                m_camera.GetComponent<CameraControl>().m_Player2 = player2;
+            }
             m_camera.GetComponent<CameraControl>().PlaceOnFirstRoom(firstRoomCoordinate);
 
             //TODO:fade from black to start

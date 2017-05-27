@@ -82,13 +82,13 @@ namespace Completed
             base.Start();
 
             // The axes names are based on player number.
-            m_AimHorizontalName = "Right Stick Vertical";//"AimHorizontal" + m_PlayerNumber;
-            m_AimVerticalName = "Right Stick Horizontal";// "AimVertical" + m_PlayerNumber;
-            m_DriveHorizontalName = "Left Stick Horizontal";// "DriveHorizontal" + m_PlayerNumber;
-            m_DriveVerticalName = "Left Stick Vertical";// "DriveVertical" + m_PlayerNumber;
-            m_FireName = "Right Trigger";// "Fire" + m_PlayerNumber;
-            m_PauseName = "Start";// "Pause" + m_PlayerNumber;
-            m_SelectName = "Back";// "Select" + m_PlayerNumber;
+            m_AimHorizontalName = "Right Stick Vertical";
+            m_AimVerticalName = "Right Stick Horizontal";
+            m_DriveHorizontalName = "Left Stick Horizontal";
+            m_DriveVerticalName = "Left Stick Vertical";
+            m_FireName = "Right Trigger";
+            m_PauseName = "Start";
+            m_SelectName = "Back";
 
             // Get access to GUIS.
             //TOOD: rename GUIS to include "GUI"
@@ -348,6 +348,9 @@ namespace Completed
 
         public override void DestroyTank()
         {
+            // Freeze the tank from moving.
+            m_RidgidbodyTank.velocity = Vector3.zero;
+
             // Immaterialize the tank.
             for (int i = 0; i < GetComponentsInChildren<MeshRenderer>().Length; i++)
             {

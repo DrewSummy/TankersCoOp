@@ -214,7 +214,6 @@ namespace Completed
                     // Reset the current room of the tanks.
                     foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
                     {
-                        Debug.Log(tank.name);
                         //tank.GetComponent<TankPlayer>().currentRoom = parentRoomScript.gameObject;
                     }
 

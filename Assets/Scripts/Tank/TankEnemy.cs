@@ -14,7 +14,6 @@ public class TankEnemy : Tank
     private TankPlayer player1Script;           // Store a reference to the TankPlayer of player 1.
     private TankPlayer player2Script;           // Store a reference to the TankPlayer of player 2.
     private ProjectileEnemy projectileScript;   // Store a reference to the projectile script.
-    private Vector3 randomDirection;            // The random direction vector.
     private float distancePlayer1;              // The float distance to player 1.
     private Vector3 player1Pos;                 // The vector for the current position of player 1.
     private Vector3 player1Velocity;            // The vector for the current velocity of player 1.
@@ -26,8 +25,22 @@ public class TankEnemy : Tank
 
     private int roomLength = 50;                // Integer for the length of the room.
     private string playerTag = "Player";        // String representing the tag of a player.
-    private string blockTag = "Player";         // String representing the tag of a block.
+    private string wallTag = "Wall";            // String representing the tag of a wall.
+    private string blockTag = "Block";          // String representing the tag of a block.
+    private string removeBlockTag = "BlockRemovable"; // String representing the tag of a removable block.
 
+    // Driving Variables
+    private float m_CurrentSpeed;               // How fast the tank is driving.
+    private float m_CurrentAcceleration = 1f;   // How fast the tank changes speed.
+    private float accelerationTimeMax = 3.0f;   // The max amount of time the tank stays on one speed.
+    private float accelerationTimeNext;         // The randomly selected amount of time the tank stays at this speed.
+    private float accelerationCounter = 0;      // The current amount of time the tank has spent on the current speed.
+    private int turning = 90;                   // The amount of degrees the tank can turn.
+    private Vector2 targetDirection;                  // The current targetDirection the tank is facing.
+    private float turningTimeMax = 2.0f;        // The max amount of time the tank goes before turning.
+    private float turningTimeNext;              // The randomly selected amount of time the tank goes before turning.
+    private float turningCounter = 0;           // The current amount of time the tank has spent not turning.
+    private float padding = 1.5f;               // The float representing how close a tank can move toward a wall.
 
     // Hunting Variables
     private float fireRate = 4.5f;               // Float for how quickly shells can be fired in succession.
@@ -49,6 +62,7 @@ public class TankEnemy : Tank
 
     public State state;
 
+    //TODO: make an array of strings of possible actions ( hunt = ["chase", "holdGround", "run"]) and select one depending on tank type
 
 
     // Use this for initialization
@@ -59,9 +73,11 @@ public class TankEnemy : Tank
         // The FSM begins on Patrol.
         state = TankEnemy.State.PATROL;
 
-        // Change the speed and rotate speed of the tank.
+        // Initiate the driving variables.
         m_Speed = 6f;
         m_RotateSpeed = 1f;
+        accelerationTimeNext = Random.Range(0, accelerationTimeMax);
+        turningTimeNext = Random.Range(0, turningTimeMax);
 
         // Get the script of player 1.
         player1 = GameObject.FindGameObjectWithTag("Player");
@@ -75,6 +91,9 @@ public class TankEnemy : Tank
         projectileSpeed = projectileScript.SendProjectileVelocity();
 
         //TODO: need to find first appropriate currentWaypoint
+
+        // Set the beginning speed.
+        m_CurrentSpeed = m_Speed;
     }
 
     // Called by the room to start the TankEnemy.
@@ -92,6 +111,7 @@ public class TankEnemy : Tank
             {
                 case State.PATROL:
                     Patrol();
+                    //PatrolMeander();
                     break;
                 case State.HUNT:
                     Hunt();
@@ -101,7 +121,12 @@ public class TankEnemy : Tank
         }
     }
 
-    // State for patrolling.
+    /*
+    States representing the tanks action.
+    Patrol - Goes from waypoint to waypoint looking for playerTanks.
+    PatrolMeander - Drives randomly looking for playerTanks.
+    Hunt - Shoots toward playerTank until out of sight for too long.
+    */
     private void Patrol()
     {
         if (playerInSight())
@@ -121,8 +146,19 @@ public class TankEnemy : Tank
             selectWaypoint();
         }
     }
-
-    // State for hunting.
+    private void PatrolMeander()
+    {
+        if (playerInSight())
+        {
+            state = TankEnemy.State.HUNT;
+            currentWaypoint = -1;
+            Debug.Log("hunt");
+        }
+        else
+        {
+            meanderTo();
+        }
+    }
     private void Hunt()
     {
         huntingCounter += Time.deltaTime;
@@ -146,7 +182,43 @@ public class TankEnemy : Tank
         }
     }
 
+    /*
+    Functions for the Patrol state:
+    moveTo(wp) - Drives toward wp.
+    rotateTo(wp) - Rotates toward wp.
+    selectWaypoint() - Randomly selects a waypoint reachable by the current position.
+    playerInSight() - Returns true if a player is within sight.
+    */
     // Selects the first currentWayPoint randomly based on closeness.
+    private void moveTo(GameObject wp)
+    {
+        // Only drives toward at a less than 5 degree angle.
+
+        rotateTo(wp);
+        vectorTowardPlayer1 = body.position - wp.transform.position;
+
+        // Keep track of the targetDirection the tank is pointed toward.
+        m_CurrentDirection = -body.eulerAngles;
+
+        // trueAngle is used because CurrentDirection has a value like (0,-270,0) where it measures the angle from rotating around the y axis.
+        // angleTargetToDirection gets a float value to later check if the tank is facing the targetDirection the joystick is pressed.
+        Vector3 trueAngle = new Vector3(-Mathf.Sin(m_CurrentDirection.y * Mathf.PI / 180), 0, Mathf.Cos(m_CurrentDirection.y * Mathf.PI / 180));
+
+
+        // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
+        float speed = 0;
+        if (Vector3.Angle(trueAngle, -vectorTowardPlayer1) < 5)
+        {
+            speed = m_Speed;
+        }
+        else if (175 < Vector3.Angle(trueAngle, -vectorTowardPlayer1))
+        {
+            speed = -m_Speed;
+        }
+        Vector3 movement = body.forward * speed * Time.deltaTime;
+
+        m_RidgidbodyTank.MovePosition(m_RidgidbodyTank.position + movement);
+    }
     public void selectWaypoint()
     {
         // Sum up the distances to each waypoint. Then, randomly select a waypoint by choosing a random
@@ -179,51 +251,16 @@ public class TankEnemy : Tank
             }
         }
     }
-
     //TODO: make these better
-    // Returns true if a player is infront of TankEnemy.
     private bool playerInSight()
     {
         //TODO: tower isn't ready
         RaycastHit hit;
         return (Physics.Raycast(tower.position, -tower.forward, out hit, roomLength) && hit.transform.tag == playerTag);
     }
-
-    // Moves body toward a waypoint.
-    private void moveTo(GameObject wp)
+    private void rotateTo(GameObject wp)
     {
-        // Only drives toward at a less than 5 degree angle.
-
-        rotateTo(wp);
-        vectorTowardPlayer1 = body.position - wp.transform.position;
-
-        // Keep track of the direction the tank is pointed toward.
-        m_CurrentDirection = -body.eulerAngles;
-
-        // trueAngle is used because CurrentDirection has a value like (0,-270,0) where it measures the angle from rotating around the y axis.
-        // angleTargetToDirection gets a float value to later check if the tank is facing the direction the joystick is pressed.
-        Vector3 trueAngle = new Vector3(-Mathf.Sin(m_CurrentDirection.y * Mathf.PI / 180), 0, Mathf.Cos(m_CurrentDirection.y * Mathf.PI / 180));
-
-
-        // If the tank isn't facing the direction the joystick is pointing, the speed equals 0.
-        float speed = 0;
-        if (Vector3.Angle(trueAngle, -vectorTowardPlayer1) < 5)
-        {
-            speed = m_Speed;
-        }
-        else if (175 < Vector3.Angle(trueAngle, -vectorTowardPlayer1))
-        {
-            speed = -m_Speed;
-        }
-        Vector3 movement = body.forward * speed * Time.deltaTime;
-
-        m_RidgidbodyTank.MovePosition(m_RidgidbodyTank.position + movement);
-    }
-
-    // Rotates body toward a waypoint.
-    protected void rotateTo(GameObject wp)
-    {
-        // Keep track of the direction toward the player.
+        // Keep track of the targetDirection toward the player.
         Vector3 m_TargetDirection = body.position - wp.transform.position;
 
         float step = m_RotateSpeed * Time.deltaTime;
@@ -247,17 +284,136 @@ public class TankEnemy : Tank
         }
     }
 
+    /*
+    Functions for the PatrolMeander state:
+    meaderTo() - Randomly changes speed and direction of the tank.
+    rotateDirection() - Helper for meanderTo which changes the tanks target direction.
+    selectDirection() - Helper for rotateDirection to select a random target direction.
+    */
+    private void meanderTo()
+    {
+        // Select a targetDirection when turningTimeMax is exceeded.
+        turningCounter += Time.deltaTime;
+        if (turningCounter > turningTimeNext)
+        {
+            turningCounter = 0;
+            turningTimeNext = Random.Range(0, turningTimeMax);
 
+            // Alter targetDirection.
+            selectDirection();
+        }
+        rotateDirection();
+        
+        // Change the speed when accelerationTimeMax is exceeded.
+        accelerationCounter += Time.deltaTime;
+        if (accelerationCounter > accelerationTimeNext)
+        {
+            m_CurrentSpeed += Random.Range(-m_CurrentAcceleration / 2, m_CurrentAcceleration);
+            accelerationCounter = 0;
+            if (m_CurrentSpeed < 0)
+            {
+                m_CurrentSpeed = 0;
+            }
+            else if (m_CurrentSpeed > m_Speed)
+            {
+                m_CurrentSpeed = m_Speed;
+            }
 
+            // Set time until next change of speed.
+            accelerationTimeNext = Random.Range(0, accelerationTimeMax);
+        }
 
+        // Keep track of the targetDirection the tank is pointed toward.
+        m_CurrentDirection = -body.eulerAngles;
 
+        // trueAngle is used because CurrentDirection has a value like (0,-270,0) where it measures the angle from rotating around the y axis.
+        // angleTargetToDirection gets a float value to later check if the tank is facing the targetDirection the joystick is pressed.
+        Vector3 trueAngle = new Vector3(-Mathf.Sin(m_CurrentDirection.y * Mathf.PI / 180), 0, Mathf.Cos(m_CurrentDirection.y * Mathf.PI / 180));
+        
+        // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
+        float speed = 0;
+        Vector3 m_TargetDirection = Vector3.Normalize(body.position) + new Vector3(targetDirection[0], 0, targetDirection[1]);
+        if (Vector3.Angle(trueAngle, m_TargetDirection) < 5)
+        {
+            speed = m_CurrentSpeed;
+        }
+        else if (175 < Vector3.Angle(trueAngle, m_TargetDirection))
+        {
+            speed = -m_CurrentSpeed;
+        }
+        Vector3 movement = body.forward * speed * Time.deltaTime;
 
+        m_RidgidbodyTank.MovePosition(m_RidgidbodyTank.position + movement);
+    }
+    private void rotateDirection()
+    {
+        // This is the targetDirection to rotate to.
+        Debug.Log(new Vector3(targetDirection[0], 0, targetDirection[1]));
+        Vector3 target = Vector3.Normalize(body.position) + new Vector3(targetDirection[0], 0, targetDirection[1]);
 
+        float step = m_RotateSpeed * Time.deltaTime;
+        Vector3 newDir = Vector3.RotateTowards(body.forward, target, step, .01F);
 
+        if (newDir == Vector3.zero)
+        {
+            // Don't rotate at all
+        }
+        // Turn forward or backward depending on which is closer.
+        else if (Vector3.Angle(body.forward, target) < 90)
+        {
+            // Rotate towards forwards.
+            body.rotation = Quaternion.LookRotation(newDir);
+        }
+        else
+        {
+            // Rotate towards backwards.
+            newDir = Vector3.RotateTowards(body.forward, -target, step, .01F);
+            body.rotation = Quaternion.LookRotation(newDir);
+        }
+    }
+    private void selectDirection()
+    {
+        RaycastHit hit;
+        targetDirection = Random.insideUnitCircle;
+
+        // Alter targetDirection.
+        //TODO: this isn't a good raycast check which is SUPPOSED to make sure the tank doesn't run into walls
+        while (Physics.Raycast(body.position, new Vector3(targetDirection[0], 0, targetDirection[1]), out hit, padding) &&
+            (hit.transform.tag != wallTag || hit.transform.tag != blockTag || hit.transform.tag != removeBlockTag))
+        {
+            targetDirection = Random.insideUnitCircle;
+            Debug.Log(hit.transform.tag);
+        }
+    }
+
+    /*
+    Functions for the Hunt state:
+    Fire() - Fires a shell from the tower.
+    */
+    // Fires a shell.
     protected new void Fire()
     {
         base.Fire();
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     protected void FireDirect()
     {
@@ -315,7 +471,7 @@ public class TankEnemy : Tank
 
     protected void RotateToward()
     {
-        // Keep track of the direction toward the player.
+        // Keep track of the targetDirection toward the player.
         Vector3 m_TargetDirection = vectorTowardPlayer1;
 
         float step = m_RotateSpeed * Time.deltaTime;
@@ -345,15 +501,15 @@ public class TankEnemy : Tank
 
         RotateToward();
 
-        // Keep track of the direction the tank is pointed toward.
+        // Keep track of the targetDirection the tank is pointed toward.
         m_CurrentDirection = -body.eulerAngles;
 
         // trueAngle is used because CurrentDirection has a value like (0,-270,0) where it measures the angle from rotating around the y axis.
-        // angleTargetToDirection gets a float value to later check if the tank is facing the direction the joystick is pressed.
+        // angleTargetToDirection gets a float value to later check if the tank is facing the targetDirection the joystick is pressed.
         Vector3 trueAngle = new Vector3(-Mathf.Sin(m_CurrentDirection.y * Mathf.PI / 180), 0, Mathf.Cos(m_CurrentDirection.y * Mathf.PI / 180));
 
 
-        // If the tank isn't facing the direction the joystick is pointing, the speed equals 0.
+        // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
         if (Vector3.Angle(trueAngle, -vectorTowardPlayer1) < 5)
         {
@@ -375,15 +531,15 @@ public class TankEnemy : Tank
 
         RotateToward();
 
-        // Keep track of the direction the tank is pointed toward.
+        // Keep track of the targetDirection the tank is pointed toward.
         m_CurrentDirection = -body.eulerAngles;
 
         // trueAngle is used because CurrentDirection has a value like (0,-270,0) where it measures the angle from rotating around the y axis.
-        // angleTargetToDirection gets a float value to later check if the tank is facing the direction the joystick is pressed.
+        // angleTargetToDirection gets a float value to later check if the tank is facing the targetDirection the joystick is pressed.
         Vector3 trueAngle = new Vector3(-Mathf.Sin(m_CurrentDirection.y * Mathf.PI / 180), 0, Mathf.Cos(m_CurrentDirection.y * Mathf.PI / 180));
 
 
-        // If the tank isn't facing the direction the joystick is pointing, the speed equals 0.
+        // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
         if (Vector3.Angle(trueAngle, -vectorTowardPlayer1) < 5)
         {
@@ -404,15 +560,15 @@ public class TankEnemy : Tank
         // Drives toward at an angle between drivingRange.
         RotateToward();
 
-        // Keep track of the direction the tank is pointed toward.
+        // Keep track of the targetDirection the tank is pointed toward.
         m_CurrentDirection = -body.eulerAngles;
 
         // trueAngle is used because CurrentDirection has a value like (0,-270,0) where it measures the angle from rotating around the y axis.
-        // angleTargetToDirection gets a float value to later check if the tank is facing the direction the joystick is pressed.
+        // angleTargetToDirection gets a float value to later check if the tank is facing the targetDirection the joystick is pressed.
         Vector3 trueAngle = new Vector3(-Mathf.Sin(m_CurrentDirection.y * Mathf.PI / 180), 0, Mathf.Cos(m_CurrentDirection.y * Mathf.PI / 180));
 
 
-        // If the tank isn't facing the direction the joystick is pointing, the speed equals 0.
+        // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
         if (Vector3.Angle(trueAngle, -vectorTowardPlayer1) < drivingRange)
         {
@@ -434,15 +590,15 @@ public class TankEnemy : Tank
         // Drives toward at an angle between drivingRange.
         RotateToward();
 
-        // Keep track of the direction the tank is pointed toward.
+        // Keep track of the targetDirection the tank is pointed toward.
         m_CurrentDirection = -body.eulerAngles;
 
         // trueAngle is used because CurrentDirection has a value like (0,-270,0) where it measures the angle from rotating around the y axis.
-        // angleTargetToDirection gets a float value to later check if the tank is facing the direction the joystick is pressed.
+        // angleTargetToDirection gets a float value to later check if the tank is facing the targetDirection the joystick is pressed.
         Vector3 trueAngle = new Vector3(-Mathf.Sin(m_CurrentDirection.y * Mathf.PI / 180), 0, Mathf.Cos(m_CurrentDirection.y * Mathf.PI / 180));
 
 
-        // If the tank isn't facing the direction the joystick is pointing, the speed equals 0.
+        // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
         if (Vector3.Angle(trueAngle, -vectorTowardPlayer1) < drivingRange)
         {
@@ -460,7 +616,7 @@ public class TankEnemy : Tank
 
     protected void RotatePerpendicular()
     {
-        // Keep track of the direction toward the player.
+        // Keep track of the targetDirection toward the player.
         Vector3 m_TargetDirection = Vector3.Cross(vectorTowardPlayer1, Vector3.up);
 
         float step = m_RotateSpeed * Time.deltaTime;
@@ -489,14 +645,14 @@ public class TankEnemy : Tank
         // Only perpendicular counter clockwise.
         RotatePerpendicular();
 
-        // Keep track of the direction the tank is pointed toward.
+        // Keep track of the targetDirection the tank is pointed toward.
         m_CurrentDirection = -body.eulerAngles;
 
         // trueAngle is used because CurrentDirection has a value like (0,-270,0) where it measures the angle from rotating around the y axis.
-        // angleTargetToDirection gets a float value to later check if the tank is facing the direction the joystick is pressed.
+        // angleTargetToDirection gets a float value to later check if the tank is facing the targetDirection the joystick is pressed.
         Vector3 trueAngle = new Vector3(-Mathf.Sin(m_CurrentDirection.y * Mathf.PI / 180), 0, Mathf.Cos(m_CurrentDirection.y * Mathf.PI / 180));
 
-        // If the tank isn't facing the direction the joystick is pointing, the speed equals 0.
+        // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
         if (85 < CalculateAngle(trueAngle, vectorTowardPlayer1) && CalculateAngle(trueAngle, vectorTowardPlayer1) < 95)
         {
@@ -522,14 +678,14 @@ public class TankEnemy : Tank
         // Only perpendicular counter clockwise.
         RotatePerpendicular();
 
-        // Keep track of the direction the tank is pointed toward.
+        // Keep track of the targetDirection the tank is pointed toward.
         m_CurrentDirection = -body.eulerAngles;
 
         // trueAngle is used because CurrentDirection has a value like (0,-270,0) where it measures the angle from rotating around the y axis.
-        // angleTargetToDirection gets a float value to later check if the tank is facing the direction the joystick is pressed.
+        // angleTargetToDirection gets a float value to later check if the tank is facing the targetDirection the joystick is pressed.
         Vector3 trueAngle = new Vector3(-Mathf.Sin(m_CurrentDirection.y * Mathf.PI / 180), 0, Mathf.Cos(m_CurrentDirection.y * Mathf.PI / 180));
 
-        // If the tank isn't facing the direction the joystick is pointing, the speed equals 0.
+        // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
         if (90 - drivingRange < CalculateAngle(trueAngle, vectorTowardPlayer1) && CalculateAngle(trueAngle, vectorTowardPlayer1) < 90 + drivingRange)
         {
@@ -555,14 +711,14 @@ public class TankEnemy : Tank
         // Only perpendicular counter clockwise.
         RotatePerpendicular();
 
-        // Keep track of the direction the tank is pointed toward.
+        // Keep track of the targetDirection the tank is pointed toward.
         m_CurrentDirection = -body.eulerAngles;
 
         // trueAngle is used because CurrentDirection has a value like (0,-270,0) where it measures the angle from rotating around the y axis.
-        // angleTargetToDirection gets a float value to later check if the tank is facing the direction the joystick is pressed.
+        // angleTargetToDirection gets a float value to later check if the tank is facing the targetDirection the joystick is pressed.
         Vector3 trueAngle = new Vector3(-Mathf.Sin(m_CurrentDirection.y * Mathf.PI / 180), 0, Mathf.Cos(m_CurrentDirection.y * Mathf.PI / 180));
 
-        // If the tank isn't facing the direction the joystick is pointing, the speed equals 0.
+        // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
         if (85 < CalculateAngle(trueAngle, vectorTowardPlayer1) && CalculateAngle(trueAngle, vectorTowardPlayer1) < 95)
         {
@@ -588,14 +744,14 @@ public class TankEnemy : Tank
         // Only perpendicular counter clockwise.
         RotatePerpendicular();
 
-        // Keep track of the direction the tank is pointed toward.
+        // Keep track of the targetDirection the tank is pointed toward.
         m_CurrentDirection = -body.eulerAngles;
 
         // trueAngle is used because CurrentDirection has a value like (0,-270,0) where it measures the angle from rotating around the y axis.
-        // angleTargetToDirection gets a float value to later check if the tank is facing the direction the joystick is pressed.
+        // angleTargetToDirection gets a float value to later check if the tank is facing the targetDirection the joystick is pressed.
         Vector3 trueAngle = new Vector3(-Mathf.Sin(m_CurrentDirection.y * Mathf.PI / 180), 0, Mathf.Cos(m_CurrentDirection.y * Mathf.PI / 180));
 
-        // If the tank isn't facing the direction the joystick is pointing, the speed equals 0.
+        // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
         if (90 - drivingRange < CalculateAngle(trueAngle, vectorTowardPlayer1) && CalculateAngle(trueAngle, vectorTowardPlayer1) < 90 + drivingRange)
         {

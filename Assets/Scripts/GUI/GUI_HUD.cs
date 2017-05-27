@@ -114,8 +114,17 @@ namespace Completed
             callAwake();
             callStart();
 
-            PlaceP1Projectiles();
-            PlaceP2Projectiles();
+            foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
+            {
+                if (tank.GetComponent<TankPlayer>().m_PlayerNumber == 1)
+                {
+                    PlaceP1Projectiles();
+                }
+                else
+                {
+                    PlaceP2Projectiles();
+                }
+            }
         }
 
         private void PlaceP1Projectiles()
@@ -185,10 +194,18 @@ namespace Completed
 
         public void UpdateProjectiles()
         {
-            UpdateP1Projectiles();
-            UpdateP2Projectiles();
-            //Debug.Log(P1ProjectileCount);
-            //Debug.Log(P2ProjectileCount);
+
+            foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
+            {
+                if (tank.GetComponent<TankPlayer>().m_PlayerNumber == 1)
+                {
+                    UpdateP1Projectiles();
+                }
+                else
+                {
+                    UpdateP2Projectiles();
+                }
+            }
         }
         private void UpdateP1Projectiles()
         {

@@ -48,7 +48,7 @@ namespace Completed
                 }
             }
             playerScript1 = m_Player1.GetComponent<TankPlayer>();
-            playerScript2 = m_Player2.GetComponent<TankPlayer>();
+            //playerScript2 = m_Player2.GetComponent<TankPlayer>();
             // TODD: set up a better method for angling the camera
             transform.rotation = m_cameraAngle;
 
