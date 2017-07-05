@@ -26,11 +26,7 @@ public class ProjectilePlayer : Projectile
     public override void KillProjectile()
     {
         base.KillProjectile();
-
-        if(!transfered)
-        {
-            parentTank.GetComponent<Tank>().increaseProjCount();
-        }
+        
         GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
     }
 

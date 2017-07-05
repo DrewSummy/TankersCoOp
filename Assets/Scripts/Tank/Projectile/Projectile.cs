@@ -162,6 +162,12 @@ public class Projectile : MonoBehaviour
         GameObject explosion = Instantiate(projectileExplosion, gameObject.transform.position, Quaternion.identity) as GameObject;
         Destroy(explosion, 1);
         // The audio will for exploding the object will play
+
+        // Update the projectileCount of the parent tank.
+        if (!transfered)
+        {
+            parentTank.GetComponent<Tank>().increaseProjCount();
+        }
     }
 
     public virtual void RemoveProjectile()
