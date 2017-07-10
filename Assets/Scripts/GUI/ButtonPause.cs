@@ -12,7 +12,6 @@ abstract public class ButtonPause : EventTrigger
     protected Vector3 selectOffset = new Vector3(50, 0, 0);         // The offset of the button when selected.
     protected Vector3 originalPos;                                // The original position of the button.
     protected Vector3 offsetPos;                                  // The position of the button when selected.
-    private Vector3 originalScale = new Vector3(1, 1, 1);         //TOUSE: The original scale of the button.
     protected Color originalColor;                                // The original color of the text.
     private Color colorRange = new Color(.2f, .2f, .2f, 0);       // The range the color changes when selected..
 

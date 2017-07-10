@@ -22,7 +22,6 @@ namespace Completed
         private Transform m_room;                                                // Store a reference to the room transform.
         private int m_level;                                                     // Store a reference to our RoomManager which will set up the room.
         private Transform[] m_doors = new Transform[4];                          // An array of the doors.
-        private bool isDoorLowered = false;                                      // The bool for is the doors are all lowered.
         private bool isPlayer1;                                                  // The bool for if player 2 is alive.
         private bool isPlayer2;                                                  // The bool for if player 2 is alive.
         private GameObject player1;                                              // Reference to the player 1 game object.
@@ -34,7 +33,6 @@ namespace Completed
         private List<Vector3> enemySpawnLocations = new List<Vector3>();         // A list of enemy spawn locations.
         private string exitTag = "Exit";                                         // String to apply the tag on the exit.
         private string wallTag = "Wall";
-        private string blockTag = "Block";
         private string blockRemovableTag = "BlockRemovable";
         private Transform enemyHolder;                                           // A variable to store a reference to the transform of the enemy object.
         private Transform projectileHolder;                                      // A variable to store a reference to the transform of the projectile holder object.
@@ -43,7 +41,6 @@ namespace Completed
         private float wallThickness = 1f;                                        // Thickness of outside walls.
         private float blockThickness = 2.5f;                                     // Thickness of blocks.
         private int m_RoomLength = 50;                                           // Length of each room declared elsewhere also.
-        private float gateHeight = 6f;                                           // Height of each gate.
         private struct obstacleCourse                                            // A struct for an obstacle course.
         {
             public int[,] room;
@@ -62,7 +59,6 @@ namespace Completed
         private bool[] m_NEWSWall = new bool[4];                                 // An array of bools to represent if the wall is open.
 
         private Gate doorScript;                                                 // Store a reference to the Gate.
-        private bool battleOver = false;                                         // Boolean for if the battle is over.
         private bool proceedEndingSequence = true;                               // Boolean for if the ending sequence should proceed.
         public bool battleBegin = false;                                         // Boolean for if the battle needs to begin.
         private bool proceedBeginningSequence = false;                           // Boolean for if the beginning sequence should proceed.
@@ -71,7 +67,6 @@ namespace Completed
         private bool roomIdle = false;                                           // Boolean for if the room is in idle.
         private Transform lightHolder;                                           // A variable to store a reference to the transform of the light holder object.
         private Light example;                                                   // Boolean for if the.
-        private bool lightsEquipped = false;                                     // TODO: not used. Boolean for if the the lights are equiped.
         private Transform[] NEWSRoom;                                            // sdsdsdStore a reference to our TankPlayer of player 1.
         public Transform roomTo;                                                 // TODO: might not need public. A variable to store a reference to the transform of the next room object.
         //public bool needToTravel = true;                                         // Boolean for if 
@@ -81,8 +76,7 @@ namespace Completed
         public bool isLastRoom = false;                                          // Boolean for if this is the last room.
         private GameObject[] waypoints;
 
-
-        private bool endBattleCalled = true;
+        
         public GameMaster GM;
         private int enemyCount = 0;
         private Object enemyCounterLock = new Object();
@@ -943,10 +937,8 @@ namespace Completed
 
             roomIdle = true;
             roomCompleted = true;
-            battleOver = true;
             battleEnsuing = false;
             StartCoroutine(FlickerLights());
-            lightsEquipped = true;
 
             // Prevent players from shooting momentarily and set them to not battling.. Wait 1 second.
             player1.GetComponent<TankPlayer>().disableShoot(true);
@@ -993,8 +985,6 @@ namespace Completed
             {
                 lightHolder.GetComponentsInChildren<Light>()[i].enabled = true;
             }
-
-            lightsEquipped = true;
         }
 
 
@@ -1186,8 +1176,6 @@ namespace Completed
                 Projectile currentProj = projectileHolder.GetComponentsInChildren<Projectile>()[proj];
                 currentProj.GetComponent<Projectile>().DisableProjectile();
             }
-
-            isDoorLowered = true;
         }
 
 

@@ -12,17 +12,18 @@ public class Projectile : MonoBehaviour
     public GameObject smokeTrail;
 
     protected int maxCollisions = 1;               // The max number of collisions before the object is destroyed. 
-    private int collisionCounter;                  // Used to keep track of the number of collisions.
+    protected int collisionCounter = 0;            // Used to keep track of the number of collisions.
     private float projectileSpeed = 16;            // The speed the projectile fires at.
-    private Vector3 projectileSpeedVector;         // The vector the projectile moves at.
-    private Vector3 normalCollision;               // The vector normal to the collision.
-    private Vector3 newProjectileSpeedVector;      // The vector the projectile reflects at.
-    private Rigidbody ProjectileRigidbody;         // Reference used to move the projectile.
+    protected Vector3 projectileSpeedVector;       // The vector the projectile moves at.
+    protected Rigidbody ProjectileRigidbody;       // Reference used to move the projectile.
     public GameObject parentTank;                  // Reference to the parent tank game object.
-    private Tank tankScript;                       // Reference to Tank to be able to call DestroyTank().
+    protected Tank tankScript;                     // Reference to Tank to be able to call DestroyTank().
     private bool disabled = false;                 // Boolean for whether the projectile is disabled.
     private GameObject currentTrail;
     public bool transfered = false;
+    private string projTag = "Projectile";
+    private string playerTag = "Player";
+    private string enemyTag = "Enemy";
 
     //TODO: make the bullet rotate around the center of the sphere collider, maybe make an empty parent gameObject as the parent
 
@@ -36,12 +37,6 @@ public class Projectile : MonoBehaviour
     // Use this for initialization
     protected void Start()
     {
-        // Each spawned projectile has collided with 0 objects.
-        collisionCounter = 0;
-
-        // The speed the projectile moves at.
-        projectileSpeed = 16;
-
         // Use the rigidbody and calculate the projectileSpeedVector.
         ProjectileRigidbody = gameObject.GetComponent<Rigidbody>();
 
@@ -52,12 +47,8 @@ public class Projectile : MonoBehaviour
         ProjectileRigidbody.velocity = -ProjectileRigidbody.transform.forward * projectileSpeed;
         projectileSpeedVector = ProjectileRigidbody.velocity;
 
-        // Update the trail.
-        currentTrail = Instantiate(smokeTrail) as GameObject;
-        currentTrail.transform.SetParent(transform);
-        currentTrail.transform.position = transform.position;
-        currentTrail.transform.rotation = transform.rotation;
-        currentTrail.GetComponent<Rigidbody>().velocity = projectileSpeedVector;
+        // Set the trail.
+        setTrail();
 
         // Load in the explosion being used from the Resources folder in assets.
         projectileExplosion = Resources.Load("TankResources/Effect_02") as GameObject;
@@ -70,98 +61,124 @@ public class Projectile : MonoBehaviour
         audioSource.clip = ricochetAudio;
     }
 
+    protected void setTrail()
+    {
+        currentTrail = Instantiate(smokeTrail) as GameObject;
+        currentTrail.transform.SetParent(transform);
+        currentTrail.transform.position = transform.position;
+        currentTrail.transform.rotation = transform.rotation;
+        currentTrail.GetComponent<Rigidbody>().velocity = projectileSpeedVector;
+    }
+
 
     protected void OnCollisionEnter(Collision collisionInfo)
     {
         // The object has collided with another projectile.
-        if (collisionInfo.transform.tag == "Projectile")
+        if (collisionInfo.transform.tag == projTag)
         {
-            if (!disabled)
-            {
-                // Drop the current smoke trail.
-                currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
-                KillProjectile();
-            }
+            projectileCollision();
         }
-        // The object has collided with a player tank.
-        else if (collisionInfo.transform.tag == "Player" || collisionInfo.transform.tag == "Enemy")
+        // The object has collided with a tank.
+        else if (collisionInfo.transform.tag == playerTag || collisionInfo.transform.tag == enemyTag)
         {
-            if (!disabled)
-            {
-                // Drop the current smoke trail.
-                tankScript = collisionInfo.gameObject.GetComponent<Tank>();
-                tankScript.DestroyTank();
-                currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
-                KillProjectile();
-
-            }
+            tankCollision(collisionInfo);
         }
         // The object has collided the max amount of times.
         else if (collisionCounter >= maxCollisions)
         {
-            // Drop the current smoke trail.
-            if (currentTrail) currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
-            KillProjectile();
+            lastCollision();
         }
         // The object has more collisions and needs to rotate and continue.
         else
         {
-            // A collsion has occured.
-            ++collisionCounter;
-
-            if (!disabled)
-            {
-                // Drop the current smoke trail.
-                //TODO: this is causing error when tanks die
-                currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
-
-                //if (ProjectileRigidbody) ProjectileRigidbody.freezeRotation = true;
-                ProjectileRigidbody.freezeRotation = true;
-
-
-                // Calculate the new vector follow the equation V' = 2(V.N)*N-V.
-                normalCollision = collisionInfo.contacts[0].normal;
-
-                newProjectileSpeedVector =
-                    Vector3.Reflect(projectileSpeedVector, normalCollision);
-
-                ProjectileRigidbody.transform.forward = -newProjectileSpeedVector;
-                ProjectileRigidbody.velocity = newProjectileSpeedVector;
-                projectileSpeedVector = ProjectileRigidbody.velocity;
-
-
-
-
-                // Update the trail.
-                currentTrail = Instantiate(smokeTrail) as GameObject;
-                currentTrail.transform.SetParent(transform);
-                currentTrail.transform.position = transform.position;
-                currentTrail.transform.rotation = transform.rotation;
-                currentTrail.GetComponent<Rigidbody>().velocity = projectileSpeedVector;
-
-            }
-
-            // If the audioclip isn't the ricochet audio make it that.
-            if (audioSource.clip != ricochetAudio)
-            {
-                audioSource.clip = ricochetAudio;
-            }
-
-            // Play the audio for the ricochet.
-            audioSource.Play();
+            wallCollision(collisionInfo);
         }
     }
-    
+
+
+    /*
+    Functions for collisions:
+    projectileCollision() - Kill the projectile.
+    tankCollision() - Kill the projectile and tank that was hit.
+    lastCollision() - Kill the projectile.
+    wallCollision() - Calculates a new direction based on angle of incidence,
+                        substitutes projectile trails, and plays audio.
+    */
+    protected void projectileCollision()
+    {
+        if (!disabled)
+        {
+            // Drop the current smoke trail.
+            KillProjectile();
+        }
+    }
+    protected void tankCollision(Collision ci)
+    {
+        if (!disabled)
+        {
+            // Drop the current smoke trail.
+            ci.gameObject.GetComponent<Tank>().DestroyTank();
+            KillProjectile();
+        }
+    }
+    protected void lastCollision()
+    {
+        // Drop the current smoke trail.
+        KillProjectile();
+    }
+    protected void wallCollision(Collision ci)
+    {
+        // A collsion has occured.
+        ++collisionCounter;
+
+        if (!disabled)
+        {
+            // Drop the current smoke trail.
+            if (currentTrail) currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
+
+            ProjectileRigidbody.freezeRotation = true;
+
+
+            // Calculate the new vector follow the equation V' = 2(V.N)*N-V.
+
+            // The vector normal to the collision.
+            Vector3 normalCollision = ci.contacts[0].normal;
+
+
+            // The vector the projectile reflects at.
+            Vector3 newProjectileSpeedVector =
+                Vector3.Reflect(projectileSpeedVector, normalCollision);
+
+            ProjectileRigidbody.transform.forward = -newProjectileSpeedVector;
+            ProjectileRigidbody.velocity = newProjectileSpeedVector;
+            projectileSpeedVector = ProjectileRigidbody.velocity;
+
+
+            // Update the trail.
+            setTrail();
+        }
+
+        // If the audioclip isn't the ricochet audio make it that.
+        if (audioSource.clip != ricochetAudio)
+        {
+            audioSource.clip = ricochetAudio;
+        }
+
+        // Play the audio for the ricochet.
+        audioSource.Play();
+    }
+
+
 
     public virtual void KillProjectile()
     {
-        // The projectile has reached the max number of collisions.
-        // Get rid of object.
+        // Get rid of object and its trail.
+        if (currentTrail) currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
         Destroy(gameObject);
         // Add the explosion and delete the object after 3 seconds.
         GameObject explosion = Instantiate(projectileExplosion, gameObject.transform.position, Quaternion.identity) as GameObject;
         Destroy(explosion, 1);
-        // The audio will for exploding the object will play
+        // TODO: The audio will for exploding the object will play
 
         // Update the projectileCount of the parent tank.
         if (!transfered)
@@ -173,7 +190,7 @@ public class Projectile : MonoBehaviour
     public virtual void RemoveProjectile()
     {
         // The same as killProjectile without audio or the explosion.
-        currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
+        if (currentTrail) currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
         GameObject.Destroy(this.gameObject);
     }
 

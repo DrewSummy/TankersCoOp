@@ -45,10 +45,6 @@ namespace Completed
         private Transform settingsHolder;                          // Holds the buttons of settings.
 
         private float[] delayRange = new float[2];
-        private float initialSpeed = 12f;
-        private float acceleration = 2f;
-        private float finalHorPos = 100;
-        private float finalVertPos = 470;
 
         //TODO: when one is called stop the other coroutine rather than wait until the other is done
         private Coroutine raise;

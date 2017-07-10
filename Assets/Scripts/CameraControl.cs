@@ -7,8 +7,6 @@ namespace Completed
     {
         public GameObject m_Player1;                   // Reference to the player's transform.
         public GameObject m_Player2;                   // Reference to the player's transform.
-        private TankPlayer playerScript1;
-        private TankPlayer playerScript2;
         public bool battling = false;
         public bool gameOver = false;
 
@@ -47,7 +45,6 @@ namespace Completed
                     m_Player2 = tank;
                 }
             }
-            playerScript1 = m_Player1.GetComponent<TankPlayer>();
             //playerScript2 = m_Player2.GetComponent<TankPlayer>();
             // TODD: set up a better method for angling the camera
             transform.rotation = m_cameraAngle;

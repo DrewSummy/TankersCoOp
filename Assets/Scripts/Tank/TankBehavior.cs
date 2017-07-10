@@ -21,8 +21,6 @@ public class TankBehavior : MonoBehaviour
     private string m_AimVerticalName;           // The name of the vector for aiming.
     private float m_AimHorizontalValue;         // The value of the vector for aiming.
     private float m_AimVerticalValue;           // The value of the vector for aiming.
-    private string m_FireName;                  // The name of the vector for shooting.
-    private float m_FireValue;                  // The value of the vector for the trigger.
     private Vector3 m_AimRotation;              // The target direction for the tower to point.
     private bool m_HasShot;                     // The boolean used to permit the tank to shoot once per trigger pull.
     private float joystickMagnitude1;           // The magnitude of the joystick for moving. 
@@ -54,7 +52,6 @@ public class TankBehavior : MonoBehaviour
         m_AimVerticalValue = 0f;
         m_DriveHorizontalValue = 0f;
         m_DriveVerticalValue = 0f;
-        m_FireValue = 0f;
 
 
         // Also reset the input values.
@@ -74,7 +71,6 @@ public class TankBehavior : MonoBehaviour
         m_AimVerticalName = "AimVertical" + m_PlayerNumber;
         m_DriveHorizontalName = "DriveHorizontal" + m_PlayerNumber;
         m_DriveVerticalName = "DriveVertical" + m_PlayerNumber;
-        m_FireName = "Fire" + m_PlayerNumber;
 
         // Get the children of tank; body and tower.
         body = this.gameObject.transform.GetChild(0);
@@ -144,9 +140,6 @@ public class TankBehavior : MonoBehaviour
             m_AimHorizontalValue = Input.GetAxis(m_AimHorizontalName);
             m_AimVerticalValue = Input.GetAxis(m_AimVerticalName);
         }
-
-        // Store the value for firing.
-        m_FireValue = Input.GetAxis(m_FireName);
     }
 
 

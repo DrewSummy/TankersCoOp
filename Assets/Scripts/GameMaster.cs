@@ -23,17 +23,13 @@ namespace Completed
         
         private LevelManager levelScript;                          // Store a reference to our LevelManager which will set up the level.
         private int Level = 1;                                     // Current level number.
-        private int maxLevel = 5;                                  // Max level number.
         private bool coop = false;                                 // Makes a player 2 if true.
 
-        // TODO: this is temporary, spawning players should be in initGame using sendPlayersPositions (i think)
-        private Vector3 player1Position = new Vector3(285, 0, 285);// Position of player 1.
+
         private TankPlayer player1Script;
         private TankPlayer player2Script;
-        private Vector3 aiTankPosition = new Vector3(295, 0, 295);
         //private Vector3 player2Position;                         // Position of player 2.
         private Transform playerHolder;                            // A variable to store a reference to the transform of the player object.
-        private Transform enemyHolder;                             // A variable to store a reference to the transform of the enemy object.
 
         //Awake is always called before any Start functions
         void Awake()
@@ -89,9 +85,6 @@ namespace Completed
                 player2Script = player2.GetComponent<TankPlayer>();
                 player2Script.m_PlayerNumber = 2;
             }
-
-            // Create playerHolder to hold both players for organization.
-            enemyHolder = new GameObject("EnemyHolder").transform;
         }
 
         private void displaymenuGUI()

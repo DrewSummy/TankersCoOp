@@ -50,21 +50,12 @@ namespace Completed
         public Vector2 lastRoomCoordinate;                                       // A Vector2 for the last room.
         private Transform roomHolder;                                            // A variable to store a reference to the transform of the Room object.
         private Transform obstacleHolder;                                        // A variable to store a reference to the transform of the Obstacle object.
-        private List<float> textureDistributions = new List<float>();            // A list of likelihoods for each obstacle to show up depending on the level.
-        private List<Vector3> spawnPositions = new List<Vector3>();              // A list of possible locations to place spawns.
         private int m_RoomLength = 50;                                           // Length of each room declared elsewhere also.
         private float wallThickness = 1f;                                        // Thickness of outside walls.
-        private float blockThickness = 2.5f;                                     // Thickness of blocks.
         private int numberOfRooms;                                               // Number of rooms based on level
-        private string blockTag = "Block";                                       // String to apply the tag on blocks.
-        private string playerSpawnTag = "PlayerSpawn";                           // String to apply the tag on player spawns.
-        private string enemySpawnTag = "EnemySpawn";                             // String to apply the tag on enemy spawns.
-        private string exitTag = "Exit";                                         // String to apply the tag on the exit.
         private Transform currentRoom;                                           // The transform for the current room.
         private GameObject player1;                                              // Reference to the player 1 game object.
         private GameObject player2;
-        //private Vector3 player2Position;
-        private bool needToStartRoom = true;                                     // Boolean of whether the first room needs to start. TODO: should be obsolete
         private int playersLeft;
 
         public GameMaster GM;

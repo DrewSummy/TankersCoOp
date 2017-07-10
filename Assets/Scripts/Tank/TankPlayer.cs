@@ -28,7 +28,6 @@ namespace Completed
         private bool m_SelectValue1;
         private string m_SelectName;                 // The name of the bool for pausing.
         private bool m_HasShot;                     // The boolean used to permit the tank to shoot once per trigger pull.
-        private bool m_HasPaused;                   // The boolean used to permit the player from pausing repeatedly.
         private bool paused;                        // The boolean for if the game is paused.
         private float joystickMagnitude1;           // The magnitude of the joystick for moving.
         private GUI_MiniMap miniMapGUI;
@@ -44,9 +43,6 @@ namespace Completed
         private Vector3 center = new Vector3(25f, 0, 25f);    // Distance to center of room for teleporting.
         public bool battling = false;               // Boolean indicating the tank is battling; needed for relocating.
         public LevelManager LM;
-
-
-        private int counter = 0;
 
 
         new void Awake()
@@ -102,8 +98,7 @@ namespace Completed
 
             // Tanks hasn't shot yet. This is used to allow semi-auto shooting.
             m_HasShot = false;
-
-            m_HasPaused = false;
+            
             paused = false;
 
             // Make the size of the killCounter the amount of colors.
@@ -193,13 +188,13 @@ namespace Completed
 
             // Adjust the rotation of tower in FixedUpdate.
             Aim();
-            
+
             // Shoot bullets from the tower in FixedUpdate if m_FireValue exceeds .9.
             if (!aimOnly)
             {
                 Shoot();
             }
-            
+
             // Toggle the map mode.
             Select();
         }
@@ -424,7 +419,7 @@ namespace Completed
         {
             return projectileAmount;
         }
-        
+
         public int getProjectileCount()
         {
             return projectileCount;
@@ -498,7 +493,7 @@ namespace Completed
             alive = true;
             transform.position = teammate.currentRoom.transform.position + center;
             currentRoom = teammate.currentRoom;
-            
+
             // Set projectile count to projectileAmount.
             projectileCount = projectileAmount;
             GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();

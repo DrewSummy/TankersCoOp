@@ -39,10 +39,6 @@ namespace Completed
         private int m_RoomLength = 50;                                           // Length of each room declared elsewhere also.
         private float wallThickness = 1f;                                        // Thickness of outside walls.
         private Vector2 playerCoord;                                             // Reference to coordinate of players position.
-        private float outlineBorderFull = 1.5f;                                        // Amount to scale by on neighborless wall. Proportional to scaleBorderFull.
-        private float scaleBorderFull = .1f;                                         // Amount to scale by on neighborless wall. Proportional to outlineBorderFull.
-        private float outlineBorderSample = 1.5f;                                        // Amount to scale by on neighborless wall. Proportional to scaleBorderSample.
-        private float scaleBorderSample = .1f;                                         // Amount to scale by on neighborless wall. Proportional to outlineBorderSample.
         private Vector3 mapOffset = new Vector3(80, 100, 0);                                         // Amount to scale by on neighborless wall. Proportional to outlineBorderFull.
         private bool selected = false;
         private int sampleRadius = 1;

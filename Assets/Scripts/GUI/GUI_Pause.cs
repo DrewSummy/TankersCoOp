@@ -17,15 +17,12 @@ namespace Completed
         public GameObject Quit;
         public GameObject QuitYes;
         public GameObject QuitNo;
-        private int[] P1Kills;
         private Transform killHolder1;
         private Transform killHolder2;
         private GameObject P1;
         private GameObject P2;
         public GameObject killCountText;
         public Material[] tankColors;
-
-        private bool enabled = false;                              // Bool for when pause is usable.
 
 
         void Awake()
@@ -62,7 +59,7 @@ namespace Completed
             }
 
             PlaceP1Kills();
-            PlaceP2Kills();
+            //PlaceP2Kills();
         }
 
         private void PlaceP1Kills()
@@ -145,7 +142,7 @@ namespace Completed
 
                     GameObject tankText = Instantiate(killCountText) as GameObject;
                     tankText.transform.SetParent(killHolder2);
-                    tankText.GetComponent<Text>().text = "x  " + P1Kills[killType];
+                    //tankText.GetComponent<Text>().text = "x  " + P1Kills[killType];
                     tankText.GetComponent<Text>().fontSize = 14;
                     tankText.transform.position = killHolder2.position + new Vector3(129, 22 - killType * 25, 0);
                     tankText.GetComponent<Text>().enabled = true;
