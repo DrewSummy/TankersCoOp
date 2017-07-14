@@ -28,6 +28,7 @@ public class ProjectileTest : MonoBehaviour {
 
     protected void Start()
     {
+        //TODO: test this
         raycastLayer = ~(1 << LayerMask.NameToLayer("Ignore Raycasat"));
     }
 

@@ -25,11 +25,13 @@ public class TankEnemy : Tank
     private bool canFire = true;                // The bool for if the tank can turn.
     private float m_towerSpeed = 90f;           // The float for how fast the tower rotates.
     protected GameObject projTest;
+    private Vector3 targetDirectionAim;
+    private float rotateSpeed = .9f;
 
     // Driving Variables
     private int drivingRange = 30;              // Angle used for driving toward/away from a player.
     private float m_CurrentSpeed;               // How fast the tank is driving.
-    private Vector3 targetDirection;            // The current targetDirection for the tank to go.
+    private Vector3 targetDirectionDrive;       // The current targetDirection for the tank to go.
     private float turningTimeMax = 5.0f;        // The max amount of time the tank goes before turning.
     private float turningTimeMin = 1.0f;        // The min amount of time the tank goes before turning.
     private float turningTimeNext;              // The randomly selected amount of time the tank goes before turning.
@@ -218,7 +220,7 @@ public class TankEnemy : Tank
     private void rotateDirection()
     {
         // This is the targetDirection to rotate to.
-        Vector3 target = targetDirection;
+        Vector3 target = targetDirectionDrive;
 
         float step = m_RotateSpeed * Time.deltaTime;
         Vector3 newDir = Vector3.RotateTowards(body.forward, target, step, .01F);
@@ -248,13 +250,13 @@ public class TankEnemy : Tank
         {
             // Set targetDirection along the x-z plane and do so until a valid direction is selected.
             Vector2 unitPlane = Random.insideUnitCircle.normalized;
-            targetDirection.Set(unitPlane[0], 0, unitPlane[1]);
-            while (obstructed(targetDirection))
+            targetDirectionDrive.Set(unitPlane[0], 0, unitPlane[1]);
+            while (obstructed(targetDirectionDrive))
             {
                 //Debug.DrawLine(body.position, Vector3.up + body.position + padding * targetDirection, Color.red, 10);
                 // Set targetDirection along the x-z plane.
                 unitPlane = Random.insideUnitCircle.normalized;
-                targetDirection.Set(unitPlane[0], 0, unitPlane[1]);
+                targetDirectionDrive.Set(unitPlane[0], 0, unitPlane[1]);
             }
             //Debug.DrawLine(body.position, Vector3.up + body.position + padding * targetDirection, Color.white, 10);
 
@@ -276,12 +278,12 @@ public class TankEnemy : Tank
 
         // Set the speed to m_CurrentSpeed if the tank is pointed to within 5 degrees of the target direction from either end.
 
-        if (Vector3.Angle(body.forward, targetDirection) < 5 || 360 < Vector3.Angle(body.forward, targetDirection))
+        if (Vector3.Angle(body.forward, targetDirectionDrive) < 5 || 360 < Vector3.Angle(body.forward, targetDirectionDrive))
         {
             speed = m_CurrentSpeed;
             //Debug.DrawLine(body.position, Vector3.up + body.position + padding * speed * body.forward, Color.green, 1);
         }
-        else if (175 < Vector3.Angle(body.forward, targetDirection) && Vector3.Angle(body.forward, targetDirection) < 185)
+        else if (175 < Vector3.Angle(body.forward, targetDirectionDrive) && Vector3.Angle(body.forward, targetDirectionDrive) < 185)
         {
             speed = -m_CurrentSpeed;
             //Debug.DrawLine(body.position, Vector3.up + body.position + padding * speed * body.forward, Color.green, 1);
@@ -404,6 +406,9 @@ public class TankEnemy : Tank
     {
         Debug.Log("evade");
         state = TankEnemy.State.EVADE;
+
+        // Start aiming at the player.
+        selectDirectionAim();
     }
     private void driveAway()
     {
@@ -425,19 +430,19 @@ public class TankEnemy : Tank
             
             // Set targetDirection along the x-z plane and do so until a valid direction is selected.
             Vector2 unitPlane = Random.insideUnitCircle.normalized;
-            targetDirection.Set(unitPlane[0], 0, unitPlane[1]);
+            targetDirectionDrive.Set(unitPlane[0], 0, unitPlane[1]);
 
-            Debug.Log(Mathf.Abs(Vector3.Angle(targetDirection, vectorTowardPlayer1)));
-            Debug.Log(isAway(targetDirection));
-            while ((obstructed(targetDirection) || !isAway(targetDirection)) && (trys > 0))
+            Debug.Log(Mathf.Abs(Vector3.Angle(targetDirectionDrive, vectorTowardPlayer1)));
+            Debug.Log(isAway(targetDirectionDrive));
+            while ((obstructed(targetDirectionDrive) || !isAway(targetDirectionDrive)) && (trys > 0))
             {
                 // Set targetDirection along the x-z plane.
                 unitPlane = Random.insideUnitCircle.normalized;
-                targetDirection.Set(unitPlane[0], 0, unitPlane[1]);
+                targetDirectionDrive.Set(unitPlane[0], 0, unitPlane[1]);
 
                 --trys;
-                Debug.Log(Mathf.Abs(Vector3.Angle(targetDirection, vectorTowardPlayer1)));
-                Debug.Log(isAway(targetDirection));
+                Debug.Log(Mathf.Abs(Vector3.Angle(targetDirectionDrive, vectorTowardPlayer1)));
+                Debug.Log(isAway(targetDirectionDrive));
             }
             Debug.Log(trys);
             StartCoroutine(delayTurn());
@@ -457,13 +462,13 @@ public class TankEnemy : Tank
     }
     private void aimScan()
     {
-
-        float step = m_towerSpeed * Time.deltaTime;
-        tower.transform.Rotate(Vector3.up * step);
+        scanTo(targetDirectionAim);
         
+        //TODO: consider keeping track of last value that lead to isHit and select values to scan to depending on the last 5 shots
+
         if (isHit(tower.forward))
         {
-            //Debug.Log("fire");
+            Debug.Log("fire");
             //Fire();
         }
     }
@@ -475,6 +480,26 @@ public class TankEnemy : Tank
         
         return projTestScript.beginShoot(m_ProjectileSpawnPoint.position, -tower.forward);
     }
+    private void scanTo(Vector3 V)
+    {
+        float step = rotateSpeed * Time.deltaTime;
+        Vector3 newDir = Vector3.RotateTowards(tower.forward, -V, step, .01F);
+        tower.rotation = Quaternion.LookRotation(newDir);
+        
+        if (-tower.forward == V)
+        {
+            selectDirectionAim();
+        }
+    }
+    private void selectDirectionAim()
+    {
+        Debug.Log("go");
+        Vector2 unitPlane = Random.insideUnitCircle.normalized;
+        targetDirectionAim.Set(unitPlane[0], 0, unitPlane[1]);
+    }
+
+
+
 
     // Temp: for turning
     protected void OnCollisionEnter(Collision collisionInfo)
