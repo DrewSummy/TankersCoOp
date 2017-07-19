@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections.Generic;       //Allows us to use Lists.
-using Random = UnityEngine.Random;      //Tells Random to use the Unity Engine random number generator.
+using System.Collections.Generic;       // Allows us to use Lists.
+using Random = UnityEngine.Random;      // Tells Random to use the Unity Engine random number generator.
 using System.Collections;
 using UnityEngine.UI;
 
@@ -191,6 +191,7 @@ namespace Completed
                 numberOfRooms = floorChart.GetLength(0) * floorChart.GetLength(1);
             }
             numberOfRooms = 2;
+            numberOfRooms = 9;
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));

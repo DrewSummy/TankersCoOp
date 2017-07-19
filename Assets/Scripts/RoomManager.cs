@@ -348,7 +348,8 @@ namespace Completed
 
                 // Give the enemies the waypoints.
                 enemy.GetComponent<TankEnemy>().waypoints = waypoints;
-                enemy.GetComponent<TankEnemy>().selectWaypoint();
+                Debug.Log("wp");
+                //enemy.GetComponent<TankEnemy>().selectWaypoint();
 
                 enemyCount++;
             }

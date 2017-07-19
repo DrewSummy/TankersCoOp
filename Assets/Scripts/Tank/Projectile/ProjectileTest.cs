@@ -10,6 +10,7 @@ public class ProjectileTest : MonoBehaviour {
 
     private string playerTag = "Player";           // The string for the player tag.
     public LayerMask raycastLayer;                 // The layerMask for the ProjectileTest to avoid the shell game objects.
+    private float maxDist = 70;                    // The maximum distance of the raycast.
 
     private struct pt                              // A class that contains a position, direction, and counter to represent a projectile test.
     {
@@ -46,10 +47,15 @@ public class ProjectileTest : MonoBehaviour {
 
         // Send out raycast
         RaycastHit hit;
-        Physics.Raycast(s.pos, s.dir * 100, out hit, raycastLayer);
+        Physics.Raycast(s.pos, s.dir * maxDist, out hit, raycastLayer);
 
+        // If the raycast doesn't hit anything at all.
+        if (hit.collider == null)
+        {
+            return false;
+        }
         // If it hit a tank.
-        if (hit.transform.tag == playerTag)
+        else if (hit.transform.tag == playerTag)
         {
             return true;
         }

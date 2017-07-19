@@ -1,12 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using Completed; // does this need {}
+using Random = UnityEngine.Random;      // Tells Random to use the Unity Engine random number generator.
 
 public class TankEnemy : Tank
 {
     // General Variables
     public RoomManager parentRoom;              // Reference to the room TankEnemy spawns in.
-    private GameObject player1;                 // Reference to the player 1 game object.
+    protected GameObject player1;               // Reference to the player 1 game object.
     //private TankPlayer player1Script;           // Store a reference to the TankPlayer of player 1.
     //private TankPlayer player2Script;           // Store a reference to the TankPlayer of player 2.
     private int roomLength = 50;                // Integer for the length of the room.
@@ -17,24 +19,27 @@ public class TankEnemy : Tank
     private Vector3 player1Pos;                 // The vector for the current position of player 1.
     private Vector3 player1Velocity;            // The vector for the current velocity of player 1.
     private Vector3 vectorTowardPlayer1;        // The vector toward player 1.
-    private ProjectileTest projTestScript;
+    protected ProjectileTest projTestScript;    // The script for shooting a test projectile.
     private float distancePlayer1;              // The float distance to player 1.
-    private float fireFreq;                     // The float for how frequent the tank shoots at.
-    private float fireFreqFight = 1.5f;         // The float for the fireFreq during FIGHT.
-    private float fireFreqChase = .75f;         // The float for the fireFreq during CHASE.
+    protected float fireFreq;                   // The float for how frequent the tank shoots at.
+    protected float fireFreqFight = 2.5f;       // The float for the fireFreq during FIGHT.
+    protected float fireFreqChase = 5f;         // The float for the fireFreq during CHASE.
     private bool canFire = true;                // The bool for if the tank can turn.
     private float m_towerSpeed = 90f;           // The float for how fast the tower rotates.
-    protected GameObject projTest;
-    private Vector3 targetDirectionAim;
-    private float rotateSpeed = .9f;
+    protected GameObject projTest;              // Reference to the projTest used for testing a shot.
+    private Vector3 targetDirectionAim;         // The current direction for the tank to shoot.
+    private float rotateSpeed = .9f;            // The speed the tank rotates the tower at.
+    private Queue<Vector3> recentShots = new Queue<Vector3>();                  // The queue for the last recentShotCount shots.
+    private int recentShotMax = 10;             // The maximum number of recent shots recorded at a time.
+    private float aimRandomChance = .5f;        // The odds of selecting a random direction to aim.
 
     // Driving Variables
     private int drivingRange = 30;              // Angle used for driving toward/away from a player.
-    private float m_CurrentSpeed;               // How fast the tank is driving.
-    private Vector3 targetDirectionDrive;       // The current targetDirection for the tank to go.
-    private float turningTimeMax = 5.0f;        // The max amount of time the tank goes before turning.
-    private float turningTimeMin = 1.0f;        // The min amount of time the tank goes before turning.
-    private float turningTimeNext;              // The randomly selected amount of time the tank goes before turning.
+    protected float m_CurrentSpeed;             // The speed the tank drives at.
+    private Vector3 targetDirectionDrive;       // The current direction for the tank to go.
+    protected float turningTimeMax = 5.0f;      // The max amount of time the tank goes before turning.
+    protected float turningTimeMin = 1.0f;      // The min amount of time the tank goes before turning.
+    protected float turningTimeNext;            // The randomly selected amount of time the tank goes before turning.
     private bool canTurn = true;                // The bool for if the tank can turn.
     private float padding = 5f;                 // The float representing how close a tank can move toward a wall.
     private float minExploreDist = 30f;         // The distance the tank remains in the EXPLORE state.
@@ -65,8 +70,8 @@ public class TankEnemy : Tank
         base.Start();
 
         // The FSM begins on Explore.
-        //setToExplore();
-        setToEvade();
+        setToExplore();
+        //setToEvade();
 
         // Initiate the driving variables.
         m_Speed = 6f;
@@ -76,6 +81,7 @@ public class TankEnemy : Tank
 
         // Initiate the shooting variables.
         fireFreq = fireFreqChase;
+        //recentShots = player1.transform.position - tower.position;
 
         // Get the script of player 1.
         player1 = GameObject.FindGameObjectWithTag("Player");
@@ -96,7 +102,7 @@ public class TankEnemy : Tank
     }
 
     // Finite State Machine representing the actions TankEnemy goes through
-    IEnumerator FSM()
+    protected IEnumerator FSM()
     {
         while (alive)
         {
@@ -113,20 +119,17 @@ public class TankEnemy : Tank
                 case State.FIGHT:
                     Fight();
                     break;
-                case State.EVADE:
-                    Evade();
-                    break;
             }
             yield return null;
         }
     }
 
-    private void trackPlayer()
+    protected void trackPlayer()
     {
         //TODO: incorporate player2
         // Update vectorTowardPlayer1
         //vectorTowardPlayer1 = body.position - player1.transform.position;
-        vectorTowardPlayer1 = player1.transform.position - body.position;
+        vectorTowardPlayer1 = player1.transform.position - tower.position;
     }
 
     /*
@@ -135,7 +138,7 @@ public class TankEnemy : Tank
     PatrolMeander - Drives randomly looking for playerTanks.
     Hunt - Shoots toward playerTank until out of sight for too long.
     */
-    private void Explore()
+    protected void Explore()
     {
         if (isExploreDistance())
         {
@@ -148,11 +151,11 @@ public class TankEnemy : Tank
             setToChase();
         }
     }
-    private void Chase()
+    protected void Chase()
     {
         if (isChaseDistance())
         {
-            //TODO
+            // Aim directly and drive randomly
             fireDirect();
             driveRandom();
         }
@@ -166,11 +169,11 @@ public class TankEnemy : Tank
         }
 
     }
-    private void Fight()
+    protected void Fight()
     {
         if (isFightDistance())
         {
-            //TODO
+            // Aim directly and drive randomly
             fireDirect();
             driveRandom();
         }
@@ -179,12 +182,13 @@ public class TankEnemy : Tank
             setToChase();
         }
     }
-    private void Evade()
+    protected void Evade()
     {
         aimScan();
-        //driveAway();
+        driveAway();
     }
 
+    //TODO: incorporate aimPredict
 
     /*
     Functions for the Explore state:
@@ -199,7 +203,7 @@ public class TankEnemy : Tank
     obstructed() - Returns true if there is something in the way.
     */
     //TODO: drives in wrong direction
-    private void setToExplore()
+    protected void setToExplore()
     {
         Debug.Log("explore");
         state = TankEnemy.State.EXPLORE;
@@ -324,7 +328,7 @@ public class TankEnemy : Tank
     Fire() - Fires a projectile if canFire and TankEnemy has projectiles.
     delayFire() - Sets canFire to false, waits fireFreq, the sets canFire to true.
     */
-    private void setToChase()
+    protected void setToChase()
     {
         Debug.Log("chase");
         fireFreq = fireFreqChase;
@@ -357,6 +361,7 @@ public class TankEnemy : Tank
         {
             StartCoroutine(delayFire());
             base.Fire();
+            recordShot(-tower.forward);
         }
     }
     private IEnumerator delayFire()
@@ -371,7 +376,7 @@ public class TankEnemy : Tank
     setToFight() - Set the state to FIGHT and change variables accordingly.
     isFightDistance() - Returns true if EnemyTank is inside of FIGHT range.
     */
-    private void setToFight()
+    protected void setToFight()
     {
         Debug.Log("fight");
         fireFreq = fireFreqFight;
@@ -398,11 +403,14 @@ public class TankEnemy : Tank
     aimRicochet() - Aims at a wall to hit the tank.
     driveAway() - Drives away from the player tank.
     selectDirectionAway() - Selects an away, unobstructed direction.
-    isAway(V) - Returns true if the direction is away from the tank by at least awayDegreesMin.
+    isAway(V) - Returns true if V is away from the tank by at least awayDegreesMin.
     aimScan() - Scans around and looks for a tank player.
-    isHit(V) - Returns true if a player tank can be hit from shooting.
+    isHit(V) - Returns true if a player tank can be hit from shooting at V.
+    scanTo(V) - Rotates the tower toward V.
+    selectDirection() - Selects a random or recent direction for targetDirectionAim.
+    recordShot() - Updates the recentShots queue with the most recent raycasts that hit a playerTank.
     */
-    private void setToEvade()
+    protected void setToEvade()
     {
         Debug.Log("evade");
         state = TankEnemy.State.EVADE;
@@ -431,9 +439,7 @@ public class TankEnemy : Tank
             // Set targetDirection along the x-z plane and do so until a valid direction is selected.
             Vector2 unitPlane = Random.insideUnitCircle.normalized;
             targetDirectionDrive.Set(unitPlane[0], 0, unitPlane[1]);
-
-            Debug.Log(Mathf.Abs(Vector3.Angle(targetDirectionDrive, vectorTowardPlayer1)));
-            Debug.Log(isAway(targetDirectionDrive));
+            
             while ((obstructed(targetDirectionDrive) || !isAway(targetDirectionDrive)) && (trys > 0))
             {
                 // Set targetDirection along the x-z plane.
@@ -441,10 +447,7 @@ public class TankEnemy : Tank
                 targetDirectionDrive.Set(unitPlane[0], 0, unitPlane[1]);
 
                 --trys;
-                Debug.Log(Mathf.Abs(Vector3.Angle(targetDirectionDrive, vectorTowardPlayer1)));
-                Debug.Log(isAway(targetDirectionDrive));
             }
-            Debug.Log(trys);
             StartCoroutine(delayTurn());
         }
     }
@@ -468,16 +471,13 @@ public class TankEnemy : Tank
 
         if (isHit(tower.forward))
         {
-            Debug.Log("fire");
-            //Fire();
+            //Debug.Log("fire");
+            Fire();
+            Debug.Log(recentShots.Count);
         }
     }
     private bool isHit(Vector3 V)
     {
-        //TODO:
-        //projTestScript.shoot(tower.position, -tower.forward);
-
-        
         return projTestScript.beginShoot(m_ProjectileSpawnPoint.position, -tower.forward);
     }
     private void scanTo(Vector3 V)
@@ -493,10 +493,45 @@ public class TankEnemy : Tank
     }
     private void selectDirectionAim()
     {
-        Debug.Log("go");
-        Vector2 unitPlane = Random.insideUnitCircle.normalized;
-        targetDirectionAim.Set(unitPlane[0], 0, unitPlane[1]);
+        // If there are a maximum amount of vectors in the queue
+        if (recentShots.Count > 0)
+        {
+            // Select the odds of a random direction or a recent direction to select.
+            float odds = Random.Range(0, 1);
+
+            if (odds > aimRandomChance)
+            {
+                // Select a random direction from recentShots to scan to.
+                Vector3[] tempQ = recentShots.ToArray();
+
+                int randomRecentShot = (int)Random.Range(0, recentShotMax);
+                targetDirectionAim = tempQ[randomRecentShot];
+                Debug.Log(randomRecentShot);
+            }
+            else
+            {
+                // Otherwise, scan to a random direction.
+                Vector2 unitPlane = Random.insideUnitCircle.normalized;
+                targetDirectionAim.Set(unitPlane[0], 0, unitPlane[1]);
+            }
+        }
+        else
+        {
+            // Otherwise, scan to a random direction.
+            Vector2 unitPlane = Random.insideUnitCircle.normalized;
+            targetDirectionAim.Set(unitPlane[0], 0, unitPlane[1]);
+        }
     }
+    private void recordShot(Vector3 s)
+    {
+        // Enqueue as direction and dequeue a direction if the queue exceeds the max count.
+        recentShots.Enqueue(s);
+        if (recentShots.Count > recentShotMax)
+        {
+            recentShots.Dequeue();
+        }
+    }
+
 
 
 
@@ -504,7 +539,7 @@ public class TankEnemy : Tank
     // Temp: for turning
     protected void OnCollisionEnter(Collision collisionInfo)
     {
-        // The TankEnemy collided with a wall so set the turn counter to max.
+        // The TankEnemy collided with a wall or block so set the turn counter to max.
         if (true)//collisionInfo.transform.tag == "Wall")
         {
             canTurn = true;
@@ -529,7 +564,7 @@ public class TankEnemy : Tank
     {
         // Sum up the distances to each waypoint. Then, randomly select a waypoint by choosing a random
         // float below that sum and find which waypoint this corresponds to by repeatedly subtracting 
-        // each distance until negative. This means closer waypoints are more likely to be selected. 
+        // each distance until negative. This means closer waypoints are more likely to be selected.
         float distanceSum = 0;
         bool[] wpOptions = new bool[waypoints.Length];
         for (int i = 0; i < waypoints.Length; i++)
