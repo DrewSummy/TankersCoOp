@@ -180,7 +180,7 @@ namespace Completed
         private void FixedUpdate()
         {
             // Adjust the rigidbody's position and orientation in FixedUpdate.
-            if (!aimOnly)
+            if (!aimOnly && alive)
             {
                 Move();
                 Turn();
@@ -224,7 +224,7 @@ namespace Completed
             }
 
             Vector3 movement = body.forward * speed * Time.deltaTime;
-
+            
             m_RidgidbodyTank.MovePosition(m_RidgidbodyTank.position + movement);
 
             // Update the velocity.
@@ -345,6 +345,9 @@ namespace Completed
         {
             // Freeze the tank from moving.
             m_RidgidbodyTank.velocity = Vector3.zero;
+            m_RidgidbodyTank.freezeRotation = true;
+
+            Debug.Log("g");
 
             // Immaterialize the tank.
             for (int i = 0; i < GetComponentsInChildren<MeshRenderer>().Length; i++)

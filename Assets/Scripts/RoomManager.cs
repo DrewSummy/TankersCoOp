@@ -925,41 +925,6 @@ namespace Completed
             ladderExit.tag = exitTag;
         }
 
-
-        private void endBattle()
-        {
-            //TODO: add completion audio
-            //TODO: reset where the players projectiles go
-            //TODO: when traveling to new room check if room is completed
-
-
-            // Set the camera's battling variable to true;
-            m_camera.GetComponent<CameraControl>().battling = false;
-
-            roomIdle = true;
-            roomCompleted = true;
-            battleEnsuing = false;
-            StartCoroutine(FlickerLights());
-
-            // Prevent players from shooting momentarily and set them to not battling.. Wait 1 second.
-            player1.GetComponent<TankPlayer>().disableShoot(true);
-            player1.GetComponent<TankPlayer>().battling = false;
-            if (coop)
-            {
-                Debug.Log("disable");
-                player2.GetComponent<TankPlayer>().disableShoot(true);
-                player2.GetComponent<TankPlayer>().battling = false;
-            }
-            GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
-            StartCoroutine(wait(1));
-            player1.GetComponent<TankPlayer>().disableShoot(false);
-            if (coop)
-            {
-                player2.GetComponent<TankPlayer>().disableShoot(false);
-            }
-            GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
-        }
-
         // Helper function for endBattle.
         IEnumerator wait(int t)
         {
@@ -1268,13 +1233,13 @@ namespace Completed
         }
 
         // Function called when enemyCount == 0.
+        //TODO: leave marks of where blocks were
         private IEnumerator endBattleCorrected()
         {
             // Remove projectiles from the player and put them into their animation.
             removeProjectiles();
 
             // Disable shooting.
-            Debug.Log("disabled");
             player1.GetComponent<TankPlayer>().disableShoot(true);
             if (coop)
             {

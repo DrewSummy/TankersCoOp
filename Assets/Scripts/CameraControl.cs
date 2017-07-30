@@ -68,12 +68,6 @@ namespace Completed
                 Mathf.Floor((m_Player1.transform.position.z + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2);
         }
 
-        private void ZoomOut()
-        {
-            float step = Mathf.Max(Vector3.Distance(transform.position, m_target + deadOffset), cameraSpeedEnding) * Time.deltaTime;
-            transform.position = Vector3.MoveTowards(transform.position, m_target + deadOffset, step);
-        }
-
         private void FixedUpdate()
         {
             // Move the camera depending on the tank's position.if (playerScript1.alive)
@@ -84,7 +78,7 @@ namespace Completed
             else
             {
                 //TODO: this is searching for the player still and so it moves off screen
-                ZoomOut();
+                GameOverZoom();
             }
         }
 
@@ -100,6 +94,12 @@ namespace Completed
                 float step = Mathf.Max(Vector3.Distance(transform.position, m_target + patrolOffset), cameraSpeedMinimum) * Time.deltaTime;
                 transform.position = Vector3.MoveTowards(transform.position, m_target + patrolOffset, step);
             }
+        }
+
+        private void GameOverZoom()
+        {
+            float step = Mathf.Max(Vector3.Distance(transform.position, m_target + deadOffset), cameraSpeedEnding) * Time.deltaTime;
+            transform.position = Vector3.MoveTowards(transform.position, m_target + deadOffset, step);
         }
 
         public void PlaceOnFirstRoom(Vector2 firstRoomCoord)//Transform room)

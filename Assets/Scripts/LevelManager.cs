@@ -184,14 +184,14 @@ namespace Completed
         // Enable some rooms in the floorChart based on the level.
         private void InstantiateFloorChart(int level)
         {
-            // Create an int for number of rooms based on level.
+            // Determines numberOfRooms based on level.
             numberOfRooms = 3 + level + Random.Range(0, level);
             if (numberOfRooms > floorChart.GetLength(0) * floorChart.GetLength(1))
             {
                 numberOfRooms = floorChart.GetLength(0) * floorChart.GetLength(1);
             }
             numberOfRooms = 2;
-            numberOfRooms = 9;
+            numberOfRooms = 4;
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));
@@ -199,38 +199,30 @@ namespace Completed
 
 
             // Go through all but the last room and instantiate them.
+            // Add the neighbors to validNextRoom.
+            List<Vector2> validNextRooms = new List<Vector2>(); ;
+            validNextRooms = AddNeighbors(validNextRooms, firstRoomCoordinate);
+
             for (int rooms = 1; rooms < numberOfRooms; rooms++)
             {
-                // Place random room.
-                int randomRowIndex = Random.Range(0, floorChart.GetLength(0));
-                int randomColumnIndex = Random.Range(0, floorChart.GetLength(1));
-                // If room is already enabled, rooms-- and keep searching.
-                if (IsEnabled(randomRowIndex, randomColumnIndex))
+                // Get random, valid room.
+                int randomRoomIndex = Random.Range(0, validNextRooms.Count);
+
+                // Update floorChart and update validNextRooms.
+                floorChart[(int)validNextRooms[randomRoomIndex].x, (int)validNextRooms[randomRoomIndex].y] = true;
+
+                validNextRooms = AddNeighbors(validNextRooms, validNextRooms[randomRoomIndex]);
+                validNextRooms.Remove(validNextRooms[randomRoomIndex]);
+
+                // Set the lastRoomCoordinate.
+                if (rooms == numberOfRooms - 1)
                 {
-                    rooms--;
-                }
-                // If room has enabled neighbors, enable room.
-                else if (IsEnabled(randomRowIndex - 1, randomColumnIndex) ||
-                    IsEnabled(randomRowIndex + 1, randomColumnIndex) ||
-                    IsEnabled(randomRowIndex, randomColumnIndex - 1) ||
-                    IsEnabled(randomRowIndex, randomColumnIndex + 1))
-                {
-                    // If it is the last room keep track of it to put the exit.
-                    if (rooms == numberOfRooms - 1)
-                    {
-                        lastRoomCoordinate = new Vector2(randomRowIndex, randomColumnIndex);
-                    }
-                    floorChart[randomRowIndex, randomColumnIndex] = true;
-                }
-                // No neighboring rooms, rooms-- and keep searching.
-                else
-                {
-                    rooms--;
+                    lastRoomCoordinate = validNextRooms[randomRoomIndex];
                 }
             }
         }
 
-        // Helper function for InstantiateFloorChart
+        // Helper functions for InstantiateFloorChart. Determines the return value of floorChart[row, column].
         private bool IsEnabled(int row, int column)
         {
             // If the point is in bounds and enabled return true.
@@ -251,6 +243,50 @@ namespace Completed
             {
                 return false;
             }
+        }
+        private bool IsNotEnabled(int row, int column)
+        {
+            // If the point is in bounds and disabled return true.
+            if ((0 <= row && row < floorChart.GetLength(0) && 0 <= column && column < floorChart.GetLength(1)))
+            {
+                if (!floorChart[row, column])
+                {
+                    return true;
+                }
+                // Else the point is enabled return false.
+                else
+                {
+                    return false;
+                }
+            }
+            // Else the point is out of bounds return false.
+            else
+            {
+                return false;
+            }
+        }
+
+        // Helper function for InstantiateFloorChart. This updates validNextRooms when a room is added.
+        private List<Vector2> AddNeighbors(List<Vector2> vNR, Vector2 coord)
+        {
+            if (IsNotEnabled((int)coord.x - 1, (int)coord.y) && !vNR.Contains(new Vector2((int)coord.x - 1, (int)coord.y)))
+            {
+                vNR.Add(new Vector2((int)coord.x - 1, (int)coord.y));
+            }
+            if (IsNotEnabled((int)coord.x + 1, (int)coord.y) && !vNR.Contains(new Vector2((int)coord.x + 1, (int)coord.y)))
+            {
+                vNR.Add(new Vector2((int)coord.x + 1, (int)coord.y));
+            }
+            if (IsNotEnabled((int)coord.x, (int)coord.y - 1) && !vNR.Contains(new Vector2((int)coord.x, (int)coord.y - 1)))
+            {
+                vNR.Add(new Vector2((int)coord.x, (int)coord.y - 1));
+            }
+            if (IsNotEnabled((int)coord.x, (int)coord.y + 1) && !vNR.Contains(new Vector2((int)coord.x, (int)coord.y + 1)))
+            {
+                vNR.Add(new Vector2((int)coord.x, (int)coord.y + 1));
+            }
+            
+            return vNR;
         }
 
         // Helper function to print out floor chart and see what it looks like.
@@ -565,7 +601,7 @@ namespace Completed
             }
         }
 
-        // Called when all plaayers hav died.
+        // Called when all players hav died.
         private void gameOver()
         {
             //TODO: this should also create some GUI and disable pause

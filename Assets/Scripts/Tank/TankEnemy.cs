@@ -24,14 +24,12 @@ public class TankEnemy : Tank
     protected float fireFreq;                   // The float for how frequent the tank shoots at.
     protected float fireFreqFight = 2.5f;       // The float for the fireFreq during FIGHT.
     protected float fireFreqChase = 5f;         // The float for the fireFreq during CHASE.
-    private bool canFire = true;                // The bool for if the tank can turn.
-    private float m_towerSpeed = 90f;           // The float for how fast the tower rotates.
+    private bool canFire = false;               // The bool for if the tank can turn.
     protected GameObject projTest;              // Reference to the projTest used for testing a shot.
     private Vector3 targetDirectionAim;         // The current direction for the tank to shoot.
-    private float rotateSpeed = .9f;            // The speed the tank rotates the tower at.
     private Queue<Vector3> recentShots = new Queue<Vector3>();                  // The queue for the last recentShotCount shots.
-    private int recentShotMax = 10;             // The maximum number of recent shots recorded at a time.
-    private float aimRandomChance = .5f;        // The odds of selecting a random direction to aim.
+    protected int recentShotMax = 10;           // The maximum number of recent shots recorded at a time.
+    protected float aimRandomChance = .5f;      // The odds of selecting a random direction to aim.
 
     // Driving Variables
     private int drivingRange = 30;              // Angle used for driving toward/away from a player.
@@ -44,6 +42,7 @@ public class TankEnemy : Tank
     private float padding = 5f;                 // The float representing how close a tank can move toward a wall.
     private float minExploreDist = 30f;         // The distance the tank remains in the EXPLORE state.
     private float minChaseDist = 15f;           // The distance the tank remains in the CHASE state.
+    private float towardDegreesMax = 45;        // The leniency on how toward the tank can drive.
     private float awayDegreesMin = 135;         // The leniency on how away the tank can drive.
 
     // Waypoint Variables
@@ -70,7 +69,7 @@ public class TankEnemy : Tank
         base.Start();
 
         // The FSM begins on Explore.
-        setToExplore();
+        setToChase();
         //setToEvade();
 
         // Initiate the driving variables.
@@ -81,7 +80,7 @@ public class TankEnemy : Tank
 
         // Initiate the shooting variables.
         fireFreq = fireFreqChase;
-        //recentShots = player1.transform.position - tower.position;
+        StartCoroutine(delayFire());
 
         // Get the script of player 1.
         player1 = GameObject.FindGameObjectWithTag("Player");
@@ -127,9 +126,9 @@ public class TankEnemy : Tank
     protected void trackPlayer()
     {
         //TODO: incorporate player2
-        // Update vectorTowardPlayer1
-        //vectorTowardPlayer1 = body.position - player1.transform.position;
+        // Update vectorTowardPlayer1 and set the y coordinate to 0.
         vectorTowardPlayer1 = player1.transform.position - tower.position;
+        vectorTowardPlayer1[1] = 0;
     }
 
     /*
@@ -143,7 +142,9 @@ public class TankEnemy : Tank
         if (isExploreDistance())
         {
             // Aim directly and drive randomly
-            aimDirect();
+            //firePredict();
+            //TODO: this rotates the tower downward
+            aimPredict();
             driveRandom();
         }
         else
@@ -157,7 +158,7 @@ public class TankEnemy : Tank
         {
             // Aim directly and drive randomly
             fireDirect();
-            driveRandom();
+            driveToward();
         }
         else if (isExploreDistance())
         {
@@ -199,8 +200,7 @@ public class TankEnemy : Tank
     delayTurn() - Helper function for selectDirection by keeping the canTurn bool false until the tank can turn.
     driveDirection() - Moves EnemyTank toward targetDirection when forward or backward is within 5 degrees.
     driveRandom() - Drives around the map and avoids walls.
-    aimDirect() - Aims directly at player1.
-    obstructed() - Returns true if there is something in the way.
+    obstructed() - Returns true if there is something in the way of driving.
     */
     //TODO: drives in wrong direction
     protected void setToExplore()
@@ -306,13 +306,29 @@ public class TankEnemy : Tank
         // Drive toward targetDirection.
         driveDirection();
     }
-    private void aimDirect()
+    private void firePredict()
     {
-        // TankEnemy looks directly at the player.
-        // TODO: incorporate player2.
+        // Aim directly at the player.
+        aimPredict();
+
+        // Fire if there are bullets and fire frequency has elapsed.
+        Fire();
+    }
+    private void aimPredict()
+    {
+        // velocity needs to be planar
         float step = m_RotateSpeed * Time.deltaTime;
-        Vector3 newDir = Vector3.RotateTowards(tower.forward, -vectorTowardPlayer1, step, .01F);
+        Debug.Log(-vectorTowardPlayer1);
+        Vector3 newDir = Vector3.RotateTowards(tower.forward, -vectorTowardPlayer1 + player1.GetComponent<TankPlayer>().SendVelocity(), step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
+
+
+
+        /*
+        float step = rotateSpeed * Time.deltaTime;
+        Vector3 newDir = Vector3.RotateTowards(tower.forward, -V, step, .01F);
+        tower.rotation = Quaternion.LookRotation(newDir);
+        */
     }
     private bool obstructed(Vector3 V)
     {
@@ -324,7 +340,11 @@ public class TankEnemy : Tank
     Functions for the Chase state:
     setToChase() - Set the state to CHASE and change variables accordingly.
     isChaseDistance() - Returns true if EnemyTank is inside of CHASE range.
+    driveToward() - Drives toward the player tank.
+    selectDirectionToward() - Selects a toward, unobstructed direction.
+    isToward(V) - Returns true if V is toward from the tank by less than towardDegreesMax.
     fireDirect() - Aims directly at the the player and shoots.
+    aimDirect() - Aims directly at player1.
     Fire() - Fires a projectile if canFire and TankEnemy has projectiles.
     delayFire() - Sets canFire to false, waits fireFreq, the sets canFire to true.
     */
@@ -347,6 +367,51 @@ public class TankEnemy : Tank
             return false;
         }
     }
+    private void driveToward()
+    {
+        // Rotate the car toward targetDirection.
+        selectDirectionToward();
+        rotateDirection();
+
+        // Drive toward targetDirection.
+        driveDirection();
+    }
+    private void selectDirectionToward()
+    {
+        // If the turning counter exceeds the max count, look for a new direction.
+        if (canTurn)
+        {
+
+            // Try at most 10 times to find a toward direction.
+            int trys = 10;
+
+            // Set targetDirection along the x-z plane and do so until a valid direction is selected.
+            Vector2 unitPlane = Random.insideUnitCircle.normalized;
+            targetDirectionDrive.Set(unitPlane[0], 0, unitPlane[1]);
+
+            while ((obstructed(targetDirectionDrive) || !isToward(targetDirectionDrive)) && (trys > 0))
+            {
+                // Set targetDirection along the x-z plane.
+                unitPlane = Random.insideUnitCircle.normalized;
+                targetDirectionDrive.Set(unitPlane[0], 0, unitPlane[1]);
+
+                --trys;
+            }
+            StartCoroutine(delayTurn());
+        }
+    }
+    private bool isToward(Vector3 V)
+    {
+        // Return true if V is close enough toward from vectorTowardPlayer1.
+        if (Mathf.Abs(Vector3.Angle(V, vectorTowardPlayer1)) < towardDegreesMax)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     private void fireDirect()
     {
         // Aim directly at the player.
@@ -354,6 +419,14 @@ public class TankEnemy : Tank
 
         // Fire if there are bullets and fire frequency has elapsed.
         Fire();
+    }
+    private void aimDirect()
+    {
+        // TankEnemy looks directly at the player.
+        // TODO: incorporate player2.
+        float step = m_RotateSpeed * Time.deltaTime;
+        Vector3 newDir = Vector3.RotateTowards(tower.forward, -vectorTowardPlayer1, step, .01F);
+        tower.rotation = Quaternion.LookRotation(newDir);
     }
     protected new void Fire()
     {
@@ -366,9 +439,11 @@ public class TankEnemy : Tank
     }
     private IEnumerator delayFire()
     {
+        Debug.Log("here");
         canFire = false;
         yield return new WaitForSeconds(fireFreq);
         canFire = true;
+        Debug.Log("2");
     }
 
     /*
@@ -473,7 +548,6 @@ public class TankEnemy : Tank
         {
             //Debug.Log("fire");
             Fire();
-            Debug.Log(recentShots.Count);
         }
     }
     private bool isHit(Vector3 V)
@@ -482,7 +556,7 @@ public class TankEnemy : Tank
     }
     private void scanTo(Vector3 V)
     {
-        float step = rotateSpeed * Time.deltaTime;
+        float step = m_RotateSpeed * Time.deltaTime;
         Vector3 newDir = Vector3.RotateTowards(tower.forward, -V, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
         
