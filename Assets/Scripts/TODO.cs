@@ -45,6 +45,7 @@ idea:
     minigame: players get hit and a hole is placed where the player got hit so that the player would fall through
     minigame: race where bullets stun competitors
     bullet types: left trigger shoots slow, right- fast, both bidirectional bullets?
+    teleport tank
     
 
 

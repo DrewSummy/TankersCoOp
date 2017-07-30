@@ -77,8 +77,9 @@ abstract public class Tank : MonoBehaviour {
         m_ProjectileSpawnPoint = tower.GetChild(3);
 
         // Load in the projectile being used from the Resources folder in assets.
-        projectile = Resources.Load("Shell") as GameObject;
-        
+        //projectile = Resources.Load("TankResources/Projectile/Shell") as GameObject;
+        projectile = Resources.Load("TankResource/Projectile/Shell") as GameObject;
+
         // Store the original pitch of the audio source.
         //m_OriginalPitch = m_MovementAudio.pitch;
 
@@ -167,7 +168,13 @@ abstract public class Tank : MonoBehaviour {
         {
             projectileHolder.GetComponentInChildren<Projectile>().transfered = true;
             projectileHolder.GetComponentInChildren<Projectile>().transform.SetParent(leftoverProjectileHolder);
+            Debug.Log(projectileHolder.parent.gameObject.name);
         }
+
+        Debug.Log(leftoverProjectileHolder);
+        Debug.Log(projectileHolder.GetComponentsInChildren<Projectile>().Length);
+        Debug.Log(name);
+        Debug.Log("//////////////////////////////////////////////////////////////////");
     }
 
     public void SetLeftoverProjectileHolder(Transform holder)

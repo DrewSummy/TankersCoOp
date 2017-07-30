@@ -13,7 +13,7 @@ public class Projectile : MonoBehaviour
 
     protected int maxCollisions = 1;               // The max number of collisions before the object is destroyed. 
     protected int collisionCounter = 0;            // Used to keep track of the number of collisions.
-    private float projectileSpeed = 16;            // The speed the projectile fires at.
+    protected float projectileSpeed = 16;          // The speed the projectile fires at.
     protected Vector3 projectileSpeedVector;       // The vector the projectile moves at.
     protected Rigidbody ProjectileRigidbody;       // Reference used to move the projectile.
     public GameObject parentTank;                  // Reference to the parent tank game object.
@@ -50,8 +50,10 @@ public class Projectile : MonoBehaviour
         // Set the trail.
         setTrail();
 
-        // Load in the explosion being used from the Resources folder in assets.
-        projectileExplosion = Resources.Load("TankResources/Effect_02") as GameObject;
+        // Load in the explosion and trail being used from the Resources folder in assets.
+        projectileExplosion = Resources.Load("TankResources/Projectile/ShellExplosion") as GameObject;
+        smokeTrail = Resources.Load("TankResources/Projectile/SmokeTrail") as GameObject;
+        Debug.Log(Resources.Load("TankResources/Projectile/SmokeTrail") as GameObject);
 
         // Get the AudioSource component of the game object.
         AudioSource audioSource = gameObject.GetComponent<AudioSource>();
@@ -63,6 +65,8 @@ public class Projectile : MonoBehaviour
 
     protected void setTrail()
     {
+        Debug.Log(parentTank.name);
+        Debug.Log(smokeTrail);
         currentTrail = Instantiate(smokeTrail) as GameObject;
         currentTrail.transform.SetParent(transform);
         currentTrail.transform.position = transform.position;
@@ -134,7 +138,10 @@ public class Projectile : MonoBehaviour
         if (!disabled)
         {
             // Drop the current smoke trail.
-            if (currentTrail) currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
+            if (currentTrail)
+            {
+                currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
+            }
 
             ProjectileRigidbody.freezeRotation = true;
 
@@ -173,7 +180,10 @@ public class Projectile : MonoBehaviour
     public virtual void KillProjectile()
     {
         // Get rid of object and its trail.
-        if (currentTrail) currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
+        if (currentTrail)
+        {
+            currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
+        }
         Destroy(gameObject);
         // Add the explosion and delete the object after 3 seconds.
         GameObject explosion = Instantiate(projectileExplosion, gameObject.transform.position, Quaternion.identity) as GameObject;
@@ -190,7 +200,10 @@ public class Projectile : MonoBehaviour
     public virtual void RemoveProjectile()
     {
         // The same as killProjectile without audio or the explosion.
-        if (currentTrail) currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
+        if (currentTrail)
+        {
+            currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
+        }
         GameObject.Destroy(this.gameObject);
     }
 
@@ -202,10 +215,10 @@ public class Projectile : MonoBehaviour
         ProjectileRigidbody.useGravity = true;
         disabled = true;
 
-        // Add random velocity and rotation to projectile.
-        //ProjectileRigidbody.velocity += new Vector3(Random.Range(1f, 5f), Random.Range(1f, 20f), Random.Range(1f, 5f));
-        ProjectileRigidbody.velocity = new Vector3(Random.Range(1f, 5f), Random.Range(1f, 20f), Random.Range(1f, 5f));
-        ProjectileRigidbody.rotation = Random.rotation;
+        // Add random force and torque to projectile.
+        //TODO: don't use magic numbers
+        ProjectileRigidbody.AddForce(new Vector3(Random.Range(1f, 5f), Random.Range(150f, 500f), Random.Range(1f, 5f)));
+        ProjectileRigidbody.AddTorque(new Vector3(Random.Range(1f, 5f), Random.Range(1f, 20f), Random.Range(1f, 5f)));
 
         // Wait and destroy the projectile after a random amount of time between 4 and 5 seconds.
         // Or set to detonate on next collision.
@@ -216,7 +229,10 @@ public class Projectile : MonoBehaviour
     // Obsolete: use setToDetonate(). Destroys the projectile object after time time.
     IEnumerator DestroyAfter(float time)
     {
-        currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
+        if (currentTrail)
+        {
+            currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
+        }
         yield return new WaitForSeconds(time);
         //GameObject.Destroy(this.gameObject);
         KillProjectile();
@@ -230,12 +246,7 @@ public class Projectile : MonoBehaviour
         Debug.Log("The projectile's forward is:");
         Debug.Log(gameObject.transform.forward);
     }
-
-    public float SendProjectileVelocity()
-    {
-        return projectileSpeed;
-    }
-
+    
     // Helper function for DisableProjectile used by RoomManager.
     private void setToDetonate()
     {

@@ -42,8 +42,7 @@ public class ProjectileTest : MonoBehaviour {
 
     private bool shoot(pt s)
     {
-
-        Debug.DrawLine(s.pos, s.pos + s.dir * 30, Color.white, 0.5f);
+        //Debug.DrawLine(s.pos, s.pos + s.dir * 30, Color.white, 0.5f);
 
         // Send out raycast
         RaycastHit hit;

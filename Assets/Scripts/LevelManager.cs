@@ -575,7 +575,6 @@ namespace Completed
             {
                 gameOver();
             }
-            Debug.Log(playersLeft);
         }
 
         // Resets the player count when

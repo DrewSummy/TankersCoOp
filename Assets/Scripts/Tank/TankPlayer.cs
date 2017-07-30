@@ -94,7 +94,7 @@ namespace Completed
 
 
             // Load in the projectile being used from the Resources folder in assets.
-            projectile = Resources.Load("Shell") as GameObject;
+            projectile = Resources.Load("TankResources/Projectile/ShellPlayer") as GameObject;
 
             // Tanks hasn't shot yet. This is used to allow semi-auto shooting.
             m_HasShot = false;
@@ -349,19 +349,23 @@ namespace Completed
 
             Debug.Log("g");
 
+            // Give projectiles to the room's projectileHolder.
+            TransferProjectiles();
+
             // Immaterialize the tank.
+            //TODO: this is immaterializing the projectiles
+            
             for (int i = 0; i < GetComponentsInChildren<MeshRenderer>().Length; i++)
             {
                 GetComponentsInChildren<MeshRenderer>()[i].enabled = false;
             }
             GetComponent<BoxCollider>().enabled = false;
 
+            //TODO: place explosion or some animation
+
             // Set alive to be false. Other scripts depend on this.
             alive = false;
-
-            // Give projectiles to the room's projectileHolder.
-            TransferProjectiles();
-
+            
             // Decrease LevelManager's player counter.
             LM.playerDied();
 

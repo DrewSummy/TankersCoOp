@@ -20,4 +20,14 @@ public class TankEnemyGreen : TankEnemy
         // Driving Variables
         m_CurrentSpeed = 3f;
     }
+
+    
+    new void Start()
+    {
+        base.Start();
+
+
+        Debug.Log("grn");
+        projectile = Resources.Load("TankResources/Projectile/ShellEnemyGreen") as GameObject;
+    }
 }

@@ -25,7 +25,6 @@ public class TankEnemy : Tank
     protected float fireFreqFight = 2.5f;       // The float for the fireFreq during FIGHT.
     protected float fireFreqChase = 5f;         // The float for the fireFreq during CHASE.
     private bool canFire = false;               // The bool for if the tank can turn.
-    protected GameObject projTest;              // Reference to the projTest used for testing a shot.
     private Vector3 targetDirectionAim;         // The current direction for the tank to shoot.
     private Queue<Vector3> recentShots = new Queue<Vector3>();                  // The queue for the last recentShotCount shots.
     protected int recentShotMax = 10;           // The maximum number of recent shots recorded at a time.
@@ -43,7 +42,7 @@ public class TankEnemy : Tank
     private float minExploreDist = 30f;         // The distance the tank remains in the EXPLORE state.
     private float minChaseDist = 15f;           // The distance the tank remains in the CHASE state.
     private float towardDegreesMax = 45;        // The leniency on how toward the tank can drive.
-    private float awayDegreesMin = 135;         // The leniency on how away the tank can drive.
+    private float awayDegreesMin = 60;          // The leniency on how away the tank can drive.
 
     // Waypoint Variables
     public GameObject[] waypoints;              // Array of GameObject waypoints established by the room.
@@ -64,7 +63,7 @@ public class TankEnemy : Tank
 
 
     // Use this for initialization
-    private new void Start()
+    protected new void Start()
     {
         base.Start();
 
@@ -87,11 +86,10 @@ public class TankEnemy : Tank
         //player1Script = player1.GetComponent<TankPlayer>();
 
         // Load in the projectile being used from the Resources folder in assets.
-        projectile = Resources.Load("TankResources/ShellEnemy") as GameObject;
+        projectile = Resources.Load("TankResources/Projectile/ShellEnemy") as GameObject;
 
         // Get the script of the projectile and record its speed.
         projTestScript = GetComponent<ProjectileTest>();
-        projTest = Resources.Load("TankResources/ProjTest") as GameObject;
     }
 
     // Called by the room to start the TankEnemy.
@@ -142,9 +140,7 @@ public class TankEnemy : Tank
         if (isExploreDistance())
         {
             // Aim directly and drive randomly
-            //firePredict();
-            //TODO: this rotates the tower downward
-            aimPredict();
+            firePredict();
             driveRandom();
         }
         else
@@ -189,7 +185,6 @@ public class TankEnemy : Tank
         driveAway();
     }
 
-    //TODO: incorporate aimPredict
 
     /*
     Functions for the Explore state:
@@ -200,6 +195,9 @@ public class TankEnemy : Tank
     delayTurn() - Helper function for selectDirection by keeping the canTurn bool false until the tank can turn.
     driveDirection() - Moves EnemyTank toward targetDirection when forward or backward is within 5 degrees.
     driveRandom() - Drives around the map and avoids walls.
+    Fire() - Fires a projectile if canFire and TankEnemy has projectiles.
+    firePredict() - Aims predictively at the the player and shoots.
+    aimPredict() - Aims at where player1 will be.
     obstructed() - Returns true if there is something in the way of driving.
     */
     //TODO: drives in wrong direction
@@ -306,8 +304,18 @@ public class TankEnemy : Tank
         // Drive toward targetDirection.
         driveDirection();
     }
+    protected new void Fire()
+    {
+        if (canFire && projectileCount > 0)
+        {
+            StartCoroutine(delayFire());
+            base.Fire();
+            recordShot(-tower.forward);
+        }
+    }
     private void firePredict()
     {
+        //TODO: make sure TankEnemy isn't hit
         // Aim directly at the player.
         aimPredict();
 
@@ -318,17 +326,8 @@ public class TankEnemy : Tank
     {
         // velocity needs to be planar
         float step = m_RotateSpeed * Time.deltaTime;
-        Debug.Log(-vectorTowardPlayer1);
         Vector3 newDir = Vector3.RotateTowards(tower.forward, -vectorTowardPlayer1 + player1.GetComponent<TankPlayer>().SendVelocity(), step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
-
-
-
-        /*
-        float step = rotateSpeed * Time.deltaTime;
-        Vector3 newDir = Vector3.RotateTowards(tower.forward, -V, step, .01F);
-        tower.rotation = Quaternion.LookRotation(newDir);
-        */
     }
     private bool obstructed(Vector3 V)
     {
@@ -345,7 +344,6 @@ public class TankEnemy : Tank
     isToward(V) - Returns true if V is toward from the tank by less than towardDegreesMax.
     fireDirect() - Aims directly at the the player and shoots.
     aimDirect() - Aims directly at player1.
-    Fire() - Fires a projectile if canFire and TankEnemy has projectiles.
     delayFire() - Sets canFire to false, waits fireFreq, the sets canFire to true.
     */
     protected void setToChase()
@@ -414,6 +412,7 @@ public class TankEnemy : Tank
     }
     private void fireDirect()
     {
+        //TODO: make sure TankEnemy isn't hit
         // Aim directly at the player.
         aimDirect();
 
@@ -428,22 +427,11 @@ public class TankEnemy : Tank
         Vector3 newDir = Vector3.RotateTowards(tower.forward, -vectorTowardPlayer1, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
     }
-    protected new void Fire()
-    {
-        if (canFire && projectileCount > 0)
-        {
-            StartCoroutine(delayFire());
-            base.Fire();
-            recordShot(-tower.forward);
-        }
-    }
     private IEnumerator delayFire()
     {
-        Debug.Log("here");
         canFire = false;
         yield return new WaitForSeconds(fireFreq);
         canFire = true;
-        Debug.Log("2");
     }
 
     /*
@@ -541,12 +529,9 @@ public class TankEnemy : Tank
     private void aimScan()
     {
         scanTo(targetDirectionAim);
-        
-        //TODO: consider keeping track of last value that lead to isHit and select values to scan to depending on the last 5 shots
 
         if (isHit(tower.forward))
         {
-            //Debug.Log("fire");
             Fire();
         }
     }
@@ -580,7 +565,6 @@ public class TankEnemy : Tank
 
                 int randomRecentShot = (int)Random.Range(0, recentShotMax);
                 targetDirectionAim = tempQ[randomRecentShot];
-                Debug.Log(randomRecentShot);
             }
             else
             {

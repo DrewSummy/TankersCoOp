@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
-using Completed; // {}?
+using Completed;
 
 public class ProjectilePlayer : Projectile
 {
@@ -30,7 +29,7 @@ public class ProjectilePlayer : Projectile
         GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
     }
 
-    // Obsolete: use DisableProjectile(). Used by RoomManager to remove extra projectiles.
+    //TODO: figure out which one of these is obsolete vv: Used by RoomManager to remove extra projectiles.
     public override void RemoveProjectile()
     {
         base.RemoveProjectile();
