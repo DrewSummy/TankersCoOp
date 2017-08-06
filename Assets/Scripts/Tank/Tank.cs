@@ -15,7 +15,7 @@ abstract public class Tank : MonoBehaviour {
 
 
     protected float m_Speed = 12f;              // How fast the tank drives.
-    protected float m_RotateSpeed = 6f;         // How fast the tank rotates.
+    protected float m_RotateSpeed = 6f;         // How fast the tank body rotates.
     protected Vector3 m_CurrentDirection;       // The current direction the tank points.
     protected Rigidbody m_RidgidbodyTank;       // Reference used to move the tank.
     protected Rigidbody m_RigidbodyTower;       // Reference used to move the tank tower. 
@@ -170,11 +170,6 @@ abstract public class Tank : MonoBehaviour {
             projectileHolder.GetComponentInChildren<Projectile>().transform.SetParent(leftoverProjectileHolder);
             Debug.Log(projectileHolder.parent.gameObject.name);
         }
-
-        Debug.Log(leftoverProjectileHolder);
-        Debug.Log(projectileHolder.GetComponentsInChildren<Projectile>().Length);
-        Debug.Log(name);
-        Debug.Log("//////////////////////////////////////////////////////////////////");
     }
 
     public void SetLeftoverProjectileHolder(Transform holder)

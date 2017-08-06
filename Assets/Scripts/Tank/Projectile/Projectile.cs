@@ -53,7 +53,6 @@ public class Projectile : MonoBehaviour
         // Load in the explosion and trail being used from the Resources folder in assets.
         projectileExplosion = Resources.Load("TankResources/Projectile/ShellExplosion") as GameObject;
         smokeTrail = Resources.Load("TankResources/Projectile/SmokeTrail") as GameObject;
-        Debug.Log(Resources.Load("TankResources/Projectile/SmokeTrail") as GameObject);
 
         // Get the AudioSource component of the game object.
         AudioSource audioSource = gameObject.GetComponent<AudioSource>();
@@ -65,8 +64,6 @@ public class Projectile : MonoBehaviour
 
     protected void setTrail()
     {
-        Debug.Log(parentTank.name);
-        Debug.Log(smokeTrail);
         currentTrail = Instantiate(smokeTrail) as GameObject;
         currentTrail.transform.SetParent(transform);
         currentTrail.transform.position = transform.position;
@@ -110,6 +107,7 @@ public class Projectile : MonoBehaviour
     */
     protected void projectileCollision()
     {
+        Debug.Log("pc");
         if (!disabled)
         {
             // Drop the current smoke trail.

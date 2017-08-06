@@ -7,7 +7,6 @@ public class SmokeTrailScript : MonoBehaviour {
     // Detach this gameObject from the projectile and Destroy it.
     public void removeSmokeTrail(Vector3 velocity)
     {
-        Debug.Log("remove trail");
         StartCoroutine(removeSmokeTrailHelper(velocity));
     }
     public IEnumerator removeSmokeTrailHelper(Vector3 velocity)

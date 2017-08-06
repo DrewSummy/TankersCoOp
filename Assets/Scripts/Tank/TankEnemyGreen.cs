@@ -26,8 +26,6 @@ public class TankEnemyGreen : TankEnemy
     {
         base.Start();
 
-
-        Debug.Log("grn");
         projectile = Resources.Load("TankResources/Projectile/ShellEnemyGreen") as GameObject;
     }
 }

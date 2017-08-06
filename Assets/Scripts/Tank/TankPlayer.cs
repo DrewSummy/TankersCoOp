@@ -346,9 +346,7 @@ namespace Completed
             // Freeze the tank from moving.
             m_RidgidbodyTank.velocity = Vector3.zero;
             m_RidgidbodyTank.freezeRotation = true;
-
-            Debug.Log("g");
-
+            
             // Give projectiles to the room's projectileHolder.
             TransferProjectiles();
 
