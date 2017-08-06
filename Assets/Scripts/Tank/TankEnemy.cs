@@ -95,7 +95,7 @@ public class TankEnemy : Tank
         projTestScript = GetComponent<ProjectileTest>();
 
 
-        // The FSM begins on Explore.
+        // Initiate the FSM.
         setToExplore();
         trackPlayer();
     }
@@ -150,7 +150,8 @@ public class TankEnemy : Tank
     /*
     Functions for the Explore state:
     setToExplore() - Set the state to EXPLORE and change variables accordingly.
-    isExploreDistance() - Returns true if EnemyTank is in EXPLORE range.
+    exploreCS() - Change state from EXPLORE to CHASE when necessary.
+    isExploreDistance() - Helper for exploreCS, returns true if the tank is in EXPLORE range.
     rotateDirection() - Rotates the EnemyTank to a random direction on random intervals.
     selectDirectionRandom() - Selects a random, unobstructed direction.
     delayTurn() - Helper function for selectDirection by keeping the canTurn bool false until the tank can turn.
@@ -163,16 +164,10 @@ public class TankEnemy : Tank
     */
     protected void Explore()
     {
-        if (isExploreDistance())
-        {
-            // Aim directly and drive randomly
-            firePredict();
-            driveRandom();
-        }
-        else
-        {
-            setToChase();
-        }
+        firePredict();
+        driveRandom();
+        
+        exploreCS();
     }
     protected void setToExplore()
     {
@@ -183,7 +178,16 @@ public class TankEnemy : Tank
         
         fireFreq = fireFreqExplore;
     }
-    private bool isExploreDistance()
+    protected virtual void exploreCS()
+    {
+        //TODO: needs to include 2nd player tanks
+        float distance = Vector3.Distance(body.position, player1.transform.position);
+        if (!isExploreDistance())
+        {
+            setToChase();
+        }
+    }
+    protected bool isExploreDistance()
     {
         //TODO: needs to include 2nd player tanks
         float distance = Vector3.Distance(body.position, player1.transform.position);
@@ -314,6 +318,7 @@ public class TankEnemy : Tank
     /*
     Functions for the Chase state:
     setToChase() - Set the state to CHASE and change variables accordingly.
+    chaseCS() - Change state from CHASE if the distance from player isn't in the CHASE range.
     isChaseDistance() - Returns true if EnemyTank is inside of CHASE range.
     driveToward() - Drives toward the player tank.
     selectDirectionToward() - Selects a toward, unobstructed direction.
@@ -324,27 +329,27 @@ public class TankEnemy : Tank
     */
     protected void Chase()
     {
-        if (isChaseDistance())
-        {
-            // Aim directly and drive randomly
-            fireDirect();
-            driveToward();
-        }
-        else if (isExploreDistance())
-        {
-            setToExplore();
-        }
-        else
-        {
-            setToFight();
-        }
+        fireDirect();
+        driveToward();
 
+        chaseCS();
     }
     protected void setToChase()
     {
         Debug.Log("chase");
         fireFreq = fireFreqChase;
         state = TankEnemy.State.CHASE;
+    }
+    protected void chaseCS()
+    {
+        if (isExploreDistance())
+        {
+            setToExplore();
+        }
+        else if (!isChaseDistance())
+        {
+            setToFight();
+        }
     }
     private bool isChaseDistance()
     {
@@ -431,26 +436,28 @@ public class TankEnemy : Tank
     /*
     Functions for the Fight state:
     setToFight() - Set the state to FIGHT and change variables accordingly.
+    fightCS() - Change state from FIGHT to CHASE if the distance from player isn't in the FIGHT range.
     isFightDistance() - Returns true if EnemyTank is inside of FIGHT range.
     */
     protected void Fight()
     {
-        if (isFightDistance())
-        {
-            // Aim directly and drive randomly
-            fireDirect();
-            driveRandom();
-        }
-        else
-        {
-            setToChase();
-        }
+        fireDirect();
+        driveRandom();
+
+        fightCS();
     }
     protected void setToFight()
     {
         Debug.Log("fight");
         fireFreq = fireFreqFight;
         state = TankEnemy.State.FIGHT;
+    }
+    protected void fightCS()
+    {
+        if (!isFightDistance())
+        {
+            setToChase();
+        }
     }
     private bool isFightDistance()
     {
@@ -470,6 +477,7 @@ public class TankEnemy : Tank
     /*
     Functions for the Evade state:
     setToEvade() - Set the state to EVADE and change variables accordingly.
+    evadeCS() - Place holder for children tanks to conditionally change from EVADE state.
     aimRicochet() - Aims at a wall to hit the tank.
     driveAway() - Drives away from the player tank.
     selectDirectionAway() - Selects an away, unobstructed direction.
@@ -482,9 +490,10 @@ public class TankEnemy : Tank
     */
     protected void Evade()
     {
-        Debug.Log("here");
         driveAway();
         aimScan();
+
+        evadeCS();
     }
     protected void setToEvade()
     {
@@ -493,6 +502,10 @@ public class TankEnemy : Tank
 
         // Start aiming at the player.
         selectDirectionAim();
+    }
+    protected void evadeCS()
+    {
+        
     }
     private void driveAway()
     {

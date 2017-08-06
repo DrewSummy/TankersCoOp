@@ -3,15 +3,17 @@ using System.Collections;
 
 public class TankEnemyRed : TankEnemy
 {
-    //TODO: give slow projectile
-
     // State variables
     private float coolDownEnd = 4f;             // The length of time the tank stays aggressive without seeing the player.
     private float coolDownTimer;                // The length of time the tank has gone without seeing the player.
+
+    // Shooting variables
     private float burstFireFreq = 2.5f;         // The amount of time between burst fires.
     protected float fireBurstFreq = .15f;       // The amount of time between each individual shot during burst fire.
-    private float stopDistance = 20f;           // The distance the tank gets to the player tank before stopping.
     private float burstAccuracy = 15f;          // The max amount of degrees a burst shot can miss the player by.
+
+    // Driving variables
+    private float stopDistance = 20f;           // The distance the tank gets to the player tank before stopping.
     private float speedAggressive = 12f;        // The speed the tank drives at.
 
 
@@ -27,8 +29,11 @@ public class TankEnemyRed : TankEnemy
     {
         base.Start();
 
+        // Set projectile.
+        projectile = Resources.Load("TankResources/Projectile/ShellEnemyRed") as GameObject;
+
         // The FSM begins on Evade.
-        setToFightAggressive();
+        setToExplore();
     }
 
     private new IEnumerator FSM()
@@ -59,11 +64,9 @@ public class TankEnemyRed : TankEnemy
     Functions for the ChaseAggressive state:
     setToChaseAggressive() - Set the state to CHASEAGGRESSIVE and change variables accordingly.
     setToChaseAggressiveNoCD() - Same as setToChaseAggressive but doesn't reset coolDownTimer.
-    coolDown() - Change tank to different state if the player hasn't been seen in coolDownEnd seconds.
-    playerInSight() - Returns true if the player is in sight.
     driveAggressive() - Drives directly at player if far enough away.
     selectDirectionDirect() - Sets targetDirectionDrive to directly at player.
-    coolDown() - Starts a coroutine that changes the state back to Explore if player hasn't been seen in too long.
+    coolDown() - Change tank to different state if the player hasn't been seen in coolDownEnd seconds.
     playerInSight() - Returns true if player is in sight.
     burstFire() - Starts a coroutine to change the state to FightAggressive
     */
@@ -80,20 +83,6 @@ public class TankEnemyRed : TankEnemy
         // Change the drive speed.
         m_CurrentSpeed = speedAggressive;
 
-        // Start cool down timer.
-        StartCoroutine(coolDown());
-
-        // Start timer until next burst shot.
-        StartCoroutine(burstFire());
-    }
-    protected void setToChaseAggressiveNoCD()
-    {
-        Debug.Log("chaseAggressive no cooldown");
-        state = TankEnemy.State.CHASEAGGRESSIVE;
-
-        // Change the drive speed.
-        m_CurrentSpeed = speedAggressive;
-        
         // Start timer until next burst shot.
         StartCoroutine(burstFire());
     }
@@ -119,8 +108,7 @@ public class TankEnemyRed : TankEnemy
         while (coolDownTimer < coolDownEnd)
         {
             yield return new WaitForSeconds(eps);
-
-
+            
             coolDownTimer += eps;
             if (playerInSight())
             {
@@ -142,7 +130,7 @@ public class TankEnemyRed : TankEnemy
         // Change states.
         if (state == TankEnemy.State.CHASEAGGRESSIVE)
         {
-            setToFightAggressive();
+            setToFightAggressiveNoCD();
         }
     }
 
@@ -151,8 +139,8 @@ public class TankEnemyRed : TankEnemy
     Functions for the FightAggressive state:
     setToFightAggressive() - Set the state to CHASEAGGRESSIVE and change variables accordingly.
     fireBurst() - Shoots accurately until out of projectiles.
-    selectDirectionAimBurst() - Selects targetDirectionAim to be at most burstAccuracy away from the vector toward the player.
     scanToBurst() - Scans toward the targetDirectionAim and fires.
+    selectDirectionAimBurst() - Selects targetDirectionAim to be at most burstAccuracy away from the vector toward the player.
     */
     protected void FightAggressive()
     {
@@ -166,39 +154,77 @@ public class TankEnemyRed : TankEnemy
 
         // Change the drive speed.
         m_CurrentSpeed = speedAggressive;
-
-        canFire = true;
-
-        fireFreq = fireBurstFreq;
         
+        // Start cool down timer.
+        //StartCoroutine(coolDown());
+
+        // Set variables
+        canFire = true;
+        fireFreq = fireBurstFreq;
         targetDirectionAim = vectorTowardPlayer1;
+    }
+    protected void setToFightAggressiveNoCD()
+    {
+        Debug.Log("fightAggressive no cooldown");
+        state = TankEnemy.State.FIGHTAGGRESSIVE;
+
+        // Change the drive speed.
+        m_CurrentSpeed = speedAggressive;
     }
     private void fireBurst()
     {
-        scanToBurst(targetDirectionAim);
+        scanToBurst();
 
         if (projectileCount <= 0)
         {
-            setToChaseAggressiveNoCD();
+            setToChaseAggressive();
+        }
+    }
+    private void scanToBurst()
+    {
+        if (canFire)
+        {
+            selectDirectionAimBurst();
+        }
+
+        float step = towerRotateSpeed * Time.deltaTime;
+        Vector3 newDir = Vector3.RotateTowards(tower.forward, -targetDirectionAim, step, .01F);
+        tower.rotation = Quaternion.LookRotation(newDir);
+
+        if (tower.forward == -targetDirectionAim && canFire)
+        {
+            Fire();
         }
     }
     private void selectDirectionAimBurst()
     {
         // Select random vector within burstAccuracy degrees of vector towards player.
         float angleOffset = Random.Range(-burstAccuracy, burstAccuracy);
-        float angle = Vector3.Angle(Vector3.forward, vectorTowardPlayer1) + angleOffset;
+        int sign = 1;
+        if (Vector3.Cross(Vector3.forward, vectorTowardPlayer1).y < 0)
+        {
+            sign = -1;
+        }
+        float angle = sign * Vector3.Angle(Vector3.forward, vectorTowardPlayer1) + angleOffset;
         targetDirectionAim = new Vector3(Mathf.Sin(angle * Mathf.PI / 180), 0, Mathf.Cos(angle * Mathf.PI / 180));
     }
-    private void scanToBurst(Vector3 V)
+
+    /*
+    Functions for Explore state:
+    exploreCS() - 
+    playerIsVisible() - Returns true if player is visible from tank position.
+    */
+    protected override void exploreCS()
     {
-        float step = towerRotateSpeed * Time.deltaTime;
-        Vector3 newDir = Vector3.RotateTowards(tower.forward, -V, step, .01F);
-        tower.rotation = Quaternion.LookRotation(newDir);
-        
-        if (-tower.forward == V && canFire)
+        if (playerIsVisible())
         {
-            Fire();
-            selectDirectionAimBurst();
+            setToFightAggressive();
         }
+    }
+    private bool playerIsVisible()
+    {
+        Debug.Log("player is visible");
+        RaycastHit hit;
+        return (Physics.Raycast(tower.position, vectorTowardPlayer1, out hit, roomLength) && hit.transform.tag == playerTag);
     }
 }
