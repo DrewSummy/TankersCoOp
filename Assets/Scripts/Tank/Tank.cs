@@ -168,7 +168,6 @@ abstract public class Tank : MonoBehaviour {
         {
             projectileHolder.GetComponentInChildren<Projectile>().transfered = true;
             projectileHolder.GetComponentInChildren<Projectile>().transform.SetParent(leftoverProjectileHolder);
-            Debug.Log(projectileHolder.parent.gameObject.name);
         }
     }
 
