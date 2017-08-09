@@ -3,7 +3,6 @@ using System.Collections;
 
 public class Projectile : MonoBehaviour
 {
-    //TODO: add smoke trails
     //TODO: add a gameobject infront of the tower so that if a wall is inside it, the tank won't shoot
 
     public GameObject projectileExplosion;         // The GameObject of the projectile's explosion.
@@ -37,15 +36,17 @@ public class Projectile : MonoBehaviour
     // Use this for initialization
     protected void Start()
     {
+        setProjectileAttributes();
+
+        // Add velocity to the projectile.
+        ProjectileRigidbody.velocity = -ProjectileRigidbody.transform.forward * projectileSpeed;
+        projectileSpeedVector = ProjectileRigidbody.velocity;
+
         // Use the rigidbody and calculate the projectileSpeedVector.
         ProjectileRigidbody = gameObject.GetComponent<Rigidbody>();
 
         // Get rid of gravity.
         ProjectileRigidbody.useGravity = false;
-
-        // Add velocity to the projectile.
-        ProjectileRigidbody.velocity = -ProjectileRigidbody.transform.forward * projectileSpeed;
-        projectileSpeedVector = ProjectileRigidbody.velocity;
 
         // Set the trail.
         setTrail();
@@ -62,6 +63,13 @@ public class Projectile : MonoBehaviour
         audioSource.clip = ricochetAudio;
     }
 
+    // This function is for inheritance.
+    protected virtual void setProjectileAttributes()
+    {
+        // Nothing
+    }
+
+    // Adds a smokeTrail object behind the projectile at start and every ricochet.
     protected void setTrail()
     {
         currentTrail = Instantiate(smokeTrail) as GameObject;
@@ -69,6 +77,8 @@ public class Projectile : MonoBehaviour
         currentTrail.transform.position = transform.position;
         currentTrail.transform.rotation = transform.rotation;
         currentTrail.GetComponent<Rigidbody>().velocity = projectileSpeedVector;
+        //TODO:
+        currentTrail.GetComponent<ParticleSystem>().playbackSpeed = projectileSpeed / 16;
     }
 
 
@@ -102,12 +112,10 @@ public class Projectile : MonoBehaviour
     projectileCollision() - Kill the projectile.
     tankCollision() - Kill the projectile and tank that was hit.
     lastCollision() - Kill the projectile.
-    wallCollision() - Calculates a new direction based on angle of incidence,
-                        substitutes projectile trails, and plays audio.
+    wallCollision() - Calculates a new direction based on angle of incidence, substitutes projectile trails, and plays audio.
     */
     protected void projectileCollision()
     {
-        Debug.Log("pc");
         if (!disabled)
         {
             // Drop the current smoke trail.

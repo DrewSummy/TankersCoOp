@@ -21,7 +21,7 @@ public class TankEnemy : Tank
     protected Vector3 vectorTowardPlayer1;      // The vector toward player 1.
     protected ProjectileTest projTestScript;    // The script for shooting a test projectile.
     private float distancePlayer1;              // The float distance to player 1.
-    protected float towerRotateSpeed = 1f;      // The speed the tank tower rotates at.
+    protected float towerRotateSpeed = 2f;      // The speed the tank tower rotates at.
     protected float fireFreq;                   // The float for how frequent the tank shoots at.
     protected float fireFreqFight = 2.5f;       // The float for the fireFreq during FIGHT.
     protected float fireFreqChase = 5f;         // The float for the fireFreq during CHASE.
@@ -33,8 +33,10 @@ public class TankEnemy : Tank
     protected float aimRandomChance = .5f;      // The odds of selecting a random direction to aim.
 
     // Driving Variables
+    protected new float m_Speed = 6f;
+    protected new float m_RotateSpeed = 1f;
     private int drivingRange = 30;              // Angle used for driving toward/away from a player.
-    protected float m_CurrentSpeed;             // The speed the tank drives at.
+    protected float speedCurrent;             // The speed the tank drives at.
     protected Vector3 targetDirectionDrive;     // The current direction for the tank to go.
     protected float turningTimeMax = 5.0f;      // The max amount of time the tank goes before turning.
     protected float turningTimeMin = 1.0f;      // The min amount of time the tank goes before turning.
@@ -50,7 +52,7 @@ public class TankEnemy : Tank
     // Waypoint Variables
     public GameObject[] waypoints;              // Array of GameObject waypoints established by the room.
     private int currentWaypoint = -1;           // Integer representing the current waypoint to move to.
-
+    
     // State Variables
     public enum State
     {
@@ -75,21 +77,18 @@ public class TankEnemy : Tank
 
 
         // Initiate the driving variables.
-        m_Speed = 6f;
-        m_RotateSpeed = 1f;
         turningTimeNext = Random.Range(turningTimeMin, turningTimeMax);
-        m_CurrentSpeed = m_Speed;
+        speedCurrent = m_Speed;
 
         // Initiate the shooting variables.
         fireFreq = fireFreqChase;
         StartCoroutine(delayFire());
 
         // Get the script of player 1.
+        //TODO: this should be given by roomManager
         player1 = GameObject.FindGameObjectWithTag("Player");
         //player1Script = player1.GetComponent<TankPlayer>();
-
-        // Load in the projectile being used from the Resources folder in assets.
-        projectile = Resources.Load("TankResources/Projectile/ShellEnemy") as GameObject;
+        
 
         // Get the script of the projectile and record its speed.
         projTestScript = GetComponent<ProjectileTest>();
@@ -174,12 +173,13 @@ public class TankEnemy : Tank
         Debug.Log("explore");
         state = TankEnemy.State.EXPLORE;
 
-        m_CurrentSpeed = m_Speed;
+        speedCurrent = m_Speed;
         
         fireFreq = fireFreqExplore;
     }
     protected virtual void exploreCS()
     {
+        Debug.Log("shouldn't call this");
         //TODO: needs to include 2nd player tanks
         float distance = Vector3.Distance(body.position, player1.transform.position);
         if (!isExploreDistance())
@@ -262,12 +262,12 @@ public class TankEnemy : Tank
 
         if (Vector3.Angle(body.forward, targetDirectionDrive) < 5 || 360 < Vector3.Angle(body.forward, targetDirectionDrive))
         {
-            speed = m_CurrentSpeed;
+            speed = speedCurrent;
             //Debug.DrawLine(body.position, Vector3.up + body.position + padding * speed * body.forward, Color.green, 1);
         }
         else if (175 < Vector3.Angle(body.forward, targetDirectionDrive) && Vector3.Angle(body.forward, targetDirectionDrive) < 185)
         {
-            speed = -m_CurrentSpeed;
+            speed = -speedCurrent;
             //Debug.DrawLine(body.position, Vector3.up + body.position + padding * speed * body.forward, Color.green, 1);
         }
 
@@ -305,7 +305,7 @@ public class TankEnemy : Tank
     private void aimPredict()
     {
         // velocity needs to be planar
-        float step = m_RotateSpeed * Time.deltaTime;
+        float step = towerRotateSpeed * Time.deltaTime;
         Vector3 newDir = Vector3.RotateTowards(tower.forward, -vectorTowardPlayer1 + player1.GetComponent<TankPlayer>().SendVelocity(), step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
     }
@@ -422,7 +422,7 @@ public class TankEnemy : Tank
     {
         // TankEnemy looks directly at the player.
         // TODO: incorporate player2.
-        float step = m_RotateSpeed * Time.deltaTime;
+        float step = towerRotateSpeed * Time.deltaTime;
         Vector3 newDir = Vector3.RotateTowards(tower.forward, -vectorTowardPlayer1, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
     }
@@ -529,7 +529,7 @@ public class TankEnemy : Tank
             Vector2 unitPlane = Random.insideUnitCircle.normalized;
             targetDirectionDrive.Set(unitPlane[0], 0, unitPlane[1]);
             
-            while ((obstructed(targetDirectionDrive) || !isAway(targetDirectionDrive)) && (trys > 0))
+            while ((obstructed(targetDirectionDrive) || !isAway()) && (trys > 0))
             {
                 // Set targetDirection along the x-z plane.
                 unitPlane = Random.insideUnitCircle.normalized;
@@ -540,10 +540,10 @@ public class TankEnemy : Tank
             StartCoroutine(delayTurn());
         }
     }
-    private bool isAway(Vector3 V)
+    private bool isAway()
     {
         // Return true if V is far enough away from vectorTowardPlayer1.
-        if (Mathf.Abs(Vector3.Angle(V, vectorTowardPlayer1)) > awayDegreesMin)
+        if (Mathf.Abs(Vector3.Angle(targetDirectionDrive, vectorTowardPlayer1)) > awayDegreesMin)
         {
             return true;
         }
@@ -554,26 +554,22 @@ public class TankEnemy : Tank
     }
     private void aimScan()
     {
-        scanTo(targetDirectionAim);
-
-        if (isHit(tower.forward))
-        {
-            Fire();
-        }
+        scanTo();
     }
-    private bool isHit(Vector3 V)
+    private bool isHit()
     {
         return projTestScript.beginShoot(m_ProjectileSpawnPoint.position, -tower.forward);
     }
-    private void scanTo(Vector3 V)
+    private void scanTo()
     {
-        float step = m_RotateSpeed * Time.deltaTime;
-        Vector3 newDir = Vector3.RotateTowards(tower.forward, -V, step, .01F);
+        float step = towerRotateSpeed * Time.deltaTime;
+        Vector3 newDir = Vector3.RotateTowards(tower.forward, -targetDirectionAim, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
         
-        if (-tower.forward == V)
+        if (-tower.forward == targetDirectionAim)
         {
             selectDirectionAim();
+            Fire();
         }
     }
     private void selectDirectionAim()
@@ -1012,15 +1008,7 @@ public class TankEnemy : Tank
         float angle = Mathf.Acos((Vector3.Dot(from, to) / (from.magnitude + to.magnitude))) * 180 / Mathf.PI;
         return angle;
     }
-
-    protected void ColorizeTank()
-    {
-        foreach (MeshRenderer mr in this.GetComponentsInChildren(typeof(MeshRenderer)))
-        {
-            mr.material = tankColor;
-        }
-    }
-
+    
     public override void DestroyTank()
     {
         base.DestroyTank();

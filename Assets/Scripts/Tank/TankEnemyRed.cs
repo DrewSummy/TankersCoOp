@@ -3,6 +3,8 @@ using System.Collections;
 
 public class TankEnemyRed : TankEnemy
 {
+    // General variables
+
     // State variables
     private float coolDownEnd = 4f;             // The length of time the tank stays aggressive without seeing the player.
     private float coolDownTimer;                // The length of time the tank has gone without seeing the player.
@@ -14,32 +16,23 @@ public class TankEnemyRed : TankEnemy
 
     // Driving variables
     private float stopDistance = 20f;           // The distance the tank gets to the player tank before stopping.
-    private float speedAggressive = 12f;        // The speed the tank drives at.
+    private float speedAggressive = 10f;        // The speed the tank drives at.
 
 
-    new void Awake()
-    {
-        base.Awake();
-        // This needs to be called in awake so that it is instantiated earlier than GUI_HUD.
-        tankColor = tankColors[2];
-        ColorizeTank();
-    }
-
-    private new void Start()
+    protected new void Start()
     {
         base.Start();
 
-        // Set projectile.
-        projectile = Resources.Load("TankResources/Projectile/ShellEnemyRed") as GameObject;
-
         // The FSM begins on Evade.
+        Debug.Log("red start");
         setToExplore();
     }
-
+    
     private new IEnumerator FSM()
     {
         while (alive)
         {
+            Debug.Log(state);
             trackPlayer();
 
             switch (state)
@@ -57,8 +50,7 @@ public class TankEnemyRed : TankEnemy
             yield return null;
         }
     }
-
-
+    
 
     /*
     Functions for the ChaseAggressive state:
@@ -81,7 +73,7 @@ public class TankEnemyRed : TankEnemy
         state = TankEnemy.State.CHASEAGGRESSIVE;
 
         // Change the drive speed.
-        m_CurrentSpeed = speedAggressive;
+        speedCurrent = speedAggressive;
 
         // Start timer until next burst shot.
         StartCoroutine(burstFire());
@@ -153,7 +145,7 @@ public class TankEnemyRed : TankEnemy
         state = TankEnemy.State.FIGHTAGGRESSIVE;
 
         // Change the drive speed.
-        m_CurrentSpeed = speedAggressive;
+        speedCurrent = speedAggressive;
         
         // Start cool down timer.
         //StartCoroutine(coolDown());
@@ -169,7 +161,7 @@ public class TankEnemyRed : TankEnemy
         state = TankEnemy.State.FIGHTAGGRESSIVE;
 
         // Change the drive speed.
-        m_CurrentSpeed = speedAggressive;
+        speedCurrent = speedAggressive;
     }
     private void fireBurst()
     {
@@ -216,6 +208,7 @@ public class TankEnemyRed : TankEnemy
     */
     protected override void exploreCS()
     {
+        Debug.Log("should call this");
         if (playerIsVisible())
         {
             setToFightAggressive();

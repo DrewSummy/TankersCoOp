@@ -367,7 +367,6 @@ namespace Completed
                         // If this is the last room, place the exit. Otherwise place an obstacle course.
                         else if (new Vector2(row, column) == lastRoomCoordinate)
                         {
-                            Debug.Log("how");
                             // Call the RoomManager function for the last room with an exit and instantiate respective variables.
                             roomHolder.GetComponent<RoomManager>().SetUpRoom
                                 (roomHolder, Level, blockMaterials, floorMaterials, NEWSWall(row, column), GM);
@@ -537,8 +536,7 @@ namespace Completed
             //TODO:fade from black to start
             StartCoroutine(fadeFromBlack());
         }
-
-
+        
         // Fade panel to black.
         private IEnumerator fadeFromBlack()
         {

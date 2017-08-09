@@ -1296,7 +1296,6 @@ namespace Completed
         {
             float speed = 40f;
             float delay = Random.Range(0, 1f);
-            Debug.Log(delay);
 
             yield return new WaitForSeconds(delay);
             while (b.position.y > -20)

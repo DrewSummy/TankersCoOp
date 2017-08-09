@@ -235,7 +235,6 @@ namespace Completed
                     if (!collisionInfo.transform.GetComponent<TankPlayer>().battling)
                     {
                         collisionInfo.transform.GetComponent<TankPlayer>().currentRoom = parentRoomScript.gameObject;
-                        Debug.Log(parentRoomScript.gameObject.name);
                     }
 
                 }

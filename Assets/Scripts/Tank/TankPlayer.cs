@@ -94,7 +94,7 @@ namespace Completed
 
 
             // Load in the projectile being used from the Resources folder in assets.
-            projectile = Resources.Load("TankResources/Projectile/ShellPlayer") as GameObject;
+            //projectile = Resources.Load("TankResources/Projectile/ShellPlayer") as GameObject;
 
             // Tanks hasn't shot yet. This is used to allow semi-auto shooting.
             m_HasShot = false;

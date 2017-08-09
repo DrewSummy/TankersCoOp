@@ -20,7 +20,7 @@ abstract public class Tank : MonoBehaviour {
     protected Rigidbody m_RidgidbodyTank;       // Reference used to move the tank.
     protected Rigidbody m_RigidbodyTower;       // Reference used to move the tank tower. 
     protected Rigidbody m_RidgidbodyBody;       // Reference used to move the tank body.
-    protected GameObject projectile;            // The GameObject of the projectile.
+    public GameObject projectile;            // The GameObject of the projectile.
     protected Transform tower;                  // The transform of the tower; the child of tank.
     public Transform body;                      // The transform of the body; the child of tank.
     //private float m_OriginalPitch;            // TODO: The pitch of the audio source at the start of the scene.
@@ -51,6 +51,9 @@ abstract public class Tank : MonoBehaviour {
         projectileHolder = new GameObject("Projectile Holder").transform;
         projectileHolder.transform.SetParent(gameObject.transform);
 
+
+        ColorizeTank();
+
         Start();
     }
 
@@ -78,7 +81,7 @@ abstract public class Tank : MonoBehaviour {
 
         // Load in the projectile being used from the Resources folder in assets.
         //projectile = Resources.Load("TankResources/Projectile/Shell") as GameObject;
-        projectile = Resources.Load("TankResource/Projectile/Shell") as GameObject;
+        //projectile = Resources.Load("TankResource/Projectile/Shell") as GameObject;
 
         // Store the original pitch of the audio source.
         //m_OriginalPitch = m_MovementAudio.pitch;
@@ -88,6 +91,14 @@ abstract public class Tank : MonoBehaviour {
         //m_MovementAudio = gameObject.GetComponents<AudioSource>()[1];
         m_FireAudio = Resources.Load("FireSound") as AudioClip;
         m_EmptyFireAudio = Resources.Load("EmptyFireSound") as AudioClip;
+    }
+
+    private void ColorizeTank()
+    {
+        foreach (MeshRenderer mr in this.GetComponentsInChildren(typeof(MeshRenderer)))
+        {
+            mr.material = tankColor;
+        }
     }
 
     protected void Fire()

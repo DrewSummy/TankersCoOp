@@ -3,10 +3,9 @@ using System.Collections;
 
 public class ProjectileEnemyGreen : ProjectileEnemy
 {
-    protected new void Start()
+    override protected void setProjectileAttributes()
     {
-        base.Start();
-        projectileSpeed = 3;
+        projectileSpeed = 8f;
         maxCollisions = 0;
     }
 }
