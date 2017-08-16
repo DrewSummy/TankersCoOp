@@ -147,7 +147,6 @@ public class Menu : MonoBehaviour {
         StartCoroutine(replaceSettings());
     }
 
-    //TODO: interrupt placing modes by checking if it is the correct selection
 
     // Cancel the current mode and place a new one.
     private IEnumerator replaceMenu()
@@ -288,7 +287,7 @@ public class Menu : MonoBehaviour {
         }
     }
 
-    // Called when reaching a new menu.
+    // Obselete: Called when reaching a new menu.
     private void cancel()
     {
         inactivateBlocks();

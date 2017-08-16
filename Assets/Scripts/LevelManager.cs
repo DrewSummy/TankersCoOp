@@ -54,11 +54,12 @@ namespace Completed
         private float wallThickness = 1f;                                        // Thickness of outside walls.
         private int numberOfRooms;                                               // Number of rooms based on level
         private Transform currentRoom;                                           // The transform for the current room.
-        private GameObject player1;                                              // Reference to the player 1 game object.
-        private GameObject player2;
+        public GameObject player1;                                              // Reference to the player 1 game object.
+        public GameObject player2;
         private int playersLeft;
 
         public GameMaster GM;
+        private GameObject levelHolder;
 
 
         // GUI stuff
@@ -316,6 +317,9 @@ namespace Completed
         // Sets up each room dependent on floorChart.
         private void SetUpFloor(int level)
         {
+            // Create the level GameObject.
+            levelHolder = new GameObject("Level " + level);
+
             // Set up the floor chart.
             InstantiateFloorChart(level);
 
@@ -394,6 +398,13 @@ namespace Completed
                         toSend[0] = row;
                         toSend[1] = column;
                         roomHolder.GetComponent<RoomManager>().roomCoord = toSend;
+                        roomHolder.GetComponent<RoomManager>().player1 = player1;
+                        if (player2)
+                        {
+                            roomHolder.GetComponent<RoomManager>().player2 = player2;
+                        }
+
+                        roomHolder.SetParent(levelHolder.transform);
                     }
                 }
             }
@@ -492,7 +503,6 @@ namespace Completed
                     if (tank.GetComponent<TankPlayer>().m_PlayerNumber == 2)
                     {
                         player2 = tank;
-                        Debug.Log("hyere");
                     }
                 }
             }
@@ -509,7 +519,7 @@ namespace Completed
             
             // Equate this to the special floorChart for the GUI minimap
             // Initiate GUI.
-            GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().beginMap(floorChart, lastRoomCoordinate, firstRoomCoordinate);
+            GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().beginMap(floorChart, lastRoomCoordinate, firstRoomCoordinate, player1);
             
 
             // Set the first room coordinates.
@@ -519,9 +529,10 @@ namespace Completed
             player1.GetComponent<TankPlayer>().currentRoom = firstRoom.gameObject;
             if (coop)
             {
-                player1.GetComponent<TankPlayer>().teammate = player2.GetComponent<TankPlayer>();
-                player2.GetComponent<TankPlayer>().teammate = player1.GetComponent<TankPlayer>();
-                player2.GetComponent<TankPlayer>().currentRoom = firstRoom.gameObject;
+                //TODO
+                //player1.GetComponent<TankPlayer>().teammate = player2.GetComponent<TankPlayer>();
+                //player2.GetComponent<TankPlayer>().teammate = player1.GetComponent<TankPlayer>();
+                //player2.GetComponent<TankPlayer>().currentRoom = firstRoom.gameObject;
             }
 
             // Start the first room with the camera on it.
@@ -607,6 +618,14 @@ namespace Completed
             //TODO: this should also create some GUI and disable pause
             Debug.Log("GameOver");
             m_camera.GetComponent<CameraControl>().gameOver = true;
+        }
+
+        // End level.
+        public void endLevel()
+        {
+            InitializeList();
+
+            Destroy(levelHolder);
         }
     }
 }

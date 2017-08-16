@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;       //Allows us to use Lists.
 using TeamUtility.IO;
 
 namespace Completed
@@ -15,7 +14,7 @@ namespace Completed
         private float m_DriveVerticalValue;         // The vertical component of the drive direction
         private float m_DriveHorizontalValue;       // The horizontal component of the drive direction
         private string m_DriveVerticalName;         // The name of the input axis for moving forward and back.
-        private string m_DriveHorizontalName;       // The name of the input axis for turning.    
+        private string m_DriveHorizontalName;       // The name of the input axis for turning.
         private string m_AimHorizontalName;         // The name of the vector for aiming.
         private string m_AimVerticalName;           // The name of the vector for aiming.
         private float m_AimHorizontalValue;         // The value of the vector for aiming.

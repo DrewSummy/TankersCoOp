@@ -21,6 +21,7 @@ namespace Completed
 
         public GameObject player;                                                // The GameObject with the player sprite.
         public GameObject playerSample;                                          // The GameObject with the sample player image.
+        private GameObject playerIndicator;
         public GameObject exit;                                                  // The GameObject with the exit sprite.
         public LevelManager levelScript;                                         // Store a reference to the LevelManager which will set up the level.
 
@@ -83,7 +84,7 @@ namespace Completed
         }
 
         // This is called once to begin the display. Every update is displayed elsewhere.
-        public void beginMap(bool[,] fC, Vector2 lR, Vector2 sR)
+        public void beginMap(bool[,] fC, Vector2 lR, Vector2 sR, GameObject player)
         {
             callAwake();
             callStart();
@@ -99,7 +100,7 @@ namespace Completed
             topRight = startRoom;
 
             // Set the player.
-            P1 = GameObject.FindGameObjectWithTag("Player");
+            P1 = player;
 
             // Go through floorChart and place the rooms while initializing floorsFull.
             initialPlacement();
@@ -187,7 +188,7 @@ namespace Completed
 
 
             // Place the indicator for the middle room.
-            GameObject playerIndicator = Instantiate(playerSample) as GameObject;
+            playerIndicator = Instantiate(playerSample) as GameObject;
             playerIndicator.GetComponent<RectTransform>().SetParent(panelSample.transform);
             playerIndicator.GetComponent<RectTransform>().position = floorHolderSample.position;
             
@@ -520,6 +521,19 @@ namespace Completed
                 placeSample();
                 selected = false;
             }
+        }
+
+        // Used by GameMaster when clearing a game.
+        public void clearMap()
+        {
+            Destroy(floorHolderFull.gameObject);
+            Destroy(floorHolderSample.gameObject);
+            Destroy(itemHolderFull.gameObject);
+            Destroy(tank);
+            Destroy(playerIndicator);
+
+            clearFull();
+            clearSample();
         }
     }
 }

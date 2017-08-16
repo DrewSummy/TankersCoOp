@@ -33,7 +33,6 @@ public class ButtonQuit : ButtonPause
     // OnClick button for quit.
     public void quit()
     {
-        Debug.Log("pressed quit are you sure?");
         // Select the yes button to begin.
         selectedQuit = true;
         yes.GetComponent<Button>().Select();
@@ -71,7 +70,7 @@ public class ButtonQuit : ButtonPause
 
 
     //TODO: these buttons: probably call a funtion in GameMaster
-    public void quitYes()
+    /*public void quitYes()
     {
         Debug.Log("wow you really did it, you really did you slut, Karen");
     }
@@ -83,5 +82,5 @@ public class ButtonQuit : ButtonPause
     public void cancelSubButton()
     {
         GetComponent<Button>().Select();
-    }
+    }*/
 }

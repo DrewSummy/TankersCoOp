@@ -8,7 +8,8 @@ public class TankEnemy : Tank
 {
     // General Variables
     public RoomManager parentRoom;              // Reference to the room TankEnemy spawns in.
-    protected GameObject player1;               // Reference to the player 1 game object.
+    public GameObject player1;                  // Reference to the player 1 game object.
+    public GameObject player2;                  // Reference to the player 2 game object.
     //private TankPlayer player1Script;           // Store a reference to the TankPlayer of player 1.
     //private TankPlayer player2Script;           // Store a reference to the TankPlayer of player 2.
     protected int roomLength = 50;              // Integer for the length of the room.
@@ -83,11 +84,6 @@ public class TankEnemy : Tank
         // Initiate the shooting variables.
         fireFreq = fireFreqChase;
         StartCoroutine(delayFire());
-
-        // Get the script of player 1.
-        //TODO: this should be given by roomManager
-        player1 = GameObject.FindGameObjectWithTag("Player");
-        //player1Script = player1.GetComponent<TankPlayer>();
         
 
         // Get the script of the projectile and record its speed.
@@ -170,7 +166,6 @@ public class TankEnemy : Tank
     }
     protected void setToExplore()
     {
-        Debug.Log("explore");
         state = TankEnemy.State.EXPLORE;
 
         speedCurrent = m_Speed;
@@ -179,7 +174,6 @@ public class TankEnemy : Tank
     }
     protected virtual void exploreCS()
     {
-        Debug.Log("shouldn't call this");
         //TODO: needs to include 2nd player tanks
         float distance = Vector3.Distance(body.position, player1.transform.position);
         if (!isExploreDistance())

@@ -33,7 +33,6 @@ public class ButtonRestart : ButtonPause
     // OnClick button for quit.
     public void restart()
     {
-        Debug.Log("restart");
         // Select the yes button to begin.
         selectedRestart = true;
         yes.GetComponent<Button>().Select();
@@ -68,8 +67,8 @@ public class ButtonRestart : ButtonPause
         }
     }
     
-    //TODO: these buttons: probably call a funtion in GameMaster
-    public void restartYes()
+    //TODO: OBSOLETE: these buttons: probably call a funtion in GameMaster
+    /*public void restartYes()
     {
         Debug.Log("another game");
     }
@@ -81,5 +80,5 @@ public class ButtonRestart : ButtonPause
     public void cancelSubButton()
     {
         GetComponent<Button>().Select();
-    }
+    }*/
 }

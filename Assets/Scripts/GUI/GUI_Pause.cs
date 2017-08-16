@@ -10,6 +10,9 @@ namespace Completed
 
         public GameObject panel;
         public GameObject tank;
+
+        // Buttons
+        public UnityEngine.UI.Selectable currentButton;
         public GameObject Resume;
         public GameObject Restart;
         public GameObject RestartYes;
@@ -17,12 +20,19 @@ namespace Completed
         public GameObject Quit;
         public GameObject QuitYes;
         public GameObject QuitNo;
+
+
         private Transform killHolder1;
         private Transform killHolder2;
         private GameObject P1;
         private GameObject P2;
         public GameObject killCountText;
         public Material[] tankColors;
+
+        public GameMaster GM;
+        public GUI_Controller controllerGUi;
+        public bool paused = false;
+
 
 
         void Awake()
@@ -43,7 +53,7 @@ namespace Completed
             // Load in the tank colors being used from the Resources folder in assets.
             tankColors = Resources.LoadAll<Material>("TankResources/TankColors");
         }
-
+        
         private void PlaceMenu()
         {
             foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
@@ -174,6 +184,11 @@ namespace Completed
                 // Set the resume button as selected. For some reason there has to be a different button selected previously.
                 Restart.GetComponent<Button>().Select();
                 Resume.GetComponent<Button>().Select();
+
+                paused = true;
+
+                // Enable the controller.
+                controllerGUi.enabled = true;
             }
         }
         public void Unpause()
@@ -183,6 +198,11 @@ namespace Completed
                 Time.timeScale = 1f;
                 RemoveKills();
                 panel.SetActive(false);
+
+                paused = false;
+
+                // Disable the controller.
+                controllerGUi.enabled = false;
             }
         }
 
@@ -207,6 +227,91 @@ namespace Completed
         {
             // Pause and Unpause are now usable.
             enabled = true;
+        }
+
+        // End and restart game.
+        private void endGame()
+        {
+            currentButton = Resume.GetComponent<Button>();
+            Unpause();
+            GM.endGame();
+        }
+        private void restartGame()
+        {
+            currentButton = Resume.GetComponent<Button>();
+            Unpause();
+            GM.restart();
+        }
+
+        // Functions called by GUI_Controller
+        public void back()
+
+        {
+            if (currentButton == Resume.GetComponent<Button>() ||
+                currentButton == Restart.GetComponent<Button>() ||
+                currentButton == Quit.GetComponent<Button>())
+            {
+                resume();
+            }
+            else if (currentButton == RestartYes.GetComponent<Button>() ||
+                currentButton == RestartNo.GetComponent<Button>())
+            {
+                currentButton = Restart.GetComponent<Button>();
+            }
+            else if (currentButton == QuitYes.GetComponent<Button>() ||
+                currentButton == QuitNo.GetComponent<Button>())
+            {
+                currentButton = Quit.GetComponent<Button>();
+            }
+
+            currentButton.Select();
+        }
+        public void select()
+        {
+            currentButton.GetComponent<Button>().onClick.Invoke();
+
+            if (currentButton.GetComponent<Button>() == Restart.GetComponent<Button>())
+            {
+                currentButton = RestartYes.GetComponent<Button>();
+            }
+            else if (currentButton.GetComponent<Button>() == Quit.GetComponent<Button>())
+            {
+                currentButton = QuitYes.GetComponent<Button>();
+            }
+            else if (currentButton.GetComponent<Button>() == RestartYes.GetComponent<Button>())
+            {
+                Restart.GetComponent<Button>().Select();
+                currentButton = Resume.GetComponent<Button>();
+                currentButton.Select();
+                restartGame();
+            }
+            else if (currentButton.GetComponent<Button>() == RestartNo.GetComponent<Button>())
+            {
+                currentButton = Restart.GetComponent<Button>();
+            }
+            else if (currentButton.GetComponent<Button>() == QuitYes.GetComponent<Button>())
+            {
+                Quit.GetComponent<Button>().Select();
+                currentButton = Resume.GetComponent<Button>();
+                currentButton.Select();
+                endGame();
+            }
+            else if (currentButton.GetComponent<Button>() == QuitNo.GetComponent<Button>())
+            {
+                currentButton = Quit.GetComponent<Button>();
+            }
+
+            currentButton.Select();
+        }
+        public void up()
+        {
+            currentButton = currentButton.GetComponent<Button>().navigation.selectOnUp;
+            currentButton.Select();
+        }
+        public void down()
+        {
+            currentButton = currentButton.GetComponent<Button>().navigation.selectOnDown;
+            currentButton.Select();
         }
     }
 }

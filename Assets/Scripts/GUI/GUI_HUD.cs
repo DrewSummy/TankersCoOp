@@ -7,9 +7,6 @@ namespace Completed
 {
     public class GUI_HUD : MonoBehaviour
     {
-        //TODO: figure out aspect ratio stuff http://answers.unity3d.com/questions/1065133/black-bars-on-top-bottom-in-aspect-ratio.html
-        //TODO: images make color darker
-
         public GameObject gameOverPanel;
         public GameObject Restart;
         public GameObject Menu;
@@ -39,7 +36,9 @@ namespace Completed
         private GameObject P1;                      // Reference to the player 1 game object.
         private GameObject P2;                      // Reference to the player 2 game object.
 
-        //TODO: choose colors based on player tank color
+        // Coroutine
+        Coroutine countDown;
+
 
 
 
@@ -257,7 +256,7 @@ namespace Completed
 
         public void PlayCountDown()
         {
-            StartCoroutine(CountdownCoroutine());
+            countDown = StartCoroutine(CountdownCoroutine());
 
             //TODO: play 3, 2, 1, countdown audio
             HUDAudio.clip = countdown;
@@ -309,6 +308,22 @@ namespace Completed
         void Update()
         {
             //Debug.Log(enemyHolder.childCount);
+        }
+
+        public void resetHUD()
+        {
+            StopCoroutine(countDown);
+            
+            /*oreach (Transform child in countdownHolder.transform)
+            {
+                GameObject.Destroy(child.gameObject);
+            }*/
+
+
+            Destroy(countdownHolder.gameObject);
+            Destroy(enemyHolder.gameObject);
+            Destroy(projectileHolder1.gameObject);
+            Destroy(projectileHolder2.gameObject);
         }
     }
 }

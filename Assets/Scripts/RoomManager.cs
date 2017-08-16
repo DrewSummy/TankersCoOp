@@ -24,10 +24,8 @@ namespace Completed
         private Transform[] m_doors = new Transform[4];                          // An array of the doors.
         private bool isPlayer1;                                                  // The bool for if player 2 is alive.
         private bool isPlayer2;                                                  // The bool for if player 2 is alive.
-        private GameObject player1;                                              // Reference to the player 1 game object.
-        private GameObject player2;
-        private TankPlayer player1Script;
-        private TankPlayer player2Script;
+        public GameObject player1;                                              // Reference to the player 1 game object.
+        public GameObject player2;
         public GameObject[] enemyList;                                           // An array of enemies for the level.
         private List<Vector3> playerSpawnLocations = new List<Vector3>();        // A list of player spawn locations.
         private List<Vector3> enemySpawnLocations = new List<Vector3>();         // A list of enemy spawn locations.
@@ -316,8 +314,12 @@ namespace Completed
                 // Send the projectile holder to each tank to hold projectiles when the enemy is killed.
                 enemy.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
 
-                // Disable until battle starts.
-                //enemy.GetComponent<Tank>().enabled = false;
+                // Pass the players.
+                enemy.GetComponent<TankEnemy>().player1 = player1;
+                if (player2)
+                {
+                    enemy.GetComponent<TankEnemy>().player2 = player2;
+                }
 
                 // Set the TankEnemy's parentRoom.
                 enemy.GetComponent<TankEnemy>().parentRoom = this;
@@ -374,7 +376,6 @@ namespace Completed
                     // Now place player 1 if not placed.
                     placePlayer = 1;
                 }
-
             }
         }
 
@@ -442,7 +443,6 @@ namespace Completed
                 if (walls[0].GetComponentsInChildren<Transform>()[1].GetComponent<Gate>().triggered &&
                     !hasTriggeredNEWS[0])
                 {
-                    Debug.Log("here");
                     if (NEWSRoom[0].GetComponent<RoomManager>().roomCompleted)
                     {
                         hasTriggeredNEWS[0] = true;
@@ -460,7 +460,6 @@ namespace Completed
                 if (walls[1].GetComponentInChildren<Gate>().triggered &&
                     !hasTriggeredNEWS[1])
                 {
-                    Debug.Log("here");
                     if (NEWSRoom[1].GetComponent<RoomManager>().roomCompleted)
                     {
                         hasTriggeredNEWS[1] = true;
@@ -480,7 +479,6 @@ namespace Completed
                 {
                     if (NEWSRoom[2].GetComponent<RoomManager>().roomCompleted)
                     {
-                        Debug.Log("here");
                         hasTriggeredNEWS[2] = true;
                     }
                     else
@@ -877,10 +875,13 @@ namespace Completed
 
 
             GameObject wp1 = new GameObject("StartRoom Spawn Pos");
+            wp1.transform.SetParent(transform);
             wp1.transform.position = new Vector3(5f, 0, 10f) + m_room.transform.position;
             GameObject wp2 = new GameObject("StartRoom Spawn Pos");
+            wp2.transform.SetParent(transform);
             wp2.transform.position = new Vector3(25f, 0, 20f) + m_room.transform.position;
             GameObject wp3 = new GameObject("StartRoom Spawn Pos");
+            wp3.transform.SetParent(transform);
             wp3.transform.position = new Vector3(35f, 0, 10f) + m_room.transform.position;
             waypoints = new GameObject[3];
             waypoints[0] = wp1;
@@ -1077,7 +1078,7 @@ namespace Completed
         {
 
             // Not getting every projectile, might want to kill every projectile during ending sequence.
-            if (player1Script.alive)
+            if (player1.GetComponent<TankPlayer>().alive)
             {
                 //TODO: set player1Script perhaps in start().
                 player1.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
@@ -1085,7 +1086,7 @@ namespace Completed
             }
             if (coop)
             {
-                if (player2Script.alive)
+                if (player2.GetComponent<TankPlayer>().alive)
                 {
                     //TODO: set player2Script perhaps in start().
                     player2.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
@@ -1113,11 +1114,6 @@ namespace Completed
         // Helper function for setUpRoom().
         private void callStart()
         {
-            player1 = GameObject.FindGameObjectsWithTag("Player")[0];
-            if (coop) player2 = GameObject.FindGameObjectsWithTag("Player")[1];
-            player1Script = player1.GetComponent<TankPlayer>();
-            if (coop) player2Script = player2.GetComponent<TankPlayer>(); ;
-
             for (int wall = 0; wall < hasTriggeredNEWS.Length; wall++)
             {
                 hasTriggeredNEWS[wall] = false;

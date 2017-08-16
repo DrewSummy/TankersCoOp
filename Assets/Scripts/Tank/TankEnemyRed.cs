@@ -3,6 +3,7 @@ using System.Collections;
 
 public class TankEnemyRed : TankEnemy
 {
+    //TODO: create new state for circling
     // General variables
 
     // State variables
@@ -24,7 +25,6 @@ public class TankEnemyRed : TankEnemy
         base.Start();
 
         // The FSM begins on Evade.
-        Debug.Log("red start");
         setToExplore();
     }
     
@@ -32,7 +32,6 @@ public class TankEnemyRed : TankEnemy
     {
         while (alive)
         {
-            Debug.Log(state);
             trackPlayer();
 
             switch (state)
@@ -208,7 +207,6 @@ public class TankEnemyRed : TankEnemy
     */
     protected override void exploreCS()
     {
-        Debug.Log("should call this");
         if (playerIsVisible())
         {
             setToFightAggressive();
@@ -216,7 +214,6 @@ public class TankEnemyRed : TankEnemy
     }
     private bool playerIsVisible()
     {
-        Debug.Log("player is visible");
         RaycastHit hit;
         return (Physics.Raycast(tower.position, vectorTowardPlayer1, out hit, roomLength) && hit.transform.tag == playerTag);
     }

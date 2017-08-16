@@ -7,8 +7,7 @@ namespace Completed
 {
     public class GUI_Menu : MonoBehaviour
     {
-        //TODO: can't press before lowered
-
+        public bool active = false;
         public GameMaster GM;
         public Transform panel;                                    //
         public Transform banner;
@@ -16,6 +15,7 @@ namespace Completed
         public Image logo;                                         //
 
         // Temp buttons
+        public UnityEngine.UI.Selectable currentButton;
         public Button solo;
         public Button coop;
         public Button settings;
@@ -56,6 +56,8 @@ namespace Completed
         {
             // Display the logo and then the menu in this coroutine.
             StartCoroutine(initialDisplayHelper());
+
+            active = true;
         }
 
         // Helper so that the menu doesn't begin until the logo finishes.
@@ -219,75 +221,82 @@ namespace Completed
         //TODO: for settings1 and coopPlay, just run lower door
         public void soloOnClick()
         {
-            if (!menu.GetComponent<Menu>().containerMoving)
+            if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
                 Debug.Log("selected Solo");
                 soloPlay.Select();
                 menu.GetComponent<Menu>().placeSolo();
+                currentButton = soloPlay;
             }
         }
         public void coopOnClick()
         {
-            if (!menu.GetComponent<Menu>().containerMoving)
+            if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
                 Debug.Log("selected Coop");
                 coopPlay.Select();
                 menu.GetComponent<Menu>().placeCoop();
+                currentButton = coopPlay;
             }
         }
         public void settingsOnClick()
         {
-            if (!menu.GetComponent<Menu>().containerMoving)
+            if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
                 Debug.Log("selected Settings");
                 setting1.Select();
                 menu.GetComponent<Menu>().placeSettings();
+                currentButton = setting1;
             }
         }
         public void soloPlayOnClick()
         {
-            if (!menu.GetComponent<Menu>().containerMoving)
+            if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
                 Debug.Log("selected SoloPlay");
                 startGame();
+                //clearMenu();
             }
         }
         public void soloBackOnClick()
         {
-            if (!menu.GetComponent<Menu>().containerMoving)
+            if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
                 Debug.Log("selected SoloPlay");
                 solo.Select();
                 menu.GetComponent<Menu>().placeMenu();
+                currentButton = solo;
             }
         }
         public void coopPlayOnClick()
         {
-            if (!menu.GetComponent<Menu>().containerMoving)
+            if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
                 Debug.Log("selected CoopPlay");
                 startGameCoop();
+                //clearMenu();
             }
         }
         public void coopBackOnClick()
         {
-            if (!menu.GetComponent<Menu>().containerMoving)
+            if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
                 Debug.Log("selected CoopBack");
                 coop.Select();
                 menu.GetComponent<Menu>().placeMenu();
+                currentButton = solo;
             }
         }
         public void settings1OnClick()
         {
-            if (!menu.GetComponent<Menu>().containerMoving)
+            if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
                 //TODO: drop a slider or a tv or something to choose the color of the tank
@@ -297,13 +306,49 @@ namespace Completed
         }
         public void settingsBackOnClick()
         {
-            if (!menu.GetComponent<Menu>().containerMoving)
+            if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
                 Debug.Log("selected SettingBack");
                 settings.Select();
                 menu.GetComponent<Menu>().placeMenu();
+                currentButton = solo;
             }
+        }
+
+        // Functions called by GUI_Controller
+        public void back()
+        {
+            if (currentButton == solo || currentButton == coop || currentButton == settings)
+            {
+                // Do nothing
+            }
+            else
+            {
+                if (!menu.GetComponent<Menu>().containerMoving)
+                {
+                    menu.GetComponent<Menu>().containerMoving = true;
+                    Debug.Log("back");
+                    solo.Select();
+                    menu.GetComponent<Menu>().placeMenu();
+                    currentButton = solo;
+                }
+            }
+        }
+        public void select()
+        {
+            currentButton.GetComponent<Button>().onClick.Invoke();
+        }
+        public void up()
+        {
+            Debug.Log("this shouldn't be being called");
+            currentButton = currentButton.GetComponent<Button>().navigation.selectOnUp;
+            currentButton.Select();
+        }
+        public void down()
+        {
+            currentButton = currentButton.GetComponent<Button>().navigation.selectOnDown;
+            currentButton.Select();
         }
 
         private IEnumerator temporarySettings1AndCoopPlay()
@@ -316,10 +361,14 @@ namespace Completed
         private void startGame()
         {
             StartCoroutine(startGameCoroutine());
+            
+            active = false;
         }
         private void startGameCoop()
         {
             StartCoroutine(startGameCoopCoroutine());
+            
+            active = false;
         }
 
         // Helper for disableCamera.
@@ -347,6 +396,7 @@ namespace Completed
             menu.SetActive(false);
             panel.gameObject.SetActive(false);
         }
+        
     }
 }
  
