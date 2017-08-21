@@ -26,7 +26,7 @@ public class TankEnemy : Tank
     protected float fireFreq;                   // The float for how frequent the tank shoots at.
     protected float fireFreqFight = 2.5f;       // The float for the fireFreq during FIGHT.
     protected float fireFreqChase = 5f;         // The float for the fireFreq during CHASE.
-    protected float fireFreqExplore = 5f;       // The float for the fireFreq during EXPLORE.    
+    protected float fireFreqExplore = 5f;       // The float for the fireFreq during EXPLORE.
     protected bool canFire = false;             // The bool for if the tank can fire.
     protected Vector3 targetDirectionAim;       // The current direction for the tank to shoot.
     private Queue<Vector3> recentShots = new Queue<Vector3>();                  // The queue for the last recentShotCount shots.
@@ -37,7 +37,7 @@ public class TankEnemy : Tank
     protected new float m_Speed = 6f;
     protected new float m_RotateSpeed = 1f;
     private int drivingRange = 30;              // Angle used for driving toward/away from a player.
-    protected float speedCurrent;             // The speed the tank drives at.
+    protected float speedCurrent;               // The speed the tank drives at.
     protected Vector3 targetDirectionDrive;     // The current direction for the tank to go.
     protected float turningTimeMax = 5.0f;      // The max amount of time the tank goes before turning.
     protected float turningTimeMin = 1.0f;      // The min amount of time the tank goes before turning.
@@ -55,18 +55,18 @@ public class TankEnemy : Tank
     private int currentWaypoint = -1;           // Integer representing the current waypoint to move to.
     
     // State Variables
-    public enum State
+    protected enum State
     {
         //TODO: add an out function for each state that switches states or not depending on conditions
         EXPLORE,
         CHASE,
         FIGHT,
         EVADE,
-        CHASEAGGRESSIVE,
-        FIGHTAGGRESSIVE
+        AGGRESSIVERELOAD,
+        AGGRESSIVE
     }
 
-    public State state;
+    protected State state;
     //TODO: add a leave function for each state
     
 
@@ -269,7 +269,7 @@ public class TankEnemy : Tank
         Vector3 movement = body.forward * speed * Time.deltaTime;
         m_RidgidbodyTank.MovePosition(m_RidgidbodyTank.position + movement);
     }
-    private void driveRandom()
+    protected void driveRandom()
     {
         // Rotate the car toward targetDirection.
         selectDirectionRandom();
@@ -287,7 +287,7 @@ public class TankEnemy : Tank
             recordShot(-tower.forward);
         }
     }
-    private void firePredict()
+    protected void firePredict()
     {
         //TODO: make sure TankEnemy isn't hit
         // Aim directly at the player.
@@ -403,7 +403,7 @@ public class TankEnemy : Tank
             return false;
         }
     }
-    private void fireDirect()
+    protected void fireDirect()
     {
         //TODO: make sure TankEnemy isn't hit
         // Aim directly at the player.
@@ -420,7 +420,7 @@ public class TankEnemy : Tank
         Vector3 newDir = Vector3.RotateTowards(tower.forward, -vectorTowardPlayer1, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
     }
-    private IEnumerator delayFire()
+    protected IEnumerator delayFire()
     {
         canFire = false;
         yield return new WaitForSeconds(fireFreq);
@@ -442,18 +442,17 @@ public class TankEnemy : Tank
     }
     protected void setToFight()
     {
-        Debug.Log("fight");
         fireFreq = fireFreqFight;
         state = TankEnemy.State.FIGHT;
     }
-    protected void fightCS()
+    protected virtual void fightCS()
     {
         if (!isFightDistance())
         {
             setToChase();
         }
     }
-    private bool isFightDistance()
+    protected virtual bool isFightDistance()
     {
         //TODO: needs to include 2nd player tanks
         float distance = Vector3.Distance(body.position, player1.transform.position);
