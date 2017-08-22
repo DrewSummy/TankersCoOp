@@ -3,9 +3,8 @@ using System.Collections;
 
 public class ProjectileEnemyRed : ProjectileEnemy
 {
-    override protected void setProjectileAttributes()
+    protected new void setVariables()
     {
         projectileSpeed = 12f;
-        maxCollisions = 0;
     }
 }

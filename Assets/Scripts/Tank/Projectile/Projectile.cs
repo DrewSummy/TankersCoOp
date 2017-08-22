@@ -10,7 +10,7 @@ public class Projectile : MonoBehaviour
     public AudioClip ricochetAudio;                // The GameObject of the audio for ricochetting.
     public GameObject smokeTrail;
 
-    protected int maxCollisions = 1;               // The max number of collisions before the object is destroyed. 
+    protected int maxCollisions = 1;                  // The max number of collisions before the object is destroyed. 
     protected int collisionCounter = 0;            // Used to keep track of the number of collisions.
     protected float projectileSpeed = 16;          // The speed the projectile fires at.
     protected Vector3 projectileSpeedVector;       // The vector the projectile moves at.
@@ -23,10 +23,7 @@ public class Projectile : MonoBehaviour
     private string projTag = "Projectile";
     private string playerTag = "Player";
     private string enemyTag = "Enemy";
-
-    //TODO: make the bullet rotate around the center of the sphere collider, maybe make an empty parent gameObject as the parent
-
-
+    
     protected void Awake()
     {
         // Use the rigidbody and calculate the projectileSpeedVector.
@@ -36,7 +33,7 @@ public class Projectile : MonoBehaviour
     // Use this for initialization
     protected void Start()
     {
-        setProjectileAttributes();
+        setVariables();
 
         // Add velocity to the projectile.
         ProjectileRigidbody.velocity = -ProjectileRigidbody.transform.forward * projectileSpeed;
@@ -63,10 +60,15 @@ public class Projectile : MonoBehaviour
         audioSource.clip = ricochetAudio;
     }
 
-    // This function is for inheritance.
-    protected virtual void setProjectileAttributes()
+    private void Update()
     {
-        // Nothing
+        //Debug.Log(maxCollisions);
+    }
+
+    // Used in inheritance to change projectile variables.
+    protected virtual void setVariables()
+    {
+        // Null
     }
 
     // Adds a smokeTrail object behind the projectile at start and every ricochet.
@@ -78,7 +80,9 @@ public class Projectile : MonoBehaviour
         currentTrail.transform.rotation = transform.rotation;
         currentTrail.GetComponent<Rigidbody>().velocity = projectileSpeedVector;
         //TODO:
-        currentTrail.GetComponent<ParticleSystem>().playbackSpeed = projectileSpeed / 16;
+        //currentTrail.GetComponent<ParticleSystem>().playbackSpeed = projectileSpeed / 16;
+        ParticleSystem.MainModule ps = currentTrail.GetComponent<ParticleSystem>().main;
+        ps.simulationSpeed = projectileSpeed / 16;
     }
 
 

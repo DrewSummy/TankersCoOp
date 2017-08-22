@@ -67,12 +67,12 @@ public class TankEnemyRed : TankEnemy
     Functions for the FightAggressive state:
     setToAggressive() - Set the state to AGGRESSIVE and change variables accordingly.
     setToAggressiveNoCD() - Same as setToAggressive() but don't restart the cooldown timer.
+    aggressiveCS() - Changes state from AGGRESSIVE if conditions are met.
     driveAggressive() - Drives directly at player if far enough away.
     fireBurst() - Shoots accurately until out of projectiles.
     scanToBurst() - Scans toward the targetDirectionAim and fires.
     selectDirectionAimBurst() - Selects targetDirectionAim to be at most burstAccuracy away from the vector toward the player.
     burstFire() - Starts a coroutine to change the state to FightAggressive
-    aggressiveCS() - Changes state from AGGRESSIVE if conditions are met.
     */
     protected void Aggressive()
     {
@@ -105,6 +105,14 @@ public class TankEnemyRed : TankEnemy
 
         // Change the drive speed.
         speedCurrent = speedAggressive;
+    }
+    private void aggressiveCS()
+    {
+        // Drive toward targetDirection if farther than fightDistance from player1.
+        if (Vector3.Distance(transform.position, player1.transform.position) < fightDistance)
+        {
+            setToFight();
+        }
     }
     private void driveAggressive()
     {
@@ -154,22 +162,14 @@ public class TankEnemyRed : TankEnemy
         // Change states.
         canBurstFire = true;
     }
-    private void aggressiveCS()
-    {
-        // Drive toward targetDirection if farther than fightDistance from player1.
-        if (Vector3.Distance(transform.position, player1.transform.position) < fightDistance)
-        {
-            setToFight();
-        }
-    }
-    
+
     /*
     Functions for the AGGRESSIVERELOAD state:
     setToAggressiveReload() - Set the state to AGGRESSIVE and change variables accordingly.
+    aggressiveCS() - Changes state from AGGRESSIVERELOAD if conditions are met.
     selectDirectionDirect() - Sets targetDirectionDrive to directly at player.
     coolDown() - Change tank to different state if the player hasn't been seen in coolDownEnd seconds.
     playerInSight() - Returns true if player is in sight.
-    aggressiveCS() - Changes state from AGGRESSIVERELOAD if conditions are met.
     */
     protected void AggressiveReload()
     {
@@ -187,6 +187,19 @@ public class TankEnemyRed : TankEnemy
 
         // Start timer until next burst shot.
         StartCoroutine(burstFire());
+    }
+    private void aggressiveReloadCS()
+    {
+        // Drive toward targetDirection if farther than fightDistance from player1.
+        if (Vector3.Distance(transform.position, player1.transform.position) < fightDistance)
+        {
+            setToFight();
+        }
+
+        if (projectileCount == projectileAmount && canBurstFire)
+        {
+            setToAggressiveNoCD();
+        }
     }
     private void selectDirectionDirect()
     {
@@ -216,22 +229,10 @@ public class TankEnemyRed : TankEnemy
         RaycastHit hit;
         return (Physics.Raycast(tower.position, -tower.forward, out hit, roomLength) && hit.transform.tag == playerTag);
     }
-    private void aggressiveReloadCS()
-    {
-        // Drive toward targetDirection if farther than fightDistance from player1.
-        if (Vector3.Distance(transform.position, player1.transform.position) < fightDistance)
-        {
-            setToFight();
-        }
-
-        if (projectileCount == projectileAmount && canBurstFire)
-        {
-            setToAggressiveNoCD();
-        }
-    }
 
     /*
     Functions for the FIGHT state:
+    setToFight() - Changes the state to FIGHT and alters variables respectively.
     fightCS() - Change state from FIGHT to AGGRESSIVE if the distance from player isn't in the FIGHT range.
     isFightDistance() - Returns true if EnemyTank is inside of FIGHT range.
     */

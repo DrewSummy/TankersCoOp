@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ProjectileTest : MonoBehaviour {
-
-
-    protected int maxCollisions = 2;               // The max number of collisions before the object is destroyed. 
+    
+    public int maxCollisions = 2;               // The max number of collisions before the object is destroyed. 
     protected Tank tankScript;                     // Reference to the parent TankEnemy.
 
     private string playerTag = "Player";           // The string for the player tag.

@@ -88,6 +88,7 @@ public class TankEnemy : Tank
 
         // Get the script of the projectile and record its speed.
         projTestScript = GetComponent<ProjectileTest>();
+        //projTestScript.maxCollisions = projectile.GetComponent<Projectile>().maxCollisions;
 
 
         // Initiate the FSM.
@@ -252,7 +253,7 @@ public class TankEnemy : Tank
         // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
 
-        // Set the speed to m_CurrentSpeed if the tank is pointed to within 5 degrees of the target direction from either end.
+        // Set the speed to speedCurrent if the tank is pointed to within 5 degrees of the target direction from either end.
 
         if (Vector3.Angle(body.forward, targetDirectionDrive) < 5 || 360 < Vector3.Angle(body.forward, targetDirectionDrive))
         {

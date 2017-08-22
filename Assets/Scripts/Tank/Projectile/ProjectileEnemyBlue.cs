@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ProjectileEnemyGreen : ProjectileEnemy
+public class ProjectileEnemyBlue : ProjectileEnemy
 {
     protected new void setVariables()
     {
-        projectileSpeed = 8f;
+        maxCollisions = 1;
     }
 }

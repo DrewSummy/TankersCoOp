@@ -3,8 +3,9 @@ using System.Collections;
 
 public class ProjectileEnemy : Projectile
 {
-    override protected void setProjectileAttributes()
+    protected override void setVariables()
     {
-        maxCollisions = 2;
+        maxCollisions = 0;
+        Debug.Log(maxCollisions);
     }
 }
