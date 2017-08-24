@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ProjectileEnemyBlue : ProjectileEnemy
 {
-    protected new void setVariables()
+    protected override void resetVariables()
     {
         maxCollisions = 1;
     }

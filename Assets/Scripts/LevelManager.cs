@@ -53,8 +53,8 @@ namespace Completed
         private int m_RoomLength = 50;                                           // Length of each room declared elsewhere also.
         private float wallThickness = 1f;                                        // Thickness of outside walls.
         private int numberOfRooms;                                               // Number of rooms based on level
-        private Transform currentRoom;                                           // The transform for the current room.
-        public GameObject player1;                                              // Reference to the player 1 game object.
+        public Transform currentRoom;                                            // The transform for the current room.
+        public GameObject player1;                                               // Reference to the player 1 game object.
         public GameObject player2;
         private int playersLeft;
 
@@ -92,17 +92,7 @@ namespace Completed
             }
         }
 
-
-        public void FindOccupiedRoom()
-        {
-            // Do some math and get the room coordinate player1 is in.
-            int stepLength = m_RoomLength + 2 * (int)wallThickness;
-            int xCoord = (int)Mathf.Floor((player1.transform.position.x + wallThickness) / stepLength);
-            int yCoord = (int)Mathf.Floor((player1.transform.position.z + wallThickness) / stepLength);
-
-            currentRoom = roomGrid[xCoord, yCoord];
-        }
-
+        
 
         private Transform[] FindCurrentNEWS()
         {
@@ -161,13 +151,7 @@ namespace Completed
             return NEWS;
 
         }
-
-        // TODO: might be used to keep track of the room the player is in.
-        public Transform SendCurrentRoom()
-        {
-            FindOccupiedRoom();
-            return currentRoom;
-        }
+        
 
         // Clears our array floorChart and prepares it to generate a new floor.
         private void InitializeList()
@@ -355,6 +339,7 @@ namespace Completed
                             roomHolder.GetComponent<RoomManager>().CreateStartingRoomWithInstructions();
                             roomHolder.GetComponent<RoomManager>().levelScript = this;
                             roomHolder.GetComponent<RoomManager>().m_camera = m_camera;
+                            currentRoom = roomHolder;
                         }
                         // If this is the starting room, place nothing.
                         //TODO: could be vector2
@@ -366,7 +351,7 @@ namespace Completed
                             roomHolder.GetComponent<RoomManager>().CreateStartingRoom();
                             roomHolder.GetComponent<RoomManager>().levelScript = this;
                             roomHolder.GetComponent<RoomManager>().m_camera = m_camera;
-
+                            currentRoom = roomHolder;
                         }
                         // If this is the last room, place the exit. Otherwise place an obstacle course.
                         else if (new Vector2(row, column) == lastRoomCoordinate)
@@ -524,7 +509,7 @@ namespace Completed
 
             // Set the first room coordinates.
             Transform firstRoom = roomGrid[(int)firstRoomCoordinate.x, (int)firstRoomCoordinate.y];
-            firstRoom.GetComponent<RoomManager>().startBeginningBattleCorrected();
+            firstRoom.GetComponent<RoomManager>().startBeginningBattle();
             // Link the players to their room and eachother.
             player1.GetComponent<TankPlayer>().currentRoom = firstRoom.gameObject;
             if (coop)
@@ -577,7 +562,6 @@ namespace Completed
             {
                 RoomScript.battleBegin = true;
             }
-
         }
 
         // Called by player to decrease the player count and end game when there are no players.
@@ -618,6 +602,8 @@ namespace Completed
             //TODO: this should also create some GUI and disable pause
             Debug.Log("GameOver");
             m_camera.GetComponent<CameraControl>().gameOver = true;
+            
+            currentRoom.GetComponent<RoomManager>().endRoom();
         }
 
         // End level.

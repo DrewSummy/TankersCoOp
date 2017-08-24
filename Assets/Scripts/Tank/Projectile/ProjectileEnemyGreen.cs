@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ProjectileEnemyGreen : ProjectileEnemy
 {
-    protected new void setVariables()
+    protected new void resetVariables()
     {
         projectileSpeed = 8f;
     }

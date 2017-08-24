@@ -19,12 +19,9 @@ namespace Completed
         public Transform gate;                  // Reference to the gate transform.
         public BoxCollider boundary;            // Reference to the boundary for triggering the gate.
         public bool triggered = false;          // Boolean for whether the gate was triggered.
-
         private bool lastRoomAudioBool;         // Boolean for whether this is a gate of the last room.
 
-
-        //TODO: why are there two box colliders
-
+        
         private void Awake()
         {
             gate = GetComponent<Transform>();
@@ -46,39 +43,7 @@ namespace Completed
         }
 
         // Lowers a door slowly.
-        public void lowerDoorSlow()
-        {
-            // How fast it shakes.
-            float speed = 40f;
-            // How much it shakes.
-            float amount = .08f;
-
-            if (!audioPlayed)
-            {
-                gateAudioSource.Play();
-                audioPlayed = true;
-            }
-
-            float lowerSpeed = gateHeight / (closeAudio.length + 1.0f);
-            if (gate.position.y > -gateHeight / 2)
-            {
-                float Angle2Amount = (Mathf.Cos(Time.time * 30) * 180) / Mathf.PI * amount;
-                gate.localRotation = Quaternion.Euler(Angle2Amount, 0, 0);
-
-                // Lowering
-                Vector3 lowering = Vector3.down * lowerSpeed * Time.deltaTime;
-                gate.Translate(lowering);
-                // Rotating
-                float AngleAmount = (Mathf.Cos(Time.time * speed) * 180) / Mathf.PI * amount;
-                gate.localRotation = Quaternion.Euler(Angle2Amount, AngleAmount, 0);
-            }
-            else
-            {
-                gate.localRotation = originalRot;
-                gate.transform.position = originalPos + Vector3.down * 4;
-            }
-        }
-        public IEnumerator lowerDoorSlowCorrected()
+        public IEnumerator lowerDoorSlow()
         {
             // How fast it shakes.
             float speed = 40f;
@@ -110,38 +75,7 @@ namespace Completed
         }
 
         // Lowers a door quickly.
-        public void lowerDoorFast()
-        {
-            float speed = 40f; // How fast it shakes.
-            float amount = .08f; // How much it shakes.
-
-            if (!audioPlayed)
-            {
-                gateAudioSource.pitch = 2f;
-                gateAudioSource.Play();
-                audioPlayed = true;
-            }
-
-            float lowerSpeed = 4 * gateHeight / (closeAudio.length + 1.0f);
-            if (gate.position.y > -gateHeight / 2)
-            {
-                float Angle2Amount = (Mathf.Cos(Time.time * 30) * 180) / Mathf.PI * amount;
-                gate.localRotation = Quaternion.Euler(Angle2Amount, 0, 0);
-
-                // Lowering
-                Vector3 lowering = Vector3.down * lowerSpeed * Time.deltaTime;
-                gate.Translate(lowering);
-                // Rotating
-                float AngleAmount = (Mathf.Cos(Time.time * speed) * 180) / Mathf.PI * amount;
-                gate.localRotation = Quaternion.Euler(Angle2Amount, AngleAmount, 0);
-            }
-            else
-            {
-                gate.localRotation = originalRot;
-                gate.transform.position = originalPos + Vector3.down * 4;
-            }
-        }
-        public IEnumerator lowerDoorFastCorrected()
+        public IEnumerator lowerDoorFast()
         {
             float speed = 40f; // How fast it shakes.
             float amount = .08f; // How much it shakes.
@@ -174,11 +108,13 @@ namespace Completed
         // Lowers the last room's door.
         public void lowerDoorLastRoom()
         {
+            boundary.enabled = false;
             // Play the last room audio, then lower the door slowly.
             if (lastRoomAudioBool)
             {
                 if (!audioPlayed)
                 {
+                    boundary.enabled = false;
                     gateAudioSource.clip = lastRoomAudio;
                     gateAudioSource.Play();
                     audioPlayed = true;
@@ -191,11 +127,8 @@ namespace Completed
                     gateAudioSource.clip = closeAudio;
                 }
             }
-
-            //lowerDoorSlow();
-            StartCoroutine(lowerDoorSlowCorrected());
+            StartCoroutine(lowerDoorSlow());
         }
-        //TODO: public IEnumerator lowerDoorLastRoomCorrected()
 
         protected void OnCollisionEnter(Collision collisionInfo)
         {
@@ -210,7 +143,7 @@ namespace Completed
                 }
                 else
                 {
-                    parentRoomScript.startBeginningBattleCorrected();
+                    parentRoomScript.startBeginningBattle();
                     // Reset the current room of the tanks.
                     foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
                     {

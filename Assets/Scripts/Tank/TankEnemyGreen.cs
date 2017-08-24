@@ -10,14 +10,21 @@ public class TankEnemyGreen : TankEnemy
     // Shooting variables
     
     // Driving variables
-    private new float m_Speed = 3f;//TODO: is this inherited
+    //private new float m_Speed = 3f;
+
+
+    protected override void resetVariables()
+    {
+        // Driving variables
+        m_Speed = 3f;
+    }
 
     protected new void Start()
     {
         base.Start();
 
         // The FSM begins on Evade.
-        setToExplore();
+        setToFight();
     }
     
 
@@ -28,8 +35,8 @@ public class TankEnemyGreen : TankEnemy
             trackPlayer();
             switch (state)
             {
-                case State.EXPLORE:
-                    Explore();
+                case State.FIGHT:
+                    Fight();
                     break;
             }
             yield return null;
@@ -37,10 +44,10 @@ public class TankEnemyGreen : TankEnemy
     }
 
     /*
-    Functions for the EXPLORE state:
-    exploreCS() - Overrides the change state funciton to never change states from EXPLORE.
+    Functions for the FIGHT state:
+    fightCS() - Overrides the change state funciton to never change states from FIGHT.
     */
-    protected override void exploreCS()
+    protected override void fightCS()
     {
         // Never change states
     }

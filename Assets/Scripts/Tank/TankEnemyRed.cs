@@ -18,17 +18,27 @@ public class TankEnemyRed : TankEnemy
     protected float fireBurstFreq = .15f;       // The amount of time between each individual shot during burst fire.
     private float burstAccuracy = 15f;          // The max amount of degrees a burst shot can miss the player by.
 
-    protected new float fireFreqFight = .35f;
+    //protected new float fireFreqFight = .35f;
 
     // Driving variables
-    protected new float m_RotateSpeed = 5f;
-    protected new float turningTimeMax = 2.5f;
-    protected new float turningTimeMin = .5f;
+    //protected new float m_RotateSpeed = 5f;
+    //protected new float turningTimeMax = 2.5f;
+    //protected new float turningTimeMin = .5f;
     private float fightDistance = 20f;          // The distance the tank gets to the player tank before fighting.
     private float speedAggressive = 10f;        // The speed the tank drives at.
 
     private float fightDistanceMax = 30f;
 
+    protected override void resetVariables()
+    {
+        // Shooting variables
+        fireFreqFight = .35f;
+
+        // Driving variables
+        m_RotateSpeed = 5f;
+        turningTimeMax = 2.5f;
+        turningTimeMin = .5f;
+    }
 
     protected new void Start()
     {

@@ -14,13 +14,10 @@ idea: items to buy
     
 save scores
 
-take in multiple controller inputs
-create second player
-
 create inbetween level idles
+
 save/continue/quit
 
-create menu
 include tutorial
 
 create tutorial
@@ -42,7 +39,8 @@ idea:
     bullet types: left trigger shoots slow, right- fast, both bidirectional bullets?
     teleport tank
     
-
+bugs:
+    projectile corner: projectiles ricochet unpredictably against corners of obstacles even when the corner is right against another obstacle
 
 
     give credit to https://github.com/daemon3000/InputManager/wiki/Getting-Started

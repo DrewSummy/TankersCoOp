@@ -300,8 +300,7 @@ namespace Completed
                 EnableTanks();
             }
         }
-
-
+        
         private void PlaceEnemies()
         {
             //TODO: somehow make random and eliminate each point from the list
@@ -660,6 +659,12 @@ namespace Completed
             // Fill enemyList.
             enemyList = Resources.LoadAll<GameObject>("TankResources/TankEnemy");
 
+            //TODO: temp for testing
+            GameObject[] temp = new GameObject[1];
+            temp[0] = enemyList[2];
+            //enemyList = temp;
+            //TODO: temp for testing
+
             // Create enemyHolder for this room.
             enemyHolder = new GameObject("EnemyHolder").transform;
             enemyHolder.SetParent(m_room);
@@ -1005,74 +1010,6 @@ namespace Completed
         
 
         // Helpers for the end of a battle.
-        private void removeDoors()
-        {
-            for (int door = 0; door < m_doors.Length; door++)
-            {
-                if (m_NEWSWall[door])
-                {
-                    doorScript = m_doors[door].GetComponent<Gate>();
-                    if (isLastRoom)
-                    {
-                        doorScript.lowerDoorLastRoom();
-                    }
-                    else if (NEWSRoom[door].GetComponent<RoomManager>().roomCompleted)
-                    {
-                        doorScript.lowerDoorFast();
-                    }
-                    else
-                    {
-                        doorScript.lowerDoorSlow();
-                    }
-
-                    // Also remove the boundaries of neighboring, completed rooms.
-                    if (NEWSRoom[door].GetComponent<RoomManager>().roomCompleted)
-                    {
-                        if (door == 0)
-                        {
-                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[3].GetComponent<Gate>().boundary.enabled = false;
-                        }
-                        if (door == 1)
-                        {
-                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[2].GetComponent<Gate>().boundary.enabled = false;
-                        }
-                        if (door == 2)
-                        {
-                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[1].GetComponent<Gate>().boundary.enabled = false;
-                        }
-                        if (door == 3)
-                        {
-                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[0].GetComponent<Gate>().boundary.enabled = false;
-                        }
-                    }
-                }
-            }
-        }
-        private void removeObstacles()
-        {
-            Debug.Log("remove");
-            // Remove obstacles.
-            foreach (Transform block in courseHolder) if (block.CompareTag(blockRemovableTag))
-                {
-                    Debug.Log(block.name);
-                    float speed = 40f; //how fast it shakes
-
-                    //TODO: audio                                     
-                    /*if (!audioPlayed)
-                    {
-                    gateAudioSource.Play();
-                    audioPlayed = true;
-                    }
-                    float lowerSpeed = gateHeight / (closeAudio.length + 2.0f);
-                    */
-
-                    if (block.position.y > -20)
-                    {
-                        Vector3 lowering = Vector3.down * speed * Time.deltaTime;
-                        block.Translate(lowering);
-                    }
-                }
-        }
 
         private void removeProjectiles()
         {
@@ -1129,14 +1066,14 @@ namespace Completed
 
                 if (enemyCount == 0)
                 {
-                    StartCoroutine(endBattleCorrected());
+                    StartCoroutine(endBattle());
                 }
             }
         }
 
         // replacement for startBeginningBattle
         // the problem is player1's projectileHolder isn't set up yet
-        public void startBeginningBattleCorrected()
+        public void startBeginningBattle()
         {
             if (!roomCompleted & !battleEnsuing)
             {
@@ -1157,18 +1094,31 @@ namespace Completed
                 GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().movePlayer();
                 
                 battleEnsuing = true;
+
+                levelScript.currentRoom = transform;
             }
         }
-        
+
         //TODO: how to properly run RoomManager
         // call startBeginningBattle() [rename to startBattle]
         // have a function enemyDead(this) called by enemyTanks
         // in function if enemyCount == 0, call endBattle
         // endbattle should be one function with coroutines
 
+        // Called by LevelManager when the game is over due to player loss
+        public void endRoom()
+        {
+            // Set every tank to do nothing.
+            foreach (Transform enemy in enemyHolder)
+            {
+                enemy.GetComponent<TankEnemy>().setToNothing();
+            }
+        }
+
+
         private IEnumerator endBattleLastRoom()
         {
-            removeDoorsCorrected();
+            removeDoors();
             //TODO: should play ending audio (special audio for last room)
 
             // Wait for camera to stop shaking.
@@ -1189,7 +1139,7 @@ namespace Completed
 
         // Function called when enemyCount == 0.
         //TODO: leave marks of where blocks were
-        private IEnumerator endBattleCorrected()
+        private IEnumerator endBattle()
         {
             // Remove projectiles from the player and put them into their animation.
             removeProjectiles();
@@ -1202,8 +1152,8 @@ namespace Completed
             }
 
             // Ending coroutines.
-            removeDoorsCorrected();
-            removeObstaclesCorrected();
+            removeDoors();
+            removeObstacles();
             StartCoroutine(FlickerLights());
             //TODO: should play ending audio
             
@@ -1236,7 +1186,7 @@ namespace Completed
 
         // Helpers for the end of a battle.
         //TODO: make lowerDoorFast() and lowerDoorLastRoom() a coroutine
-        private void removeDoorsCorrected()
+        private void removeDoors()
         {
             for (int door = 0; door < m_doors.Length; door++)
             {
@@ -1249,11 +1199,11 @@ namespace Completed
                     }
                     else if (NEWSRoom[door].GetComponent<RoomManager>().roomCompleted)
                     {
-                        StartCoroutine(doorScript.lowerDoorFastCorrected());
+                        StartCoroutine(doorScript.lowerDoorFast());
                     }
                     else
                     {
-                        StartCoroutine(doorScript.lowerDoorSlowCorrected());
+                        StartCoroutine(doorScript.lowerDoorSlow());
                     }
 
                     // Also remove the boundaries of neighboring, completed rooms.
@@ -1279,7 +1229,7 @@ namespace Completed
                 }
             }
         }
-        private void removeObstaclesCorrected()
+        private void removeObstacles()
         {
             // Remove obstacles.
             foreach (Transform block in courseHolder)

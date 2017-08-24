@@ -63,26 +63,26 @@ public class TankEnemy : Tank
         FIGHT,
         EVADE,
         AGGRESSIVERELOAD,
-        AGGRESSIVE
+        AGGRESSIVE,
+        SNIPE,
+        NOTHING
     }
 
     protected State state;
-    //TODO: add a leave function for each state
-    
-
 
     // Use this for initialization
     protected new void Start()
     {
         base.Start();
 
+        resetVariables();
 
         // Initiate the driving variables.
         turningTimeNext = Random.Range(turningTimeMin, turningTimeMax);
         speedCurrent = m_Speed;
+        
 
-        // Initiate the shooting variables.
-        fireFreq = fireFreqChase;
+        // Delay fire.
         StartCoroutine(delayFire());
         
 
@@ -96,10 +96,23 @@ public class TankEnemy : Tank
         trackPlayer();
     }
 
+
+    // Used in inheritance to change tank enemy variables.
+    protected virtual void resetVariables()
+    {
+        // Null
+    }
+
     // Called by the room to start the TankEnemy.
     public void startTankEnemy()
     {
         StartCoroutine("FSM");
+    }
+
+    // Called by the room to end the TankEnemy.
+    public void endTankEnemy()
+    {
+        setToNothing();
     }
 
     // Finite State Machine representing the actions TankEnemy goes through
@@ -294,14 +307,19 @@ public class TankEnemy : Tank
         // Aim directly at the player.
         aimPredict();
 
-        // Fire if there are bullets and fire frequency has elapsed.
-        Fire();
+        // Fire if there are bullets, fire frequency has elapsed, and the tower is predicting.
+        if (tower.forward == targetDirectionAim)
+        {
+            Fire();
+        }
     }
     private void aimPredict()
     {
         // velocity needs to be planar
         float step = towerRotateSpeed * Time.deltaTime;
-        Vector3 newDir = Vector3.RotateTowards(tower.forward, -vectorTowardPlayer1 + player1.GetComponent<TankPlayer>().SendVelocity(), step, .01F);
+        Vector3 velocityAddition = Vector3.Min(player1.GetComponent<TankPlayer>().SendVelocity(), -vectorTowardPlayer1);
+        targetDirectionAim = Vector3.Normalize(-vectorTowardPlayer1 + velocityAddition);
+        Vector3 newDir = Vector3.RotateTowards(tower.forward, targetDirectionAim, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
     }
     private bool obstructed(Vector3 V)
@@ -411,14 +429,18 @@ public class TankEnemy : Tank
         aimDirect();
 
         // Fire if there are bullets and fire frequency has elapsed.
-        Fire();
+        if (tower.forward == targetDirectionAim)
+        {
+            Fire();
+        }
     }
     protected void aimDirect()
     {
         // TankEnemy looks directly at the player.
         // TODO: incorporate player2.
         float step = towerRotateSpeed * Time.deltaTime;
-        Vector3 newDir = Vector3.RotateTowards(tower.forward, -vectorTowardPlayer1, step, .01F);
+        targetDirectionAim = -vectorTowardPlayer1;
+        Vector3 newDir = Vector3.RotateTowards(tower.forward, targetDirectionAim, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
     }
     protected IEnumerator delayFire()
@@ -479,6 +501,7 @@ public class TankEnemy : Tank
     aimScan() - Scans around and looks for a tank player.
     isHit(V) - Returns true if a player tank can be hit from shooting at V.
     scanTo(V) - Rotates the tower toward V.
+    aimDirection() - Rotates the tower toward 
     selectDirection() - Selects a random or recent direction for targetDirectionAim.
     recordShot() - Updates the recentShots queue with the most recent raycasts that hit a playerTank.
     */
@@ -550,21 +573,25 @@ public class TankEnemy : Tank
     {
         scanTo();
     }
-    private bool isHit()
+    protected bool isHit()
     {
         return projTestScript.beginShoot(m_ProjectileSpawnPoint.position, -tower.forward);
     }
-    private void scanTo()
+    protected void scanTo()
     {
-        float step = towerRotateSpeed * Time.deltaTime;
-        Vector3 newDir = Vector3.RotateTowards(tower.forward, -targetDirectionAim, step, .01F);
-        tower.rotation = Quaternion.LookRotation(newDir);
-        
+        aimDirection();
+
         if (-tower.forward == targetDirectionAim)
         {
             selectDirectionAim();
             Fire();
         }
+    }
+    protected void aimDirection()
+    {
+        float step = towerRotateSpeed * Time.deltaTime;
+        Vector3 newDir = Vector3.RotateTowards(tower.forward, -targetDirectionAim, step, .01F);
+        tower.rotation = Quaternion.LookRotation(newDir);
     }
     private void selectDirectionAim()
     {
@@ -606,7 +633,21 @@ public class TankEnemy : Tank
         }
     }
 
+    /*
+    Functions for the NOTHING state:
+    setToNothing() - Set the state to NOTHING.
+    */
+    protected void Nothing()
+    {
+        // Null
+    }
+    public void setToNothing()
+    {
+        Debug.Log("nothing");
+        state = TankEnemy.State.NOTHING;
+    }
 
+    
 
 
 

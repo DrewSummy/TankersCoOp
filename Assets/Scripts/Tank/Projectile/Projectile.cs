@@ -10,7 +10,7 @@ public class Projectile : MonoBehaviour
     public AudioClip ricochetAudio;                // The GameObject of the audio for ricochetting.
     public GameObject smokeTrail;
 
-    protected int maxCollisions = 1;                  // The max number of collisions before the object is destroyed. 
+    protected int maxCollisions = 1;               // The max number of collisions before the object is destroyed. 
     protected int collisionCounter = 0;            // Used to keep track of the number of collisions.
     protected float projectileSpeed = 16;          // The speed the projectile fires at.
     protected Vector3 projectileSpeedVector;       // The vector the projectile moves at.
@@ -33,7 +33,7 @@ public class Projectile : MonoBehaviour
     // Use this for initialization
     protected void Start()
     {
-        setVariables();
+        resetVariables();
 
         // Add velocity to the projectile.
         ProjectileRigidbody.velocity = -ProjectileRigidbody.transform.forward * projectileSpeed;
@@ -59,14 +59,9 @@ public class Projectile : MonoBehaviour
         ricochetAudio = Resources.Load("TankResources/RicochetSound") as AudioClip;
         audioSource.clip = ricochetAudio;
     }
-
-    private void Update()
-    {
-        //Debug.Log(maxCollisions);
-    }
-
+    
     // Used in inheritance to change projectile variables.
-    protected virtual void setVariables()
+    protected virtual void resetVariables()
     {
         // Null
     }
@@ -79,8 +74,6 @@ public class Projectile : MonoBehaviour
         currentTrail.transform.position = transform.position;
         currentTrail.transform.rotation = transform.rotation;
         currentTrail.GetComponent<Rigidbody>().velocity = projectileSpeedVector;
-        //TODO:
-        //currentTrail.GetComponent<ParticleSystem>().playbackSpeed = projectileSpeed / 16;
         ParticleSystem.MainModule ps = currentTrail.GetComponent<ParticleSystem>().main;
         ps.simulationSpeed = projectileSpeed / 16;
     }

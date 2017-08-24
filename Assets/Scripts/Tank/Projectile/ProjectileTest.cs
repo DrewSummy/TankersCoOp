@@ -28,20 +28,23 @@ public class ProjectileTest : MonoBehaviour {
 
     protected void Start()
     {
-        //TODO: test this
+        //TODO: test this with obstacles
         raycastLayer = ~(1 << LayerMask.NameToLayer("Ignore Raycasat"));
     }
 
-    public bool beginShoot(Vector3 position, Vector3 direction)
+    public bool beginShoot(Vector3 position, Vector3 direction, bool debug = false)
     {
         pt shot = new pt(position, direction);
 
-        return shoot(shot);
+        return shoot(shot, debug);
     }
 
-    private bool shoot(pt s)
+    private bool shoot(pt s, bool debug = false)
     {
-        //Debug.DrawLine(s.pos, s.pos + s.dir * 30, Color.white, 0.5f);
+        if (debug)
+        {
+            Debug.DrawLine(s.pos, s.pos + s.dir * 30, Color.white, 1.5f);
+        }
 
         // Send out raycast
         RaycastHit hit;
@@ -79,7 +82,7 @@ public class ProjectileTest : MonoBehaviour {
                 Vector3 normalCollision = hit.normal;
                 s.dir = Vector3.Reflect(s.dir, normalCollision);
                 
-                return shoot(s);
+                return shoot(s, debug);
             }
         }
     }
