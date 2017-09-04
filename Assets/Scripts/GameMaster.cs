@@ -55,8 +55,8 @@ public class GameMaster : MonoBehaviour
         //displaymenuGUI();
 
         //Temporary for testing.
-        CreateSoloGame();
-        //CreateCoopGame();
+        //CreateSoloGame();
+        CreateCoopGame();
     }
 
     private void PlacePlayers()
@@ -69,7 +69,7 @@ public class GameMaster : MonoBehaviour
         player1 = Resources.Load("TankResources/PlayerTank") as GameObject;
         GameObject Player1 = Instantiate(player1) as GameObject;
         Player1.transform.SetParent(playerHolder);
-        player1.name = "Player1";
+        Player1.name = "Player1";
         player1Script = player1.GetComponent<TankPlayer>();
         player1Script.m_PlayerNumber = 1;
 
@@ -80,7 +80,7 @@ public class GameMaster : MonoBehaviour
             player2 = Resources.Load("TankResources/PlayerTank") as GameObject;
             GameObject Player2 = Instantiate(player2) as GameObject;
             Player2.transform.SetParent(playerHolder);
-            player2.name = "Player2";
+            Player2.name = "Player2";
             player2Script = player2.GetComponent<TankPlayer>();
             player2Script.m_PlayerNumber = 2;
         }

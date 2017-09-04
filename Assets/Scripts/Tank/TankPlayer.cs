@@ -7,6 +7,8 @@ namespace Completed
     public class TankPlayer : Tank
     {
 
+
+        PlayerID PID;
         public int m_PlayerNumber = 1;              // Used to identify which tank belongs to which player. This is set by this tank's manager.
         public TankPlayer teammate = null;
 
@@ -76,6 +78,13 @@ namespace Completed
         {
             base.Start();
 
+            // Set the player ID.
+            PID = TeamUtility.IO.PlayerID.One;
+            if (m_PlayerNumber == 2)
+            {
+                PID = TeamUtility.IO.PlayerID.Two;
+            }
+
             // The axes names are based on player number.
             m_AimHorizontalName = "Right Stick Vertical";
             m_AimVerticalName = "Right Stick Horizontal";
@@ -137,8 +146,8 @@ namespace Completed
         {
             // Store the value of the input axes while exculding deadzones.
             // Get magnitude of joysticks inputs.
-            joystickMagnitude1 = Mathf.Pow(InputManager.GetAxis(m_DriveVerticalName), 2) + Mathf.Pow(InputManager.GetAxis(m_DriveHorizontalName), 2);
-            float joystickMagnitude2 = Mathf.Pow(InputManager.GetAxis(m_AimVerticalName), 2) + Mathf.Pow(InputManager.GetAxis(m_AimHorizontalName), 2);
+            joystickMagnitude1 = Mathf.Pow(InputManager.GetAxis(m_DriveVerticalName, PID), 2) + Mathf.Pow(InputManager.GetAxis(m_DriveHorizontalName, PID), 2);
+            float joystickMagnitude2 = Mathf.Pow(InputManager.GetAxis(m_AimVerticalName, PID), 2) + Mathf.Pow(InputManager.GetAxis(m_AimHorizontalName, PID), 2);
 
             // Create a deadzone so that small values are discarded.
             // Driving.
@@ -151,8 +160,8 @@ namespace Completed
             else
             {
                 // Get the horizontal and vertical components.
-                m_DriveHorizontalValue = -InputManager.GetAxis(m_DriveHorizontalName);
-                m_DriveVerticalValue = -InputManager.GetAxis(m_DriveVerticalName);
+                m_DriveHorizontalValue = -InputManager.GetAxis(m_DriveHorizontalName, PID);
+                m_DriveVerticalValue = -InputManager.GetAxis(m_DriveVerticalName, PID);
             }
             // Aiming.
             if (joystickMagnitude2 < .1)
@@ -162,18 +171,18 @@ namespace Completed
             else
             {
                 // Get the horizontal and vertical components.
-                m_AimHorizontalValue = InputManager.GetAxis(m_AimHorizontalName);
-                m_AimVerticalValue = InputManager.GetAxis(m_AimVerticalName);
+                m_AimHorizontalValue = InputManager.GetAxis(m_AimHorizontalName, PID);
+                m_AimVerticalValue = InputManager.GetAxis(m_AimVerticalName, PID);
             }
 
             // Store the value for firing.
-            m_FireValue = InputManager.GetAxis(m_FireName);
+            m_FireValue = InputManager.GetAxis(m_FireName, PID);
 
             // Store the value for pauseing.
-            m_PauseValue = InputManager.GetButtonDown(m_PauseName);
+            m_PauseValue = InputManager.GetButtonDown(m_PauseName, PID);
 
             // Store the value for selecting.
-            m_SelectValue1 = InputManager.GetButtonDown(m_SelectName);
+            m_SelectValue1 = InputManager.GetButtonDown(m_SelectName, PID);
         }
 
         private void FixedUpdate()
@@ -495,6 +504,7 @@ namespace Completed
             GetComponent<BoxCollider>().enabled = true;
 
             alive = true;
+            //TODO: this is erroneous, center wasn't instantiated when a new level was entered and a player died
             transform.position = teammate.currentRoom.transform.position + center;
             currentRoom = teammate.currentRoom;
 
