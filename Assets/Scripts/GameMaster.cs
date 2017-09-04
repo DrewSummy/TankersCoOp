@@ -178,7 +178,7 @@ public class GameMaster : MonoBehaviour
         // Pass the LevelManager to each tank and each tank to the LevelManager.
         levelScript.player1 = player1;
         levelScript.player1.GetComponent<TankPlayer>().LM = levelScript;
-        if (player2)
+        if (coop)
         {
             levelScript.player2 = player2;
             levelScript.player2.GetComponent<TankPlayer>().LM = levelScript;
