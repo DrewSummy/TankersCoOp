@@ -15,6 +15,7 @@ public class TankEnemyPurple : TankEnemy
     //new protected int projectileAmount = 2;
     private bool needDirection = false;
     //TODO: chance of shot, figure out why the first shot doesn't happen immediately
+    // value shots based on success
 
     // Driving variables
 
