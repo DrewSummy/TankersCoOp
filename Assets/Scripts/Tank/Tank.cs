@@ -43,7 +43,7 @@ abstract public class Tank : MonoBehaviour {
 
         // Load in the tank colors being used from the Resources folder in assets.
         // This needs to be called early so that it is instantiated before GUI_HUD.
-        tankColors = Resources.LoadAll<Material>("TankResources/TankColors");
+        tankColors = Resources.LoadAll<Material>("TankColors");
 
 
 

@@ -7,8 +7,7 @@ public class GameMaster : MonoBehaviour
 {
 
     public static GameMaster instance = null;                  // Static instance of GameMaster which allows it to be accessed by any other script.
-    public GameObject player1;                                 // The object that player 1 controls.
-    public GameObject player2;                                 // The object that player 2 controls.
+    public GameObject playerTemplate;                          // The game object for instantiating player tanks.
     public GameObject ai;
     public GameObject camera;
     public GameObject menu;
@@ -25,6 +24,8 @@ public class GameMaster : MonoBehaviour
     private bool coop = false;                                 // Makes a player 2 if true.
 
 
+    private GameObject player1;
+    private GameObject player2;
     private TankPlayer player1Script;
     private TankPlayer player2Script;
     //private Vector3 player2Position;                         // Position of player 2.
@@ -66,10 +67,9 @@ public class GameMaster : MonoBehaviour
 
         // Load in the Tank being used from the Resources folder in assets.
         // Player1
-        player1 = Resources.Load("TankResources/PlayerTank") as GameObject;
-        GameObject Player1 = Instantiate(player1) as GameObject;
-        Player1.transform.SetParent(playerHolder);
-        Player1.name = "Player1";
+        player1 = Instantiate(playerTemplate) as GameObject;
+        player1.transform.SetParent(playerHolder);
+        player1.name = "Player1";
         player1Script = player1.GetComponent<TankPlayer>();
         player1Script.m_PlayerNumber = 1;
 
@@ -77,10 +77,9 @@ public class GameMaster : MonoBehaviour
         if (coop)
         {
             // Load in the Tank being used from the Resources folder in assets.
-            player2 = Resources.Load("TankResources/PlayerTank") as GameObject;
-            GameObject Player2 = Instantiate(player2) as GameObject;
-            Player2.transform.SetParent(playerHolder);
-            Player2.name = "Player2";
+            player2 = Instantiate(playerTemplate) as GameObject;
+            player2.transform.SetParent(playerHolder);
+            player2.name = "Player2";
             player2Script = player2.GetComponent<TankPlayer>();
             player2Script.m_PlayerNumber = 2;
         }

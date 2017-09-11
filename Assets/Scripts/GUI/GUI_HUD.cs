@@ -90,16 +90,16 @@ namespace Completed
             bannerHolder.position = this.transform.position;
 
             // Load relevant sprites.
-            projectile = Resources.Load("HUDImages/Image_Projectile") as GameObject;
-            projectileEmpty = Resources.Load("HUDImages/Image_ProjectileEmpty") as GameObject;
-            tank = Resources.Load("HUDImages/Image_TankBig") as GameObject;
-            blackBanner = Resources.Load("HUDImages/Image_Banner") as GameObject;
+            projectile = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_Projectile") as GameObject;
+            projectileEmpty = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_ProjectileEmpty") as GameObject;
+            tank = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_TankBig") as GameObject;
+            blackBanner = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_Banner") as GameObject;
 
             GameObject[] sprites = new GameObject[4];
-            sprites[0] = Resources.Load("HUDImages/Image_3") as GameObject;
-            sprites[1] = Resources.Load("HUDImages/Image_2") as GameObject;
-            sprites[2] = Resources.Load("HUDImages/Image_1") as GameObject;
-            sprites[3] = Resources.Load("HUDImages/Image_Start") as GameObject;
+            sprites[0] = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_3") as GameObject;
+            sprites[1] = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_2") as GameObject;
+            sprites[2] = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_1") as GameObject;
+            sprites[3] = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_Start") as GameObject;
             countDownSprites = sprites;
 
             // Load audio objects.

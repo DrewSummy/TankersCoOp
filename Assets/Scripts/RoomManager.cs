@@ -650,14 +650,14 @@ namespace Completed
             GM = gM;
 
             // Load in the GameObjects.
-            blockTall = Resources.Load("Blocks/BlockTall") as GameObject;
-            blockShort = Resources.Load("Blocks/BlockShort") as GameObject;
-            exit = Resources.Load("Miscellaneous/Ladder") as GameObject;
-            wallOpen = Resources.Load("WallOpen") as GameObject;
-            wallClosed = Resources.Load("WallClosed") as GameObject;
+            blockTall = Resources.Load("Prefab/GameObjectPrefab/Blocks/BlockTall") as GameObject;
+            blockShort = Resources.Load("Prefab/GameObjectPrefab/Blocks/BlockShort") as GameObject;
+            exit = Resources.Load("Prefab/GameObjectPrefab/Miscellaneous/Ladder") as GameObject;
+            wallOpen = Resources.Load("Prefab/GameObjectPrefab/Room/WallOpen") as GameObject;
+            wallClosed = Resources.Load("Prefab/GameObjectPrefab/Room/WallClosed") as GameObject;
 
             // Fill enemyList.
-            enemyList = Resources.LoadAll<GameObject>("TankResources/TankEnemy");
+            enemyList = Resources.LoadAll<GameObject>("Prefab/GameObjectPrefab/TankPrefab/TankEnemy");
 
             //TODO: temp for testing
             GameObject[] temp = new GameObject[1];
