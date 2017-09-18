@@ -589,7 +589,7 @@ namespace Completed
             // If a player isn't alive, respawn the player.
             foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
             {
-                if (!tank.GetComponent<TankPlayer>().alive)
+                if (!tank.GetComponent<TankPlayer>().alive && coop)
                 {
                     tank.GetComponent<TankPlayer>().respawn();
                 }

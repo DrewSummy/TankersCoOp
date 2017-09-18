@@ -73,13 +73,13 @@ namespace Completed
         private void callStart()
         {
             // Load relevant images.
-            floorSample = Resources.Load("MiniMapImages/Image_FloorSample") as GameObject;
-            unknownSample = Resources.Load("MiniMapImages/Image_UnknownSample") as GameObject;
+            floorSample = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_FloorSample") as GameObject;
+            unknownSample = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_UnknownSample") as GameObject;
 
-            floorFull = Resources.Load("MiniMapImages/Image_FloorFull") as GameObject;
-            unknownFull = Resources.Load("MiniMapImages/Image_UnknownFull") as GameObject;
+            floorFull = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_FloorFull") as GameObject;
+            unknownFull = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_UnknownFull") as GameObject;
             
-            playerSample = Resources.Load("MiniMapImages/Image_PlayerSample") as GameObject;
+            playerSample = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_PlayerSample") as GameObject;
 
         }
 

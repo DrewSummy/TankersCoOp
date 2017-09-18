@@ -49,14 +49,14 @@ public class Projectile : MonoBehaviour
         setTrail();
 
         // Load in the explosion and trail being used from the Resources folder in assets.
-        projectileExplosion = Resources.Load("TankResources/Projectile/ShellExplosion") as GameObject;
-        smokeTrail = Resources.Load("TankResources/Projectile/SmokeTrail") as GameObject;
+        projectileExplosion = Resources.Load("Prefab/GameObjectPrefab/TankPrefab/Projectile/ShellExplosion") as GameObject;
+        smokeTrail = Resources.Load("Prefab/GameObjectPrefab/TankPrefab/Projectile/SmokeTrail") as GameObject;
 
         // Get the AudioSource component of the game object.
         AudioSource audioSource = gameObject.GetComponent<AudioSource>();
 
         // Load in the sound being used from the Resources folder in assets.
-        ricochetAudio = Resources.Load("TankResources/RicochetSound") as AudioClip;
+        ricochetAudio = Resources.Load("Prefab/Audio/RicochetSound") as AudioClip;
         audioSource.clip = ricochetAudio;
     }
     

@@ -21,22 +21,25 @@ namespace Completed
         public bool triggered = false;          // Boolean for whether the gate was triggered.
         private bool lastRoomAudioBool;         // Boolean for whether this is a gate of the last room.
 
+        public void done()
+        {
+            Debug.Log(parentRoomScript);
+        }
         
         private void Awake()
         {
             gate = GetComponent<Transform>();
             gateAudioSource = GetComponent<AudioSource>();
-
-            boundary = gate.GetComponentsInChildren<BoxCollider>()[1];
-            //Debug.Log(boundary.name);
+            
+            boundary = gate.GetComponentsInChildren<BoxCollider>()[0];//[1];
         }
 
         private void Start()
         {
             originalPos = gate.position;
 
-            closeAudio = Resources.Load("38724__metamorphmuses__long-deep-bass-boom") as AudioClip;
-            lastRoomAudio = Resources.Load("34942__sir-yaro__download-complete") as AudioClip;
+            closeAudio = Resources.Load("Prefab/Audio/38724__metamorphmuses__long-deep-bass-boom") as AudioClip;
+            lastRoomAudio = Resources.Load("Prefab/Audio/34942__sir-yaro__download-complete") as AudioClip;
             //gateAudioSource.volume = 0f; //TODO
             gateAudioSource.clip = closeAudio;
             gateAudioSource.playOnAwake = false;
@@ -135,6 +138,9 @@ namespace Completed
             // The object has collided with another projectile.
             if (collisionInfo.transform.tag == "Player")
             {
+                Debug.Log("huh");
+                Debug.Log(parentRoomScript.roomCompleted);
+                Debug.Log("the parent is supposed to a reference to the adjacent room");
                 if (parentRoomScript.roomCompleted)
                 {
                     //TODO: comment this out and test

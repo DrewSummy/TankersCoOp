@@ -650,8 +650,8 @@ namespace Completed
             GM = gM;
 
             // Load in the GameObjects.
-            blockTall = Resources.Load("Prefab/GameObjectPrefab/Blocks/BlockTall") as GameObject;
-            blockShort = Resources.Load("Prefab/GameObjectPrefab/Blocks/BlockShort") as GameObject;
+            blockTall = Resources.Load("Prefab/GameObjectPrefab/Obstacles/Blocks/BlockTall") as GameObject;
+            blockShort = Resources.Load("Prefab/GameObjectPrefab/Obstacles/Blocks/BlockShort") as GameObject;
             exit = Resources.Load("Prefab/GameObjectPrefab/Miscellaneous/Ladder") as GameObject;
             wallOpen = Resources.Load("Prefab/GameObjectPrefab/Room/WallOpen") as GameObject;
             wallClosed = Resources.Load("Prefab/GameObjectPrefab/Room/WallClosed") as GameObject;
@@ -733,6 +733,7 @@ namespace Completed
                 //doorScript = placeNorthWall.GetComponentsInChildren<Transform>()[1].GetComponent<Gate>();
                 doorScript = placeNorthWall.GetComponentInChildren<Gate>();
                 doorScript.parentRoomScript = this;
+                doorScript.done();
                 // Place light.
                 GameObject northWallLight = new GameObject();
                 northWallLight.name = "NorthLight";
@@ -765,6 +766,7 @@ namespace Completed
                 m_doors[1] = placeEastWall.GetComponentsInChildren<Transform>()[1];
                 doorScript = placeEastWall.GetComponentsInChildren<Transform>()[1].GetComponent<Gate>();
                 doorScript.parentRoomScript = this;
+                doorScript.done();
                 // Place light.
                 GameObject northEastLight = new GameObject();
                 northEastLight.name = "EastLight";
@@ -796,6 +798,7 @@ namespace Completed
                 m_doors[2] = placeWestWall.GetComponentsInChildren<Transform>()[1];
                 doorScript = placeWestWall.GetComponentsInChildren<Transform>()[1].GetComponent<Gate>();
                 doorScript.parentRoomScript = this;
+                doorScript.done();
                 // Place light.
                 GameObject westWallLight = new GameObject();
                 westWallLight.name = "WestLight";
@@ -827,6 +830,7 @@ namespace Completed
                 m_doors[3] = placeSouthWall.GetComponentsInChildren<Transform>()[1];
                 doorScript = placeSouthWall.GetComponentsInChildren<Transform>()[1].GetComponent<Gate>();
                 doorScript.parentRoomScript = this;
+                doorScript.done();
                 // Place light.
                 GameObject southWallLight = new GameObject();
                 southWallLight.name = "SouthLight";
