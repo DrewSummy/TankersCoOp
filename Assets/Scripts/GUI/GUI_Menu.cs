@@ -341,7 +341,6 @@ namespace Completed
         }
         public void up()
         {
-            Debug.Log("this shouldn't be being called");
             currentButton = currentButton.GetComponent<Button>().navigation.selectOnUp;
             currentButton.Select();
         }

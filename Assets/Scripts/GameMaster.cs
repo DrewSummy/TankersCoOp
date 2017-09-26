@@ -56,8 +56,8 @@ public class GameMaster : MonoBehaviour
         //displaymenuGUI();
 
         //Temporary for testing.
-        //CreateSoloGame();
-        CreateCoopGame();
+        CreateSoloGame();
+        //CreateCoopGame();
     }
 
     private void PlacePlayers()
