@@ -1196,6 +1196,7 @@ namespace Completed
             {
                 if (m_NEWSWall[door])
                 {
+                    // Disable the box collider for the open door. This is here as a flat surface to ricochet bullets off.
                     doorScript = m_doors[door].GetComponent<Gate>();
                     if (isLastRoom)
                     {

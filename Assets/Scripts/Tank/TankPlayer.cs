@@ -504,9 +504,7 @@ namespace Completed
             GetComponent<BoxCollider>().enabled = true;
 
             alive = true;
-            //TODO: this is erroneous, center wasn't instantiated when a new level was entered and a player died
-            Debug.Log(teammate);
-            Debug.Log(teammate.currentRoom);
+            // Place in the center of the room the player was in.
             transform.position = teammate.currentRoom.transform.position + center;
             currentRoom = teammate.currentRoom;
 

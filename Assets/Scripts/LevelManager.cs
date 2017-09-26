@@ -96,11 +96,18 @@ namespace Completed
 
         private Transform[] FindCurrentNEWS()
         {
+            // Find the alive player and use that.
+            GameObject player = player1;
+            if (!player1.GetComponent<TankPlayer>().alive)
+            {
+                player = player2;
+            }
+
             Transform[] NEWS = new Transform [4];
 
             int stepLength = m_RoomLength + 2 * (int)wallThickness;
-            int xCoord = (int)Mathf.Floor((player1.transform.position.x + wallThickness) / stepLength);
-            int yCoord = (int)Mathf.Floor((player1.transform.position.z + wallThickness) / stepLength);
+            int xCoord = (int)Mathf.Floor((player.transform.position.x + wallThickness) / stepLength);
+            int yCoord = (int)Mathf.Floor((player.transform.position.z + wallThickness) / stepLength);
 
             if (floorChart[xCoord, yCoord + 1])
             {
@@ -514,10 +521,9 @@ namespace Completed
             player1.GetComponent<TankPlayer>().currentRoom = firstRoom.gameObject;
             if (coop)
             {
-                //TODO
-                //player1.GetComponent<TankPlayer>().teammate = player2.GetComponent<TankPlayer>();
-                //player2.GetComponent<TankPlayer>().teammate = player1.GetComponent<TankPlayer>();
-                //player2.GetComponent<TankPlayer>().currentRoom = firstRoom.gameObject;
+                player1.GetComponent<TankPlayer>().teammate = player2.GetComponent<TankPlayer>();
+                player2.GetComponent<TankPlayer>().teammate = player1.GetComponent<TankPlayer>();
+                player2.GetComponent<TankPlayer>().currentRoom = firstRoom.gameObject;
             }
 
             // Start the first room with the camera on it.

@@ -23,7 +23,7 @@ namespace Completed
 
         public void done()
         {
-            Debug.Log(parentRoomScript);
+            //Debug.Log(parentRoomScript);
         }
         
         private void Awake()
@@ -48,6 +48,7 @@ namespace Completed
         // Lowers a door slowly.
         public IEnumerator lowerDoorSlow()
         {
+            Debug.Log("slow");
             // How fast it shakes.
             float speed = 40f;
             // How much it shakes.
@@ -138,9 +139,10 @@ namespace Completed
             // The object has collided with another projectile.
             if (collisionInfo.transform.tag == "Player")
             {
-                Debug.Log("huh");
-                Debug.Log(parentRoomScript.roomCompleted);
-                Debug.Log("the parent is supposed to a reference to the adjacent room");
+                //Debug.Log("huh");
+                Debug.Log(parentRoomScript);
+                //Debug.Log(parentRoomScript.roomCompleted);
+                //Debug.Log("the parent is supposed to a reference to the adjacent room");
                 if (parentRoomScript.roomCompleted)
                 {
                     //TODO: comment this out and test
