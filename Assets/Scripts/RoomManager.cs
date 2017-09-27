@@ -309,6 +309,7 @@ namespace Completed
                 GameObject enemy = Instantiate(enemyList[Random.Range(0, enemyList.Length)]) as GameObject;
                 enemy.transform.position = enemySpawnLocations[location];
                 enemy.transform.SetParent(enemyHolder);
+                Debug.Log(enemy.activeSelf);
 
                 // Send the projectile holder to each tank to hold projectiles when the enemy is killed.
                 enemy.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);

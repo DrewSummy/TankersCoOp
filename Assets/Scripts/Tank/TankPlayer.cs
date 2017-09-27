@@ -177,11 +177,9 @@ namespace Completed
 
             // Store the value for firing.
             m_FireValue = InputManager.GetAxis(m_FireName, PID);
-            Debug.Log(m_FireValue);
 
             // Store the value for pauseing.
             m_PauseValue = InputManager.GetButtonDown(m_PauseName, PID);
-            Debug.Log(PID);
 
             // Store the value for selecting.
             m_SelectValue1 = InputManager.GetButtonDown(m_SelectName, PID);

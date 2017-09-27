@@ -48,7 +48,6 @@ namespace Completed
         // Lowers a door slowly.
         public IEnumerator lowerDoorSlow()
         {
-            Debug.Log("slow");
             // How fast it shakes.
             float speed = 40f;
             // How much it shakes.
@@ -139,25 +138,15 @@ namespace Completed
             // The object has collided with another projectile.
             if (collisionInfo.transform.tag == "Player")
             {
-                //Debug.Log("huh");
-                Debug.Log(parentRoomScript);
-                //Debug.Log(parentRoomScript.roomCompleted);
-                //Debug.Log("the parent is supposed to a reference to the adjacent room");
                 if (parentRoomScript.roomCompleted)
                 {
                     //TODO: comment this out and test
-                    triggered = true;
-                    boundary.enabled = false;
+                    //triggered = true;
+                    //boundary.enabled = false;
                 }
                 else
                 {
                     parentRoomScript.startBeginningBattle();
-                    // Reset the current room of the tanks.
-                    foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
-                    {
-                        //tank.GetComponent<TankPlayer>().currentRoom = parentRoomScript.gameObject;
-                    }
-
                 }
             }
         }
