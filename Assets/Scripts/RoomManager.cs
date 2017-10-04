@@ -321,12 +321,19 @@ namespace Completed
                     enemy.GetComponent<TankEnemy>().player2 = player2;
                 }
 
+                List<GameObject> playerTanks = new List<GameObject>();
+                playerTanks.Add(player1);
+                if (player2)
+                {
+                    playerTanks.Add(player2);
+                }
+                enemy.GetComponent<Tank>().targets = playerTanks;
+
                 // Set the TankEnemy's parentRoom.
                 enemy.GetComponent<TankEnemy>().parentRoom = this;
 
                 // Give the enemies the waypoints.
                 enemy.GetComponent<TankEnemy>().waypoints = waypoints;
-                //enemy.GetComponent<TankEnemy>().selectWaypoint();
 
                 enemyCount++;
             }

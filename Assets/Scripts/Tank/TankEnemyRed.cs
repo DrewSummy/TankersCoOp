@@ -107,7 +107,7 @@ public class TankEnemyRed : TankEnemy
         // Set variables
         canFire = true;
         fireFreq = fireBurstFreq;
-        targetDirectionAim = vectorTowardPlayer1;
+        targetDirectionAim = vectorTowardTarget;
     }
     protected void setToAggressiveNoCD()
     {
@@ -119,6 +119,7 @@ public class TankEnemyRed : TankEnemy
     private void aggressiveCS()
     {
         // Drive toward targetDirection if farther than fightDistance from player1.
+
         if (Vector3.Distance(transform.position, player1.transform.position) < fightDistance)
         {
             setToFight();
@@ -158,11 +159,11 @@ public class TankEnemyRed : TankEnemy
         // Select random vector within burstAccuracy degrees of vector towards player.
         float angleOffset = Random.Range(-burstAccuracy, burstAccuracy);
         int sign = 1;
-        if (Vector3.Cross(Vector3.forward, vectorTowardPlayer1).y < 0)
+        if (Vector3.Cross(Vector3.forward, vectorTowardTarget).y < 0)
         {
             sign = -1;
         }
-        float angle = sign * Vector3.Angle(Vector3.forward, vectorTowardPlayer1) + angleOffset;
+        float angle = sign * Vector3.Angle(Vector3.forward, vectorTowardTarget) + angleOffset;
         targetDirectionAim = new Vector3(Mathf.Sin(angle * Mathf.PI / 180), 0, Mathf.Cos(angle * Mathf.PI / 180));
     }
     private IEnumerator burstFire()
@@ -201,7 +202,8 @@ public class TankEnemyRed : TankEnemy
     private void aggressiveReloadCS()
     {
         // Drive toward targetDirection if farther than fightDistance from player1.
-        if (Vector3.Distance(transform.position, player1.transform.position) < fightDistance)
+        //if (Vector3.Distance(transform.position, player1.transform.position) < fightDistance)
+        if (vectorTowardTarget.magnitude < fightDistance)
         {
             setToFight();
         }
@@ -213,7 +215,7 @@ public class TankEnemyRed : TankEnemy
     }
     private void selectDirectionDirect()
     {
-        targetDirectionDrive = vectorTowardPlayer1;
+        targetDirectionDrive = vectorTowardTarget;
     }
     private IEnumerator coolDown()
     {
@@ -275,7 +277,7 @@ public class TankEnemyRed : TankEnemy
     protected override bool isFightDistance()
     {
         //TODO: needs to include 2nd player tanks
-        float distance = Vector3.Distance(body.position, player1.transform.position);
+        float distance = vectorTowardTarget.magnitude;// Vector3.Distance(body.position, player1.transform.position);
         if (distance < fightDistanceMax)
         {
             return true;
@@ -301,6 +303,6 @@ public class TankEnemyRed : TankEnemy
     private bool playerIsVisible()
     {
         RaycastHit hit;
-        return (Physics.Raycast(tower.position, vectorTowardPlayer1, out hit, roomLength) && hit.transform.tag == playerTag);
+        return (Physics.Raycast(tower.position, vectorTowardTarget, out hit, roomLength) && hit.transform.tag == playerTag);
     }
 }

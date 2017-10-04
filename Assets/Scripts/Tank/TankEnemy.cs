@@ -10,18 +10,17 @@ public class TankEnemy : Tank
     public RoomManager parentRoom;              // Reference to the room TankEnemy spawns in.
     public GameObject player1;                  // Reference to the player 1 game object.
     public GameObject player2;                  // Reference to the player 2 game object.
-    //private TankPlayer player1Script;           // Store a reference to the TankPlayer of player 1.
+    //private TankPlayer targetTankScript;           // Store a reference to the TankPlayer of player 1.
     //private TankPlayer player2Script;           // Store a reference to the TankPlayer of player 2.
     protected int roomLength = 50;              // Integer for the length of the room.
     protected string playerTag = "Player";      // String representing the tag of a player.
     protected string blockTag = "Block";        // String representing the tag of a block.
 
     // Shooting Variables
-    private Vector3 player1Pos;                 // The vector for the current position of player 1.
-    private Vector3 player1Velocity;            // The vector for the current velocity of player 1.
-    protected Vector3 vectorTowardPlayer1;      // The vector toward player 1.
+    protected GameObject targetTank;
+    protected Vector3 vectorTowardTarget;      // The vector toward player 1.
     protected ProjectileTest projTestScript;    // The script for shooting a test projectile.
-    private float distancePlayer1;              // The float distance to player 1.
+    private float distancetargetTank;              // The float distance to player 1.
     protected float towerRotateSpeed = 2f;      // The speed the tank tower rotates at.
     protected float fireFreq;                   // The float for how frequent the tank shoots at.
     protected float fireFreqFight = 2.5f;       // The float for the fireFreq during FIGHT.
@@ -106,6 +105,8 @@ public class TankEnemy : Tank
     // Called by the room to start the TankEnemy.
     public void startTankEnemy()
     {
+        //this.enabled = true;
+        Debug.Log(isActiveAndEnabled);
         StartCoroutine("FSM");
     }
 
@@ -140,11 +141,18 @@ public class TankEnemy : Tank
 
     protected void trackPlayer()
     {
-        //TODO: incorporate player2
-        // Update vectorTowardPlayer1 and set the y coordinate to 0.
-        vectorTowardPlayer1 = player1.transform.position - tower.position;
-        vectorTowardPlayer1[1] = 0;
-        vectorTowardPlayer1 = Vector3.Normalize(vectorTowardPlayer1);
+        // Update vectorTowardTarget.
+        float minDist = float.PositiveInfinity;
+
+        for (int tankI = 0; tankI < targets.Count; tankI++)
+        {
+            if (Vector3.Distance(targets[tankI].transform.position, transform.position) < minDist)
+            {
+                minDist = Vector3.Distance(targets[tankI].transform.position, transform.position);
+                targetTank = targets[tankI];
+            }
+        }
+        vectorTowardTarget = targetTank.transform.position - transform.position;
     }
 
     /*
@@ -168,7 +176,7 @@ public class TankEnemy : Tank
     driveRandom() - Drives around the map and avoids walls.
     Fire() - Fires a projectile if canFire and TankEnemy has projectiles.
     firePredict() - Aims predictively at the the player and shoots.
-    aimPredict() - Aims at where player1 will be.
+    aimPredict() - Aims at where targetTank will be.
     obstructed() - Returns true if there is something in the way of driving.
     */
     protected void Explore()
@@ -189,7 +197,8 @@ public class TankEnemy : Tank
     protected virtual void exploreCS()
     {
         //TODO: needs to include 2nd player tanks
-        float distance = Vector3.Distance(body.position, player1.transform.position);
+        //float distance = Vector3.Distance(body.position, targetTank.transform.position);
+        float distance = vectorTowardTarget.magnitude;
         if (!isExploreDistance())
         {
             setToChase();
@@ -198,7 +207,7 @@ public class TankEnemy : Tank
     protected bool isExploreDistance()
     {
         //TODO: needs to include 2nd player tanks
-        float distance = Vector3.Distance(body.position, player1.transform.position);
+        float distance = vectorTowardTarget.magnitude;// Vector3.Distance(body.position, targetTank.transform.position);
         if (distance > minExploreDist)
         {
             return true;
@@ -317,8 +326,8 @@ public class TankEnemy : Tank
     {
         // velocity needs to be planar
         float step = towerRotateSpeed * Time.deltaTime;
-        Vector3 velocityAddition = Vector3.Min(player1.GetComponent<TankPlayer>().SendVelocity(), -vectorTowardPlayer1);
-        targetDirectionAim = Vector3.Normalize(-vectorTowardPlayer1 + velocityAddition);
+        Vector3 velocityAddition = Vector3.Min(targetTank.GetComponent<TankPlayer>().SendVelocity(), -vectorTowardTarget);
+        targetDirectionAim = Vector3.Normalize(-vectorTowardTarget + velocityAddition);
         Vector3 newDir = Vector3.RotateTowards(tower.forward, targetDirectionAim, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
     }
@@ -337,7 +346,7 @@ public class TankEnemy : Tank
     selectDirectionToward() - Selects a toward, unobstructed direction.
     isToward(V) - Returns true if V is toward from the tank by less than towardDegreesMax.
     fireDirect() - Aims directly at the the player and shoots.
-    aimDirect() - Aims directly at player1.
+    aimDirect() - Aims directly at targetTank.
     delayFire() - Sets canFire to false, waits fireFreq, the sets canFire to true.
     */
     protected void Chase()
@@ -367,7 +376,7 @@ public class TankEnemy : Tank
     private bool isChaseDistance()
     {
         //TODO: needs to include 2nd player tanks
-        float distance = Vector3.Distance(body.position, player1.transform.position);
+        float distance = Vector3.Distance(body.position, targetTank.transform.position);
         if (minChaseDist < distance && distance <= minExploreDist)
         {
             return true;
@@ -412,8 +421,8 @@ public class TankEnemy : Tank
     }
     private bool isToward(Vector3 V)
     {
-        // Return true if V is close enough toward from vectorTowardPlayer1.
-        if (Mathf.Abs(Vector3.Angle(V, vectorTowardPlayer1)) < towardDegreesMax)
+        // Return true if V is close enough toward from vectorTowardTarget.
+        if (Mathf.Abs(Vector3.Angle(V, vectorTowardTarget)) < towardDegreesMax)
         {
             return true;
         }
@@ -439,7 +448,7 @@ public class TankEnemy : Tank
         // TankEnemy looks directly at the player.
         // TODO: incorporate player2.
         float step = towerRotateSpeed * Time.deltaTime;
-        targetDirectionAim = -vectorTowardPlayer1;
+        targetDirectionAim = -vectorTowardTarget;
         Vector3 newDir = Vector3.RotateTowards(tower.forward, targetDirectionAim, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
     }
@@ -478,7 +487,7 @@ public class TankEnemy : Tank
     protected virtual bool isFightDistance()
     {
         //TODO: needs to include 2nd player tanks
-        float distance = Vector3.Distance(body.position, player1.transform.position);
+        float distance = Vector3.Distance(body.position, targetTank.transform.position);
         if (minChaseDist >= distance)
         {
             return true;
@@ -559,8 +568,8 @@ public class TankEnemy : Tank
     }
     private bool isAway()
     {
-        // Return true if V is far enough away from vectorTowardPlayer1.
-        if (Mathf.Abs(Vector3.Angle(targetDirectionDrive, vectorTowardPlayer1)) > awayDegreesMin)
+        // Return true if V is far enough away from vectorTowardTarget.
+        if (Mathf.Abs(Vector3.Angle(targetDirectionDrive, vectorTowardTarget)) > awayDegreesMin)
         {
             return true;
         }
@@ -712,11 +721,11 @@ public class TankEnemy : Tank
     {
         /*
         float step = m_RotateSpeed * Time.deltaTime;
-        Vector3 newDir = Vector3.RotateTowards(tower.forward, player1Hit + vectorTowardPlayer1, step, .01F);
+        Vector3 newDir = Vector3.RotateTowards(tower.forward, targetTankHit + vectorTowardTarget, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
         
 
-        if (Vector3.Normalize(newDir) == Vector3.Normalize(player1Hit + vectorTowardPlayer1))
+        if (Vector3.Normalize(newDir) == Vector3.Normalize(targetTankHit + vectorTowardTarget))
         {
             if (canFire)
             {
@@ -730,13 +739,13 @@ public class TankEnemy : Tank
     protected void AimPredict()
     {
         // AI to look infront of player.
-        //tower.LookAt(player1Hit + tower.position + vectorTowardPlayer1);
+        //tower.LookAt(targetTankHit + tower.position + vectorTowardTarget);
     }
 
     protected void RotateToward()
     {
         // Keep track of the targetDirection toward the player.
-        Vector3 m_TargetDirection = vectorTowardPlayer1;
+        Vector3 m_TargetDirection = vectorTowardTarget;
 
         float step = m_RotateSpeed * Time.deltaTime;
         Vector3 newDir = Vector3.RotateTowards(body.forward, m_TargetDirection, step, .01F);
@@ -775,11 +784,11 @@ public class TankEnemy : Tank
 
         // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
-        if (Vector3.Angle(trueAngle, -vectorTowardPlayer1) < 5)
+        if (Vector3.Angle(trueAngle, -vectorTowardTarget) < 5)
         {
             speed = m_Speed;
         }
-        else if (175 < Vector3.Angle(trueAngle, -vectorTowardPlayer1))
+        else if (175 < Vector3.Angle(trueAngle, -vectorTowardTarget))
         {
             speed = -m_Speed;
         }
@@ -805,11 +814,11 @@ public class TankEnemy : Tank
 
         // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
-        if (Vector3.Angle(trueAngle, -vectorTowardPlayer1) < 5)
+        if (Vector3.Angle(trueAngle, -vectorTowardTarget) < 5)
         {
             speed = -m_Speed;
         }
-        else if (175 < Vector3.Angle(trueAngle, -vectorTowardPlayer1))
+        else if (175 < Vector3.Angle(trueAngle, -vectorTowardTarget))
         {
             speed = m_Speed;
         }
@@ -834,11 +843,11 @@ public class TankEnemy : Tank
 
         // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
-        if (Vector3.Angle(trueAngle, -vectorTowardPlayer1) < drivingRange)
+        if (Vector3.Angle(trueAngle, -vectorTowardTarget) < drivingRange)
         {
             speed = m_Speed;
         }
-        else if (180 - drivingRange < Vector3.Angle(trueAngle, -vectorTowardPlayer1))
+        else if (180 - drivingRange < Vector3.Angle(trueAngle, -vectorTowardTarget))
         {
             speed = -m_Speed;
         }
@@ -864,11 +873,11 @@ public class TankEnemy : Tank
 
         // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
-        if (Vector3.Angle(trueAngle, -vectorTowardPlayer1) < drivingRange)
+        if (Vector3.Angle(trueAngle, -vectorTowardTarget) < drivingRange)
         {
             speed = -m_Speed;
         }
-        else if (180 - drivingRange < Vector3.Angle(trueAngle, -vectorTowardPlayer1))
+        else if (180 - drivingRange < Vector3.Angle(trueAngle, -vectorTowardTarget))
         {
             speed = m_Speed;
         }
@@ -881,7 +890,7 @@ public class TankEnemy : Tank
     protected void RotatePerpendicular()
     {
         // Keep track of the targetDirection toward the player.
-        Vector3 m_TargetDirection = Vector3.Cross(vectorTowardPlayer1, Vector3.up);
+        Vector3 m_TargetDirection = Vector3.Cross(vectorTowardTarget, Vector3.up);
 
         float step = m_RotateSpeed * Time.deltaTime;
         Vector3 newDir = Vector3.RotateTowards(body.forward, m_TargetDirection, step, .01F);
@@ -918,16 +927,16 @@ public class TankEnemy : Tank
 
         // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
-        if (85 < CalculateAngle(trueAngle, vectorTowardPlayer1) && CalculateAngle(trueAngle, vectorTowardPlayer1) < 95)
+        if (85 < CalculateAngle(trueAngle, vectorTowardTarget) && CalculateAngle(trueAngle, vectorTowardTarget) < 95)
         {
             speed = -m_Speed;
         }
-        else if (265 < CalculateAngle(trueAngle, vectorTowardPlayer1) && CalculateAngle(trueAngle, vectorTowardPlayer1) < 275)
+        else if (265 < CalculateAngle(trueAngle, vectorTowardTarget) && CalculateAngle(trueAngle, vectorTowardTarget) < 275)
         {
             speed = -m_Speed;
         }
         // This prevents the tank from stopping when the angle is 0.
-        else if (CalculateAngle(trueAngle, vectorTowardPlayer1) < 1)
+        else if (CalculateAngle(trueAngle, vectorTowardTarget) < 1)
         {
             speed = -m_Speed;
         }
@@ -951,16 +960,16 @@ public class TankEnemy : Tank
 
         // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
-        if (90 - drivingRange < CalculateAngle(trueAngle, vectorTowardPlayer1) && CalculateAngle(trueAngle, vectorTowardPlayer1) < 90 + drivingRange)
+        if (90 - drivingRange < CalculateAngle(trueAngle, vectorTowardTarget) && CalculateAngle(trueAngle, vectorTowardTarget) < 90 + drivingRange)
         {
             speed = -m_Speed;
         }
-        else if (270 - drivingRange < CalculateAngle(trueAngle, vectorTowardPlayer1) && CalculateAngle(trueAngle, vectorTowardPlayer1) < 270 + drivingRange)
+        else if (270 - drivingRange < CalculateAngle(trueAngle, vectorTowardTarget) && CalculateAngle(trueAngle, vectorTowardTarget) < 270 + drivingRange)
         {
             speed = -m_Speed;
         }
         // This prevents the tank from stopping when the angle is 0.
-        else if (CalculateAngle(trueAngle, vectorTowardPlayer1) < 1)
+        else if (CalculateAngle(trueAngle, vectorTowardTarget) < 1)
         {
             speed = -m_Speed;
         }
@@ -984,16 +993,16 @@ public class TankEnemy : Tank
 
         // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
-        if (85 < CalculateAngle(trueAngle, vectorTowardPlayer1) && CalculateAngle(trueAngle, vectorTowardPlayer1) < 95)
+        if (85 < CalculateAngle(trueAngle, vectorTowardTarget) && CalculateAngle(trueAngle, vectorTowardTarget) < 95)
         {
             speed = m_Speed;
         }
-        else if (265 < CalculateAngle(trueAngle, vectorTowardPlayer1) && CalculateAngle(trueAngle, vectorTowardPlayer1) < 275)
+        else if (265 < CalculateAngle(trueAngle, vectorTowardTarget) && CalculateAngle(trueAngle, vectorTowardTarget) < 275)
         {
             speed = m_Speed;
         }
         // This prevents the tank from stopping when the angle is 0.
-        else if (CalculateAngle(trueAngle, vectorTowardPlayer1) < 1)
+        else if (CalculateAngle(trueAngle, vectorTowardTarget) < 1)
         {
             speed = m_Speed;
         }
@@ -1017,16 +1026,16 @@ public class TankEnemy : Tank
 
         // If the tank isn't facing the targetDirection the joystick is pointing, the speed equals 0.
         float speed = 0;
-        if (90 - drivingRange < CalculateAngle(trueAngle, vectorTowardPlayer1) && CalculateAngle(trueAngle, vectorTowardPlayer1) < 90 + drivingRange)
+        if (90 - drivingRange < CalculateAngle(trueAngle, vectorTowardTarget) && CalculateAngle(trueAngle, vectorTowardTarget) < 90 + drivingRange)
         {
             speed = m_Speed;
         }
-        else if (270 - drivingRange < CalculateAngle(trueAngle, vectorTowardPlayer1) && CalculateAngle(trueAngle, vectorTowardPlayer1) < 270 + drivingRange)
+        else if (270 - drivingRange < CalculateAngle(trueAngle, vectorTowardTarget) && CalculateAngle(trueAngle, vectorTowardTarget) < 270 + drivingRange)
         {
             speed = m_Speed;
         }
         // This prevents the tank from stopping when the angle is 0.
-        else if (CalculateAngle(trueAngle, vectorTowardPlayer1) < 1)
+        else if (CalculateAngle(trueAngle, vectorTowardTarget) < 1)
         {
             speed = m_Speed;
         }

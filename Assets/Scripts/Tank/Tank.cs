@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 abstract public class Tank : MonoBehaviour {
 
@@ -12,6 +13,7 @@ abstract public class Tank : MonoBehaviour {
     protected int projectileCount = 5;          // The current amount of projectiles available to fire. Starts at 5.
     public Material tankColor;                  // The material for the tank.
     public bool alive = true;
+    public List<GameObject> targets;
 
 
     protected float m_Speed = 12f;              // How fast the tank drives.
@@ -20,7 +22,7 @@ abstract public class Tank : MonoBehaviour {
     protected Rigidbody m_RidgidbodyTank;       // Reference used to move the tank.
     protected Rigidbody m_RigidbodyTower;       // Reference used to move the tank tower. 
     protected Rigidbody m_RidgidbodyBody;       // Reference used to move the tank body.
-    public GameObject projectile;            // The GameObject of the projectile.
+    public GameObject projectile;               // The GameObject of the projectile.
     protected Transform tower;                  // The transform of the tower; the child of tank.
     public Transform body;                      // The transform of the body; the child of tank.
     //private float m_OriginalPitch;            // TODO: The pitch of the audio source at the start of the scene.
