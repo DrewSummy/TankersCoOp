@@ -16,6 +16,7 @@ abstract public class Tank : MonoBehaviour {
     public List<GameObject> targets;
 
 
+    protected Vector3 velocity;                 // The velocity of the tank, kept track of for ai.
     protected float m_Speed = 12f;              // How fast the tank drives.
     protected float m_RotateSpeed = 6f;         // How fast the tank body rotates.
     protected Vector3 m_CurrentDirection;       // The current direction the tank points.
@@ -103,6 +104,12 @@ abstract public class Tank : MonoBehaviour {
         }
     }
 
+    // Send velocity so AI tanks can predict.
+    public Vector3 SendVelocity()
+    {
+        return velocity;
+    }
+
     protected void Fire()
     {
         // Create a projectile with position rotation and velocity.
@@ -150,7 +157,6 @@ abstract public class Tank : MonoBehaviour {
             }
         }
     }
-
 
     protected void EmptyFire()
     {

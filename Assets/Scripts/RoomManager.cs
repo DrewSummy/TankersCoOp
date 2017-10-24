@@ -79,6 +79,16 @@ namespace Completed
         private int enemyCount = 0;
         private Object enemyCounterLock = new Object();
 
+        private void Update()
+        {
+            // Start each EnemyTank.
+            foreach (Transform enemy in enemyHolder)
+            {
+                Debug.Log(enemy.gameObject.activeInHierarchy);
+            }
+        }
+
+
         // Instantiates the 2D arrays representing the room's obstacle course.
         private void SetObstacleCourses()
         {
@@ -281,7 +291,6 @@ namespace Completed
         private IEnumerator BeginSetUp()
         {
             // Place the unenabled enemies and players.
-            //TODO: make the colors of the enemies happen on awake not enable
             PlaceEnemies();
             PlacePlayers();
 
@@ -307,6 +316,8 @@ namespace Completed
             for (int location = 0; location < enemySpawnLocations.Count; location++)
             {
                 GameObject enemy = Instantiate(enemyList[Random.Range(0, enemyList.Length)]) as GameObject;
+                Debug.Log("//////////////////////////////////////////");
+                Debug.Log(enemy.activeInHierarchy);
                 enemy.transform.position = enemySpawnLocations[location];
                 enemy.transform.SetParent(enemyHolder);
                 Debug.Log(enemy.activeSelf);

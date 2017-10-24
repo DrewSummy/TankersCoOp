@@ -8,7 +8,6 @@ public class GameMaster : MonoBehaviour
 
     public static GameMaster instance = null;                  // Static instance of GameMaster which allows it to be accessed by any other script.
     public GameObject playerTemplate;                          // The game object for instantiating player tanks.
-    public GameObject ai;
     public GameObject camera;
     public GameObject menu;
     public GUI_Menu menuGUI;                                   // GUI
@@ -183,5 +182,4 @@ public class GameMaster : MonoBehaviour
             levelScript.player2.GetComponent<TankPlayer>().LM = levelScript;
         }
     }
-    
 }

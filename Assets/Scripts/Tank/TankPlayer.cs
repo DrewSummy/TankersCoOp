@@ -34,7 +34,6 @@ namespace Completed
         private GUI_MiniMap miniMapGUI;
         private GUI_Pause pauseGUI;
 
-        private Vector3 velocity;                   // The velocity of the tank, kept track of for ai.
         public int killAmount = 0;                  // The number of kills by this tank, kept track of for GUI_Pause.
         public int[] killCounter;                   // An array of number of kills for each type of tank.
         private bool aimOnly = true;                // Boolean for whether the tank is enabled.
@@ -403,12 +402,6 @@ namespace Completed
 
                 //TODO: may need another if else case inside both these cases to switch m_MovementAudio.clip
             }
-        }
-
-        public Vector3 SendVelocity()
-        {
-            //TODO: figure out why this is always 0
-            return velocity;
         }
 
         public Vector3 SendPosition()

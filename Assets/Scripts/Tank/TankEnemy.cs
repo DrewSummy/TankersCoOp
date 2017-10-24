@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using Completed; // does this need {}
+using Completed;
 using Random = UnityEngine.Random;      // Tells Random to use the Unity Engine random number generator.
 
 public class TankEnemy : Tank
@@ -18,9 +18,9 @@ public class TankEnemy : Tank
 
     // Shooting Variables
     protected GameObject targetTank;
-    protected Vector3 vectorTowardTarget;      // The vector toward player 1.
+    protected Vector3 vectorTowardTarget;       // The vector toward player 1.
     protected ProjectileTest projTestScript;    // The script for shooting a test projectile.
-    private float distancetargetTank;              // The float distance to player 1.
+    private float distancetargetTank;           // The float distance to player 1.
     protected float towerRotateSpeed = 2f;      // The speed the tank tower rotates at.
     protected float fireFreq;                   // The float for how frequent the tank shoots at.
     protected float fireFreqFight = 2.5f;       // The float for the fireFreq during FIGHT.
@@ -105,9 +105,7 @@ public class TankEnemy : Tank
     // Called by the room to start the TankEnemy.
     public void startTankEnemy()
     {
-        //this.enabled = true;
-        Debug.Log(isActiveAndEnabled);
-        StartCoroutine("FSM");
+        StartCoroutine(FSM());
     }
 
     // Called by the room to end the TankEnemy.
@@ -143,15 +141,18 @@ public class TankEnemy : Tank
     {
         // Update vectorTowardTarget.
         float minDist = float.PositiveInfinity;
-
+        Debug.Log("////////////////");
+        Debug.Log(targets.Count);
         for (int tankI = 0; tankI < targets.Count; tankI++)
         {
+            Debug.Log(targets[tankI] == gameObject);
             if (Vector3.Distance(targets[tankI].transform.position, transform.position) < minDist)
             {
                 minDist = Vector3.Distance(targets[tankI].transform.position, transform.position);
                 targetTank = targets[tankI];
             }
         }
+
         vectorTowardTarget = targetTank.transform.position - transform.position;
     }
 
@@ -291,6 +292,9 @@ public class TankEnemy : Tank
         // Move the rigidbody.
         Vector3 movement = body.forward * speed * Time.deltaTime;
         m_RidgidbodyTank.MovePosition(m_RidgidbodyTank.position + movement);
+
+        // Update velocity.
+        velocity = body.forward * speed;
     }
     protected void driveRandom()
     {
@@ -326,7 +330,7 @@ public class TankEnemy : Tank
     {
         // velocity needs to be planar
         float step = towerRotateSpeed * Time.deltaTime;
-        Vector3 velocityAddition = Vector3.Min(targetTank.GetComponent<TankPlayer>().SendVelocity(), -vectorTowardTarget);
+        Vector3 velocityAddition = Vector3.Min(targetTank.GetComponent<Tank>().SendVelocity(), -vectorTowardTarget);
         targetDirectionAim = Vector3.Normalize(-vectorTowardTarget + velocityAddition);
         Vector3 newDir = Vector3.RotateTowards(tower.forward, targetDirectionAim, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);

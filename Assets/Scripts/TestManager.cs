@@ -1,108 +1,109 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TeamUtility.IO;
 
 public class TestManager : MonoBehaviour {
 
 
-    public List<GameObject> teamA;                                         // Tanks on team A.
-    public List<GameObject> teamB;                                         // Tanks on team B.
-    public List<Transform> spawnLocations = new List<Transform>();         // A list of spawn locations.
-    public Transform projectileHolder;                                     // A variable to store a reference to the transform of the projectile holder object.
-    public Transform testRoom;
-    
+    public List<GameObject> teamA;                                         // A list of gameobjects representing tanks on team A.
+    public List<GameObject> teamB;                                         // A list of gameobjects representing tanks on team B.
+    private List<GameObject> teamAInstance = new List<GameObject>();       // A list of gameobject instances representing tanks on team A.
+    private List<GameObject> teamBInstance = new List<GameObject>();       // A list of gameobject instances representing tanks on team B.
+    public List<Transform> spawnLocations = new List<Transform>();         // A list of transforms representing spawn locations.
+    public Transform projectileHolder;                                     // A transform for the projectile holder object.
+    public Transform testRoom;                                             // A transform to hold the room object.
+    public Transform tankHolder;
     
     // Use this for initialization
-    void Start ()
+    void Start()
     {
-        // Place Tanks
-        //PlaceTanks();
-
-        // Assign targets
-        //AssignTargets();
-
-        // Enable tanks.
-        //EnableTanks();
-
-        StartCoroutine(s());
-	}
-
-    /// <summary>
-    /// ///////////////////// start the test like game master does
-    /// </summary>
-    /// 
-
-    private IEnumerator s()
-    {
-        // Place Tanks
-        PlaceTanks();
+        // Place tanks
+        InitializeTanks();
 
         // Assign targets
         AssignTargets();
 
-        Debug.Log(3);
-        yield return new WaitForSeconds(1f);
-        Debug.Log(2);
-        yield return new WaitForSeconds(1f);
-        Debug.Log(1);
-        yield return new WaitForSeconds(1f);
-
-        // Enable tanks.
+        // Enable tanks
         EnableTanks();
     }
 
-
-    private void PlaceTanks()
+    // Initialize the tank instances and add them to the correct lists.
+    private void InitializeTanks()
     {
-        List<GameObject> allTanks = new List<GameObject>();
-        allTanks.AddRange(teamA);
-        allTanks.AddRange(teamB);
-        Debug.Log(allTanks.Count);
+        List<GameObject> tempTanks = new List<GameObject>();
+        tempTanks.AddRange(teamA);
+        tempTanks.AddRange(teamB);
 
         List<Transform> currentSpawnLocations = spawnLocations;
-
-        while (allTanks.Count > 0)
+        
+        while (tempTanks.Count > teamA.Count)
         {
             // Get tank, remove from list.
-            int tankIndex = Random.Range(0, allTanks.Count);
-            GameObject enemy = Instantiate(allTanks[tankIndex]) as GameObject;
-            allTanks.RemoveAt(tankIndex);
-            enemy.transform.SetParent(testRoom);
+            int tankIndex = Random.Range(0, tempTanks.Count);
+            GameObject t = Instantiate(tempTanks[tankIndex]) as GameObject;
+            tempTanks.RemoveAt(tankIndex);
+            t.transform.SetParent(testRoom);
+
+            // Add t to teamAInstance to enable later.
+            teamAInstance.Add(t);
 
             // Place in location, remove from list.
             int locationIndex = Random.Range(0, currentSpawnLocations.Count);
-            enemy.transform.position = currentSpawnLocations[locationIndex].position;
+            t.transform.position = currentSpawnLocations[locationIndex].position;
             currentSpawnLocations.RemoveAt(locationIndex);
 
             // Set leftover projectiles.
-            enemy.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
+            t.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
+        }
+
+        while (tempTanks.Count > 0)
+        {
+            // Get tank, remove from list.
+            int tankIndex = Random.Range(0, tempTanks.Count);
+            GameObject t = Instantiate(tempTanks[tankIndex]) as GameObject;
+            t.name = "wooh";
+            tempTanks.RemoveAt(tankIndex);
+            t.transform.SetParent(testRoom);
+
+            // Add t to teamBInstance to enable later.
+            teamBInstance.Add(t);
+
+            // Place in location, remove from list.
+            int locationIndex = Random.Range(0, currentSpawnLocations.Count);
+            t.transform.position = currentSpawnLocations[locationIndex].position;
+            currentSpawnLocations.RemoveAt(locationIndex);
+
+            // Set leftover projectiles.
+            t.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
         }
     }
 
+    // Go through each teamInstance and set the targets to each other.
     private void AssignTargets()
     {
-        for (int tank = 0; tank < teamA.Count; tank++)
+        for (int t = 0; t < teamAInstance.Count; t++)
         {
-            teamA[tank].GetComponent<Tank>().targets = teamB;
+            Debug.Log(teamAInstance[t]);
+            teamAInstance[t].GetComponent<Tank>().targets = teamBInstance;
         }
-
-        for (int tank = 0; tank < teamB.Count; tank++)
+        for (int t = 0; t < teamBInstance.Count; t++)
         {
-            teamA[tank].GetComponent<Tank>().targets = teamA;
+            teamBInstance[t].GetComponent<Tank>().targets = teamAInstance;
         }
     }
 
+    // Go through all tanks and call their start function.
     private void EnableTanks()
     {
-        List<GameObject> allTanks = new List<GameObject>();
-        allTanks.AddRange(teamA);
-        allTanks.AddRange(teamB);
+        List<GameObject> tempTanks = new List<GameObject>();
+        tempTanks.AddRange(teamAInstance);
+        tempTanks.AddRange(teamBInstance);
 
-        for (int tank = 0; tank < allTanks.Count; tank++)
+        for (int tank = 0; tank < tempTanks.Count; tank++)
         {
-            Debug.Log(allTanks[tank].activeSelf);
-            allTanks[tank].GetComponent<TankEnemy>().enabled = true;
-            allTanks[tank].GetComponent<TankEnemy>().startTankEnemy();
+            //tempTanks[tank].GetComponent<TankEnemy>().enabled = true;
+            tempTanks[tank].GetComponent<TankEnemy>().startTankEnemy();
         }
     }
 }
