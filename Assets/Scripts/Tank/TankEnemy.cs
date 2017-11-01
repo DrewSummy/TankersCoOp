@@ -10,15 +10,14 @@ public class TankEnemy : Tank
     public RoomManager parentRoom;              // Reference to the room TankEnemy spawns in.
     public GameObject player1;                  // Reference to the player 1 game object.
     public GameObject player2;                  // Reference to the player 2 game object.
-    //private TankPlayer targetTankScript;           // Store a reference to the TankPlayer of player 1.
-    //private TankPlayer player2Script;           // Store a reference to the TankPlayer of player 2.
     protected int roomLength = 50;              // Integer for the length of the room.
     protected string playerTag = "Player";      // String representing the tag of a player.
     protected string blockTag = "Block";        // String representing the tag of a block.
 
     // Shooting Variables
     protected GameObject targetTank;
-    protected Vector3 vectorTowardTarget;       // The vector toward player 1.
+    protected Vector3 vectorTowardTarget;       // The vector toward the target tank.
+    protected Vector3 vectorVelocityTarget;     // The vector the target tank travels at.
     protected ProjectileTest projTestScript;    // The script for shooting a test projectile.
     private float distancetargetTank;           // The float distance to player 1.
     protected float towerRotateSpeed = 2f;      // The speed the tank tower rotates at.
@@ -64,7 +63,7 @@ public class TankEnemy : Tank
         AGGRESSIVERELOAD,
         AGGRESSIVE,
         SNIPE,
-        NOTHING
+        IDLE
     }
 
     protected State state;
@@ -111,7 +110,7 @@ public class TankEnemy : Tank
     // Called by the room to end the TankEnemy.
     public void endTankEnemy()
     {
-        setToNothing();
+        setToIdle();
     }
 
     // Finite State Machine representing the actions TankEnemy goes through
@@ -132,28 +131,55 @@ public class TankEnemy : Tank
                 case State.FIGHT:
                     Fight();
                     break;
+                case State.IDLE:
+                    Idle();
+                    break;
             }
             yield return null;
         }
     }
 
+    // Sets target player and vectorTowardsTarget as well as putting the tank
+    // in IDLE state if there are no targets.
     protected void trackPlayer()
     {
-        // Update vectorTowardTarget.
+        if (targets.Count == 0)
+        {
+            state = State.IDLE;
+            return;
+        }
+
+        // Update vectorTowardTarget and remove destroyed tanks.
         float minDist = float.PositiveInfinity;
-        Debug.Log("////////////////");
-        Debug.Log(targets.Count);
+        List<int> toRemove = new List<int>();
         for (int tankI = 0; tankI < targets.Count; tankI++)
         {
-            Debug.Log(targets[tankI] == gameObject);
-            if (Vector3.Distance(targets[tankI].transform.position, transform.position) < minDist)
+            if (!targets[tankI])
             {
-                minDist = Vector3.Distance(targets[tankI].transform.position, transform.position);
-                targetTank = targets[tankI];
+                toRemove.Add(tankI);
+            }
+            else
+            {
+                if (Vector3.Distance(targets[tankI].transform.position, transform.position) < minDist)
+                {
+                    minDist = Vector3.Distance(targets[tankI].transform.position, transform.position);
+                    targetTank = targets[tankI];
+                }
             }
         }
 
-        vectorTowardTarget = targetTank.transform.position - transform.position;
+
+        // Remove the non existent targets.
+        for (int tankI = 0; tankI < toRemove.Count; tankI++)
+        {
+            targets.RemoveAt(tankI);
+        }
+
+        if (targets.Count != 0)
+        {
+            vectorTowardTarget = targetTank.transform.position - transform.position;
+            vectorVelocityTarget = targetTank.GetComponent<Tank>().SendVelocity();
+        }
     }
 
     /*
@@ -309,7 +335,7 @@ public class TankEnemy : Tank
     {
         if (canFire && projectileCount > 0)
         {
-            StartCoroutine(delayFire());         
+            StartCoroutine(delayFire());
             base.Fire();
             recordShot(-tower.forward);
         }
@@ -330,7 +356,7 @@ public class TankEnemy : Tank
     {
         // velocity needs to be planar
         float step = towerRotateSpeed * Time.deltaTime;
-        Vector3 velocityAddition = Vector3.Min(targetTank.GetComponent<Tank>().SendVelocity(), -vectorTowardTarget);
+        Vector3 velocityAddition = Vector3.Min(vectorVelocityTarget, -vectorTowardTarget);
         targetDirectionAim = Vector3.Normalize(-vectorTowardTarget + velocityAddition);
         Vector3 newDir = Vector3.RotateTowards(tower.forward, targetDirectionAim, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
@@ -380,7 +406,7 @@ public class TankEnemy : Tank
     private bool isChaseDistance()
     {
         //TODO: needs to include 2nd player tanks
-        float distance = Vector3.Distance(body.position, targetTank.transform.position);
+        float distance = Vector3.Magnitude(vectorTowardTarget);
         if (minChaseDist < distance && distance <= minExploreDist)
         {
             return true;
@@ -437,7 +463,6 @@ public class TankEnemy : Tank
     }
     protected void fireDirect()
     {
-        //TODO: make sure TankEnemy isn't hit
         // Aim directly at the player.
         aimDirect();
 
@@ -452,7 +477,7 @@ public class TankEnemy : Tank
         // TankEnemy looks directly at the player.
         // TODO: incorporate player2.
         float step = towerRotateSpeed * Time.deltaTime;
-        targetDirectionAim = -vectorTowardTarget;
+        targetDirectionAim = Vector3.Normalize(-vectorTowardTarget);
         Vector3 newDir = Vector3.RotateTowards(tower.forward, targetDirectionAim, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
     }
@@ -490,8 +515,7 @@ public class TankEnemy : Tank
     }
     protected virtual bool isFightDistance()
     {
-        //TODO: needs to include 2nd player tanks
-        float distance = Vector3.Distance(body.position, targetTank.transform.position);
+        float distance = Vector3.Magnitude(vectorTowardTarget);
         if (minChaseDist >= distance)
         {
             return true;
@@ -647,17 +671,17 @@ public class TankEnemy : Tank
     }
 
     /*
-    Functions for the NOTHING state:
-    setToNothing() - Set the state to NOTHING.
+    Functions for the IDLE state:
+    setToIdle() - Set the state to NOTHING.
     */
-    protected void Nothing()
+    protected void Idle()
     {
         // Null
     }
-    public void setToNothing()
+    public void setToIdle()
     {
-        Debug.Log("nothing");
-        state = TankEnemy.State.NOTHING;
+        Debug.Log("idle");
+        state = TankEnemy.State.IDLE;
     }
 
     
@@ -1064,8 +1088,10 @@ public class TankEnemy : Tank
         //GetComponent<Rigidbody>().AddExplosionForce(5, transform.position, 4, 3.0F);
 
         // Update the enemy count in the parent room.
-        parentRoom.GetComponent<RoomManager>().enemyDecrement();
-
-        GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateEnemies(this.transform.parent);
+        if (!testEnvironment)
+        {
+            parentRoom.GetComponent<RoomManager>().enemyDecrement();
+            GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateEnemies(this.transform.parent);
+        }
     }
 }

@@ -1134,7 +1134,7 @@ namespace Completed
             // Set every tank to do nothing.
             foreach (Transform enemy in enemyHolder)
             {
-                enemy.GetComponent<TankEnemy>().setToNothing();
+                enemy.GetComponent<TankEnemy>().setToIdle();
             }
         }
 

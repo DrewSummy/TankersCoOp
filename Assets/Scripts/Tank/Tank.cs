@@ -14,6 +14,7 @@ abstract public class Tank : MonoBehaviour {
     public Material tankColor;                  // The material for the tank.
     public bool alive = true;
     public List<GameObject> targets;
+    public bool testEnvironment = false;        // Bool to represent if the tank is in a test environment.
 
 
     protected Vector3 velocity;                 // The velocity of the tank, kept track of for ai.

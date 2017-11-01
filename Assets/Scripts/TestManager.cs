@@ -8,8 +8,8 @@ public class TestManager : MonoBehaviour {
 
     public List<GameObject> teamA;                                         // A list of gameobjects representing tanks on team A.
     public List<GameObject> teamB;                                         // A list of gameobjects representing tanks on team B.
-    private List<GameObject> teamAInstance = new List<GameObject>();       // A list of gameobject instances representing tanks on team A.
-    private List<GameObject> teamBInstance = new List<GameObject>();       // A list of gameobject instances representing tanks on team B.
+    public List<GameObject> teamAInstance = new List<GameObject>();       // A list of gameobject instances representing tanks on team A.
+    public List<GameObject> teamBInstance = new List<GameObject>();       // A list of gameobject instances representing tanks on team B.
     public List<Transform> spawnLocations = new List<Transform>();         // A list of transforms representing spawn locations.
     public Transform projectileHolder;                                     // A transform for the projectile holder object.
     public Transform testRoom;                                             // A transform to hold the room object.
@@ -31,18 +31,14 @@ public class TestManager : MonoBehaviour {
     // Initialize the tank instances and add them to the correct lists.
     private void InitializeTanks()
     {
-        List<GameObject> tempTanks = new List<GameObject>();
-        tempTanks.AddRange(teamA);
-        tempTanks.AddRange(teamB);
-
+        // Go through each team and instantiate the tanks while placing them in random locations.
         List<Transform> currentSpawnLocations = spawnLocations;
-        
-        while (tempTanks.Count > teamA.Count)
+
+
+        foreach (GameObject a in teamA)
         {
             // Get tank, remove from list.
-            int tankIndex = Random.Range(0, tempTanks.Count);
-            GameObject t = Instantiate(tempTanks[tankIndex]) as GameObject;
-            tempTanks.RemoveAt(tankIndex);
+            GameObject t = Instantiate(a) as GameObject;
             t.transform.SetParent(testRoom);
 
             // Add t to teamAInstance to enable later.
@@ -56,17 +52,13 @@ public class TestManager : MonoBehaviour {
             // Set leftover projectiles.
             t.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
         }
-
-        while (tempTanks.Count > 0)
+        foreach (GameObject b in teamB)
         {
             // Get tank, remove from list.
-            int tankIndex = Random.Range(0, tempTanks.Count);
-            GameObject t = Instantiate(tempTanks[tankIndex]) as GameObject;
-            t.name = "wooh";
-            tempTanks.RemoveAt(tankIndex);
+            GameObject t = Instantiate(b) as GameObject;
             t.transform.SetParent(testRoom);
 
-            // Add t to teamBInstance to enable later.
+            // Add t to teamAInstance to enable later.
             teamBInstance.Add(t);
 
             // Place in location, remove from list.
@@ -84,7 +76,6 @@ public class TestManager : MonoBehaviour {
     {
         for (int t = 0; t < teamAInstance.Count; t++)
         {
-            Debug.Log(teamAInstance[t]);
             teamAInstance[t].GetComponent<Tank>().targets = teamBInstance;
         }
         for (int t = 0; t < teamBInstance.Count; t++)
@@ -104,6 +95,7 @@ public class TestManager : MonoBehaviour {
         {
             //tempTanks[tank].GetComponent<TankEnemy>().enabled = true;
             tempTanks[tank].GetComponent<TankEnemy>().startTankEnemy();
+            tempTanks[tank].GetComponent<TankEnemy>().testEnvironment = true;
         }
     }
 }

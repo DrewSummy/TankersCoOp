@@ -10,4 +10,10 @@ public class TankEnemyBlue : TankEnemy
     // Shooting variables
 
     // Driving variables
+
+    protected override void resetVariables()
+    {
+        // Driving variables
+        m_RotateSpeed = 3f;
+}
 }

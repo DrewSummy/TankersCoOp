@@ -46,8 +46,8 @@ public class TankEnemyPurple : TankEnemy
                 case State.SNIPE:
                     Snipe();
                     break;
-                case State.NOTHING:
-                    Nothing();
+                case State.IDLE:
+                    Idle();
                     break;
             }
             yield return null;
