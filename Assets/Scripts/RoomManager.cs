@@ -24,7 +24,7 @@ namespace Completed
         private Transform[] m_doors = new Transform[4];                          // An array of the doors.
         private bool isPlayer1;                                                  // The bool for if player 2 is alive.
         private bool isPlayer2;                                                  // The bool for if player 2 is alive.
-        public GameObject player1;                                              // Reference to the player 1 game object.
+        public GameObject player1;                                               // Reference to the player 1 game object.
         public GameObject player2;
         public GameObject[] enemyList;                                           // An array of enemies for the level.
         private List<Vector3> playerSpawnLocations = new List<Vector3>();        // A list of player spawn locations.
@@ -32,6 +32,8 @@ namespace Completed
         private string exitTag = "Exit";                                         // String to apply the tag on the exit.
         private string wallTag = "Wall";
         private string blockRemovableTag = "BlockRemovable";
+        private string enemyTeamName = "Enemy";                                  // The string to pass to all the AI tanks.
+        private string playerTeamName = "Player";                                 // The string to pass to all the AI tanks.
         private Transform enemyHolder;                                           // A variable to store a reference to the transform of the enemy object.
         private Transform projectileHolder;                                      // A variable to store a reference to the transform of the projectile holder object.
         private Transform wallHolder;                                            // A variable to store a reference to the transform of the wall holder object.
@@ -316,11 +318,8 @@ namespace Completed
             for (int location = 0; location < enemySpawnLocations.Count; location++)
             {
                 GameObject enemy = Instantiate(enemyList[Random.Range(0, enemyList.Length)]) as GameObject;
-                Debug.Log("//////////////////////////////////////////");
-                Debug.Log(enemy.activeInHierarchy);
                 enemy.transform.position = enemySpawnLocations[location];
                 enemy.transform.SetParent(enemyHolder);
-                Debug.Log(enemy.activeSelf);
 
                 // Send the projectile holder to each tank to hold projectiles when the enemy is killed.
                 enemy.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
@@ -345,6 +344,10 @@ namespace Completed
 
                 // Give the enemies the waypoints.
                 enemy.GetComponent<TankEnemy>().waypoints = waypoints;
+
+
+                enemy.GetComponent<TankEnemy>().teamName = enemyTeamName;
+                enemy.GetComponent<TankEnemy>().enemyTeamName = playerTeamName;
 
                 enemyCount++;
             }

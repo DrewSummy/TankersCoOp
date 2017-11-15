@@ -81,17 +81,18 @@ public class TankEnemy : Tank
         
 
         // Delay fire.
-        StartCoroutine(delayFire());
-        
-
-        // Get the script of the projectile and record its speed.
-        projTestScript = GetComponent<ProjectileTest>();
-        //projTestScript.maxCollisions = projectile.GetComponent<Projectile>().maxCollisions;
+        //StartCoroutine(delayFire());
+        canFire = true;
 
 
         // Initiate the FSM.
         setToExplore();
         trackPlayer();
+
+        // Get the script of the projectile and record its speed.
+        projTestScript = GetComponent<ProjectileTest>();
+        // Transfer the enemyTag to the projTestScript.
+        projTestScript.enemyTeamName = enemyTeamName;
     }
 
 
@@ -110,16 +111,16 @@ public class TankEnemy : Tank
     // Called by the room to end the TankEnemy.
     public void endTankEnemy()
     {
+        Debug.Log(1);
         setToIdle();
     }
 
     // Finite State Machine representing the actions TankEnemy goes through
-    protected IEnumerator FSM()
+    protected virtual IEnumerator FSM()
     {
         while (alive)
         {
             trackPlayer();
-
             switch (state)
             {
                 case State.EXPLORE:
@@ -141,22 +142,25 @@ public class TankEnemy : Tank
 
     // Sets target player and vectorTowardsTarget as well as putting the tank
     // in IDLE state if there are no targets.
-    protected void trackPlayer()
+    protected virtual void trackPlayer()
     {
-        if (targets.Count == 0)
+        if (state == State.IDLE)
         {
-            state = State.IDLE;
+            return;
+        }
+        else if (targets.Count == 0)
+        {
+            setToIdle();
             return;
         }
 
         // Update vectorTowardTarget and remove destroyed tanks.
         float minDist = float.PositiveInfinity;
-        List<int> toRemove = new List<int>();
-        for (int tankI = 0; tankI < targets.Count; tankI++)
+        for (int tankI = targets.Count - 1; tankI >= 0; tankI--)
         {
             if (!targets[tankI])
             {
-                toRemove.Add(tankI);
+                targets.RemoveAt(tankI);
             }
             else
             {
@@ -166,13 +170,6 @@ public class TankEnemy : Tank
                     targetTank = targets[tankI];
                 }
             }
-        }
-
-
-        // Remove the non existent targets.
-        for (int tankI = 0; tankI < toRemove.Count; tankI++)
-        {
-            targets.RemoveAt(tankI);
         }
 
         if (targets.Count != 0)
@@ -680,7 +677,7 @@ public class TankEnemy : Tank
     }
     public void setToIdle()
     {
-        Debug.Log("idle");
+        //Debug.Log("set to idle");
         state = TankEnemy.State.IDLE;
     }
 

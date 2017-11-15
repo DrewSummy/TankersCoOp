@@ -3,18 +3,15 @@ using System.Collections;
 
 public class TankEnemyGreen : TankEnemy
 {
-    // General variables
-
-    // State variables
-
-    // Shooting variables
-    
-    // Driving variables
-    //private new float m_Speed = 3f;
-
-
     protected override void resetVariables()
     {
+        // General variables
+
+        // State variables
+
+        // Shooting variables
+        fireFreq = 5f;
+
         // Driving variables
         m_Speed = 3f;
     }
@@ -28,7 +25,7 @@ public class TankEnemyGreen : TankEnemy
     }
     
 
-    private new IEnumerator FSM()
+    protected override IEnumerator FSM()
     {
         while (alive)
         {

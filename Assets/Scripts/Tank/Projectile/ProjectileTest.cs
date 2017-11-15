@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class ProjectileTest : MonoBehaviour {
     
-    public int maxCollisions = 2;               // The max number of collisions before the object is destroyed. 
+    public int maxCollisions = 2;                  // The max number of collisions before the object is destroyed.
+    public string enemyTeamName;                   // String to check if the object hit was an enemy.
     protected Tank tankScript;                     // Reference to the parent TankEnemy.
+
 
     private string playerTag = "Player";           // The string for the player tag.
     public LayerMask raycastLayer;                 // The layerMask for the ProjectileTest to avoid the shell game objects.
@@ -56,9 +58,16 @@ public class ProjectileTest : MonoBehaviour {
             return false;
         }
         // If it hit a tank.
-        else if (hit.transform.tag == playerTag)
+        else if (hit.transform.GetComponent<Tank>())
         {
-            return true;
+            if (hit.transform.GetComponent<Tank>().teamName == enemyTeamName)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         // Else it hit a wall or block.
         else

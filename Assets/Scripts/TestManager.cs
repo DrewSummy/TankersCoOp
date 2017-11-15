@@ -14,6 +14,8 @@ public class TestManager : MonoBehaviour {
     public Transform projectileHolder;                                     // A transform for the projectile holder object.
     public Transform testRoom;                                             // A transform to hold the room object.
     public Transform tankHolder;
+    private string teamAName = "A";
+    private string teamBName = "B";
     
     // Use this for initialization
     void Start()
@@ -51,6 +53,10 @@ public class TestManager : MonoBehaviour {
 
             // Set leftover projectiles.
             t.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
+
+            // Set the tags.
+            t.GetComponent<TankEnemy>().teamName = teamAName;
+            t.GetComponent<TankEnemy>().enemyTeamName = teamBName;
         }
         foreach (GameObject b in teamB)
         {
@@ -68,6 +74,10 @@ public class TestManager : MonoBehaviour {
 
             // Set leftover projectiles.
             t.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
+
+            // Set the tags.
+            t.GetComponent<TankEnemy>().teamName = teamBName;
+            t.GetComponent<TankEnemy>().enemyTeamName = teamAName;
         }
     }
 
@@ -76,11 +86,24 @@ public class TestManager : MonoBehaviour {
     {
         for (int t = 0; t < teamAInstance.Count; t++)
         {
-            teamAInstance[t].GetComponent<Tank>().targets = teamBInstance;
+            // Clear the list.
+            teamAInstance[t].GetComponent<Tank>().targets.Clear();
+            // Add targets with the helper function.
+            deepCopyTeam(teamAInstance[t].GetComponent<Tank>(), teamBInstance);
         }
         for (int t = 0; t < teamBInstance.Count; t++)
         {
-            teamBInstance[t].GetComponent<Tank>().targets = teamAInstance;
+        
+            teamBInstance[t].GetComponent<Tank>().targets.Clear();
+            deepCopyTeam(teamBInstance[t].GetComponent<Tank>(), teamAInstance);
+        }
+    }
+    // Helper function for assigning targets.
+    private void deepCopyTeam(Tank tank, List<GameObject> team)
+    {
+        foreach (GameObject t in team)
+        {
+            tank.targets.Add(t);
         }
     }
 

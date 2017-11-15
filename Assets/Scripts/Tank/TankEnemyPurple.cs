@@ -31,12 +31,40 @@ public class TankEnemyPurple : TankEnemy
     {
         base.Start();
 
+        // Get the script of the projectile and record its speed.
+        //////////////projTestScript = GetComponent<ProjectileTest>();
+
+        //projTestScript.maxCollisions = projectile.GetComponent<Projectile>().maxCollisions;
+
         // The FSM begins on Evade.
         setToSnipe();
     }
+    
+    protected override void trackPlayer()
+    {
+        if (state == State.IDLE)
+        {
+            return;
+        }
+        else if (targets.Count == 0)
+        {
+            setToIdle();
+            return;
+        }
+
+        // Update vectorTowardTarget and remove destroyed tanks.
+        float minDist = float.PositiveInfinity;
+        for (int tankI = targets.Count - 1; tankI >= 0; tankI--)
+        {
+            if (!targets[tankI])
+            {
+                targets.RemoveAt(tankI);
+            }
+        }
+    }
 
 
-    private new IEnumerator FSM()
+    protected override IEnumerator FSM()
     {
         while (alive)
         {
@@ -64,8 +92,6 @@ public class TankEnemyPurple : TankEnemy
     protected void Snipe()
     {
         findShot();
-
-
     }
     private void setToSnipe()
     {
@@ -85,7 +111,7 @@ public class TankEnemyPurple : TankEnemy
     {
         selectDirectionAim();
         aimDirection();
-
+        
         if (-tower.forward == targetDirectionAim)
         {
             Fire();
@@ -103,7 +129,7 @@ public class TankEnemyPurple : TankEnemy
             float eps = .1f;
             float angle = 0;
             Vector3 testShot = Vector3.forward;
-
+            
             while (angle < 360)
             {
                 if (projTestScript.beginShoot(tower.position, testShot))

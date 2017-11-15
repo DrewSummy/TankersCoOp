@@ -29,6 +29,7 @@ public class GameMaster : MonoBehaviour
     private TankPlayer player2Script;
     //private Vector3 player2Position;                         // Position of player 2.
     private Transform playerHolder;                            // A variable to store a reference to the transform of the player object.
+    private string playerTeamName = "Player";                  // String to set the team of players.
 
     //Awake is always called before any Start functions
     void Awake()
@@ -71,6 +72,7 @@ public class GameMaster : MonoBehaviour
         player1.name = "Player1";
         player1Script = player1.GetComponent<TankPlayer>();
         player1Script.m_PlayerNumber = 1;
+        player1.GetComponent<Tank>().teamName = playerTeamName;
 
         // Player2
         if (coop)
@@ -81,6 +83,7 @@ public class GameMaster : MonoBehaviour
             player2.name = "Player2";
             player2Script = player2.GetComponent<TankPlayer>();
             player2Script.m_PlayerNumber = 2;
+            player1.GetComponent<Tank>().teamName = playerTeamName;
         }
     }
 

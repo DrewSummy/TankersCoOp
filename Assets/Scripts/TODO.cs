@@ -39,6 +39,7 @@ idea:
     bullet types: left trigger shoots slow, right- fast, both bidirectional bullets?
     teleport tank
     add background to tank game: two planes of dark brown, tilted cubes that move in waves
+    if you kill the last tank after you died, flip a coin to see if you continue
     
 bugs:
     projectile corner: projectiles ricochet unpredictably against corners of obstacles even when the corner is right against another obstacle
