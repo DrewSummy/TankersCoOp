@@ -3,17 +3,16 @@ using System.Collections;
 
 public class TankEnemyBlue : TankEnemy
 {
-    // General variables
-
-    // State variables
-
-    // Shooting variables
-
-    // Driving variables
-
     protected override void resetVariables()
     {
+        // General variables
+
+        // State variables
+
+        // Shooting variables
+        fireFreq = 2f;
+
         // Driving variables
         m_RotateSpeed = 3f;
-}
+    }
 }

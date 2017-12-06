@@ -73,7 +73,7 @@ namespace Completed
             //TODO maybe
         }
 
-        private new void Start()
+        protected new void Start()
         {
             base.Start();
 
@@ -94,9 +94,9 @@ namespace Completed
             m_SelectName = "Back";
 
             // Get access to GUIS.
-            //TOOD: rename GUIS to include "GUI"
-            miniMapGUI = GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>();
-            pauseGUI = GameObject.FindGameObjectWithTag("Pause").GetComponent<GUI_Pause>();
+            ////////////////////////THIS SHOULD BE SET IN THE GUI START FUNCTION
+            //miniMapGUI = GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>();
+            //pauseGUI = GameObject.FindGameObjectWithTag("Pause").GetComponent<GUI_Pause>();
 
 
 
@@ -364,7 +364,8 @@ namespace Completed
             {
                 GetComponentsInChildren<MeshRenderer>()[i].enabled = false;
             }
-            GetComponent<BoxCollider>().enabled = false;
+
+            hitbox.enabled = false;
 
             //TODO: place explosion or some animation
 

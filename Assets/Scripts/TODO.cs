@@ -40,6 +40,7 @@ idea:
     teleport tank
     add background to tank game: two planes of dark brown, tilted cubes that move in waves
     if you kill the last tank after you died, flip a coin to see if you continue
+    waiting screen is two tanks driving around eachother like two objects of equal gravity in free space
     
 bugs:
     projectile corner: projectiles ricochet unpredictably against corners of obstacles even when the corner is right against another obstacle

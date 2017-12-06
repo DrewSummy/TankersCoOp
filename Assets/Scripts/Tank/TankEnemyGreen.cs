@@ -10,7 +10,7 @@ public class TankEnemyGreen : TankEnemy
         // State variables
 
         // Shooting variables
-        fireFreq = 5f;
+        fireFreq = 3f;
 
         // Driving variables
         m_Speed = 3f;
@@ -29,6 +29,7 @@ public class TankEnemyGreen : TankEnemy
     {
         while (alive)
         {
+            //Debug.Log(state);
             trackPlayer();
             switch (state)
             {

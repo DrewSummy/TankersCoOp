@@ -277,12 +277,10 @@ public class TankEnemy : Tank
             targetDirectionDrive.Set(unitPlane[0], 0, unitPlane[1]);
             while (obstructed(targetDirectionDrive))
             {
-                //Debug.DrawLine(body.position, Vector3.up + body.position + padding * targetDirection, Color.red, 10);
                 // Set targetDirection along the x-z plane.
                 unitPlane = Random.insideUnitCircle.normalized;
                 targetDirectionDrive.Set(unitPlane[0], 0, unitPlane[1]);
             }
-            //Debug.DrawLine(body.position, Vector3.up + body.position + padding * targetDirection, Color.white, 10);
 
             StartCoroutine(delayTurn());
         }
@@ -493,6 +491,7 @@ public class TankEnemy : Tank
     */
     protected void Fight()
     {
+        Debug.Log("here");
         fireDirect();
         driveRandom();
 
@@ -671,7 +670,7 @@ public class TankEnemy : Tank
     Functions for the IDLE state:
     setToIdle() - Set the state to NOTHING.
     */
-    protected void Idle()
+    protected virtual void Idle()
     {
         // Null
     }

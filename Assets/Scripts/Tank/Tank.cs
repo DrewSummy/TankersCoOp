@@ -17,6 +17,7 @@ abstract public class Tank : MonoBehaviour {
     public bool testEnvironment = false;        // Bool to represent if the tank is in a test environment.
     public string teamName;
     public string enemyTeamName;
+    protected BoxCollider hitbox;               // Reference to the box collider in the body of the tank.
 
 
     protected Vector3 velocity;                 // The velocity of the tank, kept track of for ai.
@@ -50,14 +51,11 @@ abstract public class Tank : MonoBehaviour {
         // Load in the tank colors being used from the Resources folder in assets.
         // This needs to be called early so that it is instantiated before GUI_HUD.
         tankColors = Resources.LoadAll<Material>("Prefab/GameObjectPrefab/TankPrefab/TankColors");
-
-
-
+        
         // Empty game object for holding projectiles. This needs to be in awake so that RoomManager can use it.
         projectileHolder = new GameObject("Projectile Holder").transform;
         projectileHolder.transform.SetParent(gameObject.transform);
-
-
+        
         ColorizeTank();
 
         Start();
@@ -84,6 +82,9 @@ abstract public class Tank : MonoBehaviour {
         body = this.gameObject.transform.GetChild(0);
         tower = this.gameObject.transform.GetChild(1);
         m_ProjectileSpawnPoint = tower.GetChild(3);
+
+        // Get the reference to the hitbox.
+        hitbox = body.GetComponent<BoxCollider>();
 
         // Load in the projectile being used from the Resources folder in assets.
         //projectile = Resources.Load("TankResources/Projectile/Shell") as GameObject;
@@ -181,6 +182,8 @@ abstract public class Tank : MonoBehaviour {
 
         // Destroy tank.
         Destroy(this.gameObject);
+
+        hitbox.enabled = false;
     }
     
     public void TransferProjectiles()

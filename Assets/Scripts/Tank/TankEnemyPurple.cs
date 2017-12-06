@@ -5,14 +5,20 @@ using Random = UnityEngine.Random;
 
 public class TankEnemyPurple : TankEnemy
 {
+
     // General variables
-    List<Vector3> hits = new List<Vector3>();
+    List<Vector3> hitAngles = new List<Vector3>();
+    List<float> hitWeights = new List<float>();
+    float hitCount = 0;
 
     // State variables
+    float snipeDelay = 1.0f;
 
     // Shooting variables
-    //new protected float fireFreq = 10f;
-    //new protected int projectileAmount = 2;
+    //float shootChance = .8f;
+
+    // Driving variables
+
     private bool needDirection = false;
     //TODO: chance of shot, figure out why the first shot doesn't happen immediately
     // value shots based on success
@@ -22,24 +28,26 @@ public class TankEnemyPurple : TankEnemy
 
     protected override void resetVariables()
     {
+        // General variables
+
+        // State variables
+
         // Shooting variables
-        fireFreq = 10f;
+        fireFreq = 2f;
         projectileAmount = 2;
+
+        // Driving variables
+        m_RotateSpeed = 3f;
     }
 
     protected new void Start()
     {
         base.Start();
 
-        // Get the script of the projectile and record its speed.
-        //////////////projTestScript = GetComponent<ProjectileTest>();
-
-        //projTestScript.maxCollisions = projectile.GetComponent<Projectile>().maxCollisions;
-
         // The FSM begins on Evade.
         setToSnipe();
     }
-    
+
     protected override void trackPlayer()
     {
         if (state == State.IDLE)
@@ -53,7 +61,6 @@ public class TankEnemyPurple : TankEnemy
         }
 
         // Update vectorTowardTarget and remove destroyed tanks.
-        float minDist = float.PositiveInfinity;
         for (int tankI = targets.Count - 1; tankI >= 0; tankI--)
         {
             if (!targets[tankI])
@@ -85,9 +92,11 @@ public class TankEnemyPurple : TankEnemy
     /*
     Functions for the SNIPE state:
     setToSnipe() - 
+    setBackToSnipe() -
     findShot() - 
-    find() - 
     selectDirectionAim() - 
+    selectWeightedTarget() - Selects a random target direction based on weights.
+
     */
     protected void Snipe()
     {
@@ -96,27 +105,27 @@ public class TankEnemyPurple : TankEnemy
     private void setToSnipe()
     {
         state = TankEnemy.State.SNIPE;
+        targetDirectionAim = Vector3.zero;
 
-        //selectDirectionAim();
         needDirection = true;
     }
-    protected void findShot()
+    private IEnumerator setBackToSnipe()
     {
-        //find all possible directions
-        find();
-
-        //shoot projectileTest in each
+        setToIdle();
+        yield return new WaitForSeconds(snipeDelay);
+        setToSnipe();
     }
-    private void find()
+
+    private void findShot()
     {
         selectDirectionAim();
         aimDirection();
-        
         if (-tower.forward == targetDirectionAim)
         {
             Fire();
             needDirection = true;
         }
+
         selectDirectionAim();
     }
     private void selectDirectionAim()
@@ -125,16 +134,21 @@ public class TankEnemyPurple : TankEnemy
         {
             // Goes through every possible shot and records everyone that hits a player tank.
             needDirection = false;
-            hits.Clear();
+            hitAngles.Clear();
+            hitWeights.Clear();
+            hitCount = 0;
             float eps = .1f;
             float angle = 0;
             Vector3 testShot = Vector3.forward;
-            
+
             while (angle < 360)
             {
-                if (projTestScript.beginShoot(tower.position, testShot))
+                if (projTestScript.beginShoot(tower.position, testShot, true))
                 {
-                    hits.Add(testShot);
+                    hitAngles.Add(testShot);
+                    hitWeights.Add(10f);
+                    //TODO: this should be weighted by the distance
+                    hitCount += 10f;
                 }
 
                 angle += eps;
@@ -142,14 +156,59 @@ public class TankEnemyPurple : TankEnemy
             }
 
             // Set targetDirectionAim if hits isn't empty.
-            if (hits.Count != 0)
+            if (hitAngles.Count != 0)
             {
-                targetDirectionAim = hits[Random.Range(0, hits.Count)];
+                //targetDirectionAim = hitAngles[Random.Range(0, hitAngles.Count)];
+                targetDirectionAim = selectWeightedTarget();
             }
             else
             {
                 needDirection = true;
+
+                // Change to idle and set a coroutine to set back to snipe.
+                //StartCoroutine(setBackToSnipe());
             }
+        }
+    }
+    private Vector3 selectWeightedTarget()
+    {
+        float counter = Random.Range(0, hitCount);
+        int counterI = 0;
+        counter -= hitWeights[counterI];
+        while (counter > 0)
+        {
+            counterI++;
+            counter -= hitWeights[counterI];
+        }
+        return hitAngles[counterI];
+    }
+
+    /*
+    Functions for the IDLE state:
+    Idle() - Overrides the change Idle funciton to look around randomly.
+    */
+    protected override void Idle()
+    {
+        // Never change states
+        findNoShoot();
+    }
+    private void findNoShoot()
+    {
+        aimRandom();
+        aimDirection();
+        if (-tower.forward == targetDirectionAim)
+        {
+            needDirection = true;
+        }
+    }
+    private void aimRandom()
+    {
+        if (needDirection)
+        {
+            needDirection = false;
+            // Set targetDirection along the x-z plane and do so until a valid direction is selected.
+            Vector2 unitPlane = Random.insideUnitCircle.normalized;
+            targetDirectionAim.Set(unitPlane[0], 0, unitPlane[1]);
         }
     }
 }

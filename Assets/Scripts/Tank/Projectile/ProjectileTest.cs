@@ -58,6 +58,7 @@ public class ProjectileTest : MonoBehaviour {
             return false;
         }
         // If it hit a tank.
+        //////////////THIS IS WRONG
         else if (hit.transform.GetComponent<Tank>())
         {
             if (hit.transform.GetComponent<Tank>().teamName == enemyTeamName)

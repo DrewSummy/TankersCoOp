@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TeamUtility.IO;
+using Completed;
 
 public class TestManager : MonoBehaviour {
 
@@ -16,7 +17,8 @@ public class TestManager : MonoBehaviour {
     public Transform tankHolder;
     private string teamAName = "A";
     private string teamBName = "B";
-    
+    public GUI_HUD HUDGUI;
+
     // Use this for initialization
     void Start()
     {
@@ -28,6 +30,8 @@ public class TestManager : MonoBehaviour {
 
         // Enable tanks
         EnableTanks();
+
+        HUDGUI.enableHUD();
     }
 
     // Initialize the tank instances and add them to the correct lists.
@@ -55,8 +59,11 @@ public class TestManager : MonoBehaviour {
             t.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
 
             // Set the tags.
-            t.GetComponent<TankEnemy>().teamName = teamAName;
-            t.GetComponent<TankEnemy>().enemyTeamName = teamBName;
+            if (t.GetComponent<TankEnemy>())
+            {
+                t.GetComponent<TankEnemy>().teamName = teamAName;
+                t.GetComponent<TankEnemy>().enemyTeamName = teamBName;
+            }
         }
         foreach (GameObject b in teamB)
         {
@@ -76,8 +83,11 @@ public class TestManager : MonoBehaviour {
             t.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
 
             // Set the tags.
-            t.GetComponent<TankEnemy>().teamName = teamBName;
-            t.GetComponent<TankEnemy>().enemyTeamName = teamAName;
+            if (t.GetComponent<TankEnemy>())
+            {
+                t.GetComponent<TankEnemy>().teamName = teamBName;
+                t.GetComponent<TankEnemy>().enemyTeamName = teamAName;
+            }
         }
     }
 
@@ -117,8 +127,20 @@ public class TestManager : MonoBehaviour {
         for (int tank = 0; tank < tempTanks.Count; tank++)
         {
             //tempTanks[tank].GetComponent<TankEnemy>().enabled = true;
-            tempTanks[tank].GetComponent<TankEnemy>().startTankEnemy();
-            tempTanks[tank].GetComponent<TankEnemy>().testEnvironment = true;
+            if (tempTanks[tank].GetComponent<TankEnemy>())
+            {
+                tempTanks[tank].GetComponent<TankEnemy>().startTankEnemy();
+                tempTanks[tank].GetComponent<TankEnemy>().testEnvironment = true;
+            }
+            else
+            {
+                // Load in the Tank being used from the Resources folder in assets.
+                // Player1
+                tempTanks[tank].transform.SetParent(transform);
+                tempTanks[tank].name = "Player1";
+                tempTanks[tank].GetComponent<TankPlayerTest>().m_PlayerNumber = 1;
+                //tempTanks[tank].GetComponent<Tank>().teamName = playerTeamName;
+            }
         }
     }
 }

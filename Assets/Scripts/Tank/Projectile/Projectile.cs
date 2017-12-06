@@ -23,7 +23,9 @@ public class Projectile : MonoBehaviour
     private string projTag = "Projectile";
     private string playerTag = "Player";
     private string enemyTag = "Enemy";
-    
+    private float offset = .25f;
+
+
     protected void Awake()
     {
         // Use the rigidbody and calculate the projectileSpeedVector.
@@ -71,8 +73,8 @@ public class Projectile : MonoBehaviour
     {
         currentTrail = Instantiate(smokeTrail) as GameObject;
         currentTrail.transform.SetParent(transform);
-        currentTrail.transform.position = transform.position;
         currentTrail.transform.rotation = transform.rotation;
+        currentTrail.transform.position = transform.position + offset * currentTrail.transform.forward;// currentTrail.transform.rotation * offset;
         currentTrail.GetComponent<Rigidbody>().velocity = projectileSpeedVector;
         ParticleSystem.MainModule ps = currentTrail.GetComponent<ParticleSystem>().main;
         ps.simulationSpeed = projectileSpeed / 16;
