@@ -143,11 +143,13 @@ public class TankEnemyPurple : TankEnemy
 
             while (angle < 360)
             {
-                if (projTestScript.beginShoot(tower.position, testShot, true))
+                float weight = projTestScript.beginShoot(tower.position, testShot, true);
+
+                // If there was a hit, record it.
+                if (weight > -1)
                 {
                     hitAngles.Add(testShot);
-                    hitWeights.Add(10f);
-                    //TODO: this should be weighted by the distance
+                    hitWeights.Add(weight);
                     hitCount += 10f;
                 }
 

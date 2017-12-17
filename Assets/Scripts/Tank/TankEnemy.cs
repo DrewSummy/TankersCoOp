@@ -608,7 +608,7 @@ public class TankEnemy : Tank
     }
     protected bool isHit()
     {
-        return projTestScript.beginShoot(m_ProjectileSpawnPoint.position, -tower.forward);
+        return projTestScript.beginShoot(m_ProjectileSpawnPoint.position, -tower.forward) > -1;
     }
     protected void scanTo()
     {

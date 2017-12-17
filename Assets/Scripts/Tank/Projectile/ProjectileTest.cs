@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class ProjectileTest : MonoBehaviour {
     
@@ -34,14 +35,15 @@ public class ProjectileTest : MonoBehaviour {
         raycastLayer = ~(1 << LayerMask.NameToLayer("Ignore Raycasat"));
     }
 
-    public bool beginShoot(Vector3 position, Vector3 direction, bool debug = false)
+    public float beginShoot(Vector3 position, Vector3 direction, bool debug = false)
     {
         pt shot = new pt(position, direction);
 
-        return shoot(shot, debug);
+        return shoot(shot, 0, debug);
     }
 
-    private bool shoot(pt s, bool debug = false)
+    // Returns the distance traveled to hit an enemy. -1 is reserved for never hitting.
+    private float shoot(pt s, float distWeight,bool debug = false)
     {
         if (debug)
         {
@@ -51,11 +53,12 @@ public class ProjectileTest : MonoBehaviour {
         // Send out raycast
         RaycastHit hit;
         Physics.Raycast(s.pos, s.dir * maxDist, out hit, raycastLayer);
+        distWeight += hit.distance;
 
         // If the raycast doesn't hit anything at all.
         if (hit.collider == null)
         {
-            return false;
+            return -1;
         }
         // If it hit a tank.
         //////////////THIS IS WRONG
@@ -63,11 +66,11 @@ public class ProjectileTest : MonoBehaviour {
         {
             if (hit.transform.GetComponent<Tank>().teamName == enemyTeamName)
             {
-                return true;
+                return distWeight;
             }
             else
             {
-                return false;
+                return -1;
             }
         }
         // Else it hit a wall or block.
@@ -77,7 +80,7 @@ public class ProjectileTest : MonoBehaviour {
             // No more collisions
             if (s.collisionCounter >= maxCollisions)
             {
-                return false;
+                return -1;
             }
             // More collisionselse
             else
@@ -92,7 +95,7 @@ public class ProjectileTest : MonoBehaviour {
                 Vector3 normalCollision = hit.normal;
                 s.dir = Vector3.Reflect(s.dir, normalCollision);
                 
-                return shoot(s, debug);
+                return shoot(s, distWeight, debug);
             }
         }
     }
