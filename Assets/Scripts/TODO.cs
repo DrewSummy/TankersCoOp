@@ -38,7 +38,7 @@ idea:
     minigame: race where bullets stun competitors
     bullet types: left trigger shoots slow, right- fast, both bidirectional bullets?
     teleport tank
-    add background to tank game: two planes of dark brown, tilted cubes that move in waves
+    add background to tank game: two planes of dark brown, tilted cubes that move in waves or https://youtu.be/WW6c7a_CXAw?t=22
     if you kill the last tank after you died, flip a coin to see if you continue
     waiting screen is two tanks driving around eachother like two objects of equal gravity in free space
     tank that chases and then blows up

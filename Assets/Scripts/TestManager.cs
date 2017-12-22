@@ -96,16 +96,45 @@ public class TestManager : MonoBehaviour {
     {
         for (int t = 0; t < teamAInstance.Count; t++)
         {
-            // Clear the list.
+            // Clear the lists.
             teamAInstance[t].GetComponent<Tank>().targets.Clear();
+            teamAInstance[t].GetComponent<Tank>().teammates.Clear();
+
             // Add targets with the helper function.
-            deepCopyTeam(teamAInstance[t].GetComponent<Tank>(), teamBInstance);
+            //deepCopyTeam(teamAInstance[t].GetComponent<Tank>(), teamBInstance);
+
+            // Add the targets to the tank.
+            foreach (GameObject tank in teamBInstance)
+            {
+                teamAInstance[t].GetComponent<Tank>().targets.Add(tank);
+            }
+
+            // Add the teammates to the tank.
+            foreach (GameObject team in teamAInstance)
+            {
+                teamAInstance[t].GetComponent<Tank>().teammates.Add(team);
+            }
         }
         for (int t = 0; t < teamBInstance.Count; t++)
         {
-        
+            // Clear the lists.
             teamBInstance[t].GetComponent<Tank>().targets.Clear();
-            deepCopyTeam(teamBInstance[t].GetComponent<Tank>(), teamAInstance);
+            teamBInstance[t].GetComponent<Tank>().teammates.Clear();
+
+            // Add targets with the helper function.
+            //deepCopyTeam(teamBInstance[t].GetComponent<Tank>(), teamAInstance);
+
+            // Add the targets to the tank.
+            foreach (GameObject tank in teamAInstance)
+            {
+                teamBInstance[t].GetComponent<Tank>().targets.Add(tank);
+            }
+
+            // Add the teammates to the tank.
+            foreach (GameObject team in teamBInstance)
+            {
+                teamBInstance[t].GetComponent<Tank>().teammates.Add(team);
+            }
         }
     }
     // Helper function for assigning targets.

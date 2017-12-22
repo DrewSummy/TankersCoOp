@@ -21,9 +21,6 @@ public class TankEnemyRed : TankEnemy
     //protected new float fireFreqFight = .35f;
 
     // Driving variables
-    //protected new float m_RotateSpeed = 5f;
-    //protected new float turningTimeMax = 2.5f;
-    //protected new float turningTimeMin = .5f;
     private float fightDistance = 20f;          // The distance the tank gets to the player tank before fighting.
     private float speedAggressive = 10f;        // The speed the tank drives at.
 
@@ -262,6 +259,10 @@ public class TankEnemyRed : TankEnemy
         // Set variables.
         canFire = true;
         coolingDown = false;
+
+        // Change the drive speed.
+        speedCurrent = m_Speed;
+
         fireFreq = fireFreqFight;
 
         StopCoroutine(cD);

@@ -43,7 +43,7 @@ public class ProjectileTest : MonoBehaviour {
     }
 
     // Returns the distance traveled to hit an enemy. -1 is reserved for never hitting.
-    private float shoot(pt s, float distWeight,bool debug = false)
+    private float shoot(pt s, float distWeight, bool debug = false)
     {
         if (debug)
         {
@@ -61,7 +61,6 @@ public class ProjectileTest : MonoBehaviour {
             return -1;
         }
         // If it hit a tank.
-        //////////////THIS IS WRONG
         else if (hit.transform.GetComponent<Tank>())
         {
             if (hit.transform.GetComponent<Tank>().teamName == enemyTeamName)

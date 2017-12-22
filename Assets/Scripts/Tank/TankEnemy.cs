@@ -30,7 +30,8 @@ public class TankEnemy : Tank
     private Queue<Vector3> recentShots = new Queue<Vector3>();                  // The queue for the last recentShotCount shots.
     protected int recentShotMax = 10;           // The maximum number of recent shots recorded at a time.
     protected float aimRandomChance = .5f;      // The odds of selecting a random direction to aim.
-
+    protected LayerMask raycastLayer;                 // The layerMask for the ProjectileTest to avoid the shell game objects.
+    
     // Driving Variables
     protected new float m_Speed = 6f;
     protected new float m_RotateSpeed = 1f;
@@ -63,7 +64,8 @@ public class TankEnemy : Tank
         AGGRESSIVERELOAD,
         AGGRESSIVE,
         SNIPE,
-        IDLE
+        IDLE,
+        SEARCH
     }
 
     protected State state;
@@ -93,6 +95,9 @@ public class TankEnemy : Tank
         projTestScript = GetComponent<ProjectileTest>();
         // Transfer the enemyTag to the projTestScript.
         projTestScript.enemyTeamName = enemyTeamName;
+
+        //TODO: test this with obstacles
+        raycastLayer = ~(1 << LayerMask.NameToLayer("Ignore Raycasat"));
     }
 
 
@@ -111,7 +116,6 @@ public class TankEnemy : Tank
     // Called by the room to end the TankEnemy.
     public void endTankEnemy()
     {
-        Debug.Log(1);
         setToIdle();
     }
 
@@ -374,20 +378,20 @@ public class TankEnemy : Tank
     aimDirect() - Aims directly at targetTank.
     delayFire() - Sets canFire to false, waits fireFreq, the sets canFire to true.
     */
-    protected void Chase()
+    protected virtual void Chase()
     {
         fireDirect();
         driveToward();
 
         chaseCS();
     }
-    protected void setToChase()
+    protected virtual void setToChase()
     {
         Debug.Log("chase");
         fireFreq = fireFreqChase;
         state = TankEnemy.State.CHASE;
     }
-    protected void chaseCS()
+    protected virtual void chaseCS()
     {
         if (isExploreDistance())
         {
@@ -411,7 +415,7 @@ public class TankEnemy : Tank
             return false;
         }
     }
-    private void driveToward()
+    protected void driveToward()
     {
         // Rotate the car toward targetDirection.
         selectDirectionToward();
@@ -491,7 +495,6 @@ public class TankEnemy : Tank
     */
     protected void Fight()
     {
-        Debug.Log("here");
         fireDirect();
         driveRandom();
 
@@ -680,7 +683,9 @@ public class TankEnemy : Tank
         state = TankEnemy.State.IDLE;
     }
 
-    
+
+
+
 
 
 
@@ -1077,6 +1082,10 @@ public class TankEnemy : Tank
         return angle;
     }
     
+
+
+
+
     public override void DestroyTank()
     {
         base.DestroyTank();

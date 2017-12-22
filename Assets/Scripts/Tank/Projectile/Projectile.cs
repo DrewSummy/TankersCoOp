@@ -190,7 +190,7 @@ public class Projectile : MonoBehaviour
             currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
         }
         Destroy(gameObject);
-        // Add the explosion and delete the object after 3 seconds.
+        // Add the explosion and delete the object after 1 seconds.
         GameObject explosion = Instantiate(projectileExplosion, gameObject.transform.position, Quaternion.identity) as GameObject;
         Destroy(explosion, 1);
         // TODO: The audio will for exploding the object will play

@@ -34,7 +34,7 @@ public class TankEnemyPurple : TankEnemy
 
         // Shooting variables
         fireFreq = 2f;
-        projectileAmount = 2;
+        projectileAmount = 1;
 
         // Driving variables
         m_RotateSpeed = 3f;
@@ -143,7 +143,7 @@ public class TankEnemyPurple : TankEnemy
 
             while (angle < 360)
             {
-                float weight = projTestScript.beginShoot(tower.position, testShot, true);
+                float weight = projTestScript.beginShoot(tower.position, testShot, false);
 
                 // If there was a hit, record it.
                 if (weight > -1)

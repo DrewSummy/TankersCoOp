@@ -14,6 +14,7 @@ abstract public class Tank : MonoBehaviour {
     public Material tankColor;                  // The material for the tank.
     public bool alive = true;
     public List<GameObject> targets;
+    public List<GameObject> teammates;
     public bool testEnvironment = false;        // Bool to represent if the tank is in a test environment.
     public string teamName;
     public string enemyTeamName;
