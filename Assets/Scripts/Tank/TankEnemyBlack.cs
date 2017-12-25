@@ -250,11 +250,11 @@ public class TankEnemyBlack : TankEnemy
         // Switch states to avoid previous momentum.
         setToIdle();
 
-        yield return new WaitForSeconds(1);
-        
         // Display the explosion.
         GameObject explosion = Instantiate(suicideExplosion, gameObject.transform.position, Quaternion.identity) as GameObject;
-        Destroy(explosion, 1);
+
+        yield return new WaitForSeconds(.5f);
+        
 
         // Destroy the tanks in targets and teammates if they are within explodeRadius.
         List<GameObject> targetsAndTeammates = new List<GameObject>();
