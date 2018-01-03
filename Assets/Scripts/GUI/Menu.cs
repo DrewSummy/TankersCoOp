@@ -128,22 +128,18 @@ public class Menu : MonoBehaviour {
     // Called when the respective mode needs to be displayed.
     public void placeMenu()
     {
-        menu.transform.GetComponentInChildren<TextMesh>().text = "MENU";
         StartCoroutine(replaceMenu());
     }
     public void placeSolo()
     {
-        menu.transform.GetComponentInChildren<TextMesh>().text = "SOLO";
         StartCoroutine(replaceSolo());
     }
     public void placeCoop()
     {
-        menu.transform.GetComponentInChildren<TextMesh>().text = "CO-OP";
         StartCoroutine(replaceCoop());
     }
     public void placeSettings()
     {
-        menu.transform.GetComponentInChildren<TextMesh>().text = "SETTINGS";
         StartCoroutine(replaceSettings());
     }
 
@@ -153,6 +149,8 @@ public class Menu : MonoBehaviour {
     {
         // Raise, inactivate blocks, place blocks, lower.
         yield return raiseContainer();
+
+        menu.transform.GetComponentInChildren<TextMesh>().text = "MENU";
 
         inactivateBlocks();
 
@@ -176,6 +174,8 @@ public class Menu : MonoBehaviour {
     {
         // Raise, inactivate blocks, place blocks, lower.
         yield return raiseContainer();
+        
+        menu.transform.GetComponentInChildren<TextMesh>().text = "SOLO";
 
         inactivateBlocks();
         
@@ -199,6 +199,8 @@ public class Menu : MonoBehaviour {
         // Raise, inactivate blocks, place blocks, lower.
         yield return raiseContainer();
 
+        menu.transform.GetComponentInChildren<TextMesh>().text = "CO-OP";
+
         inactivateBlocks();
 
         // Place the blocks (5, 6).
@@ -209,9 +211,7 @@ public class Menu : MonoBehaviour {
             blocks[i].GetComponent<Rigidbody>().velocity = Vector3.zero;
             blocks[i].GetComponent<Rigidbody>().useGravity = true;
             blocks[i].transform.position = dropLocation - (i - 5) * blockHeight * Vector3.up;
-            //+ Random.Range(offsetRange[0], offsetRange[1]) * Vector3.right + Random.Range(offsetRange[0], offsetRange[1]) * Vector3.forward;
             blocks[i].transform.rotation = Quaternion.identity;
-            //blocks[i].transform.Rotate(new Vector3(0, Random.Range(0, 90), 0));
         }
 
         yield return lowerContainer();
@@ -221,6 +221,8 @@ public class Menu : MonoBehaviour {
     {
         // Raise, inactivate blocks, place blocks, lower.
         yield return raiseContainer();
+
+        menu.transform.GetComponentInChildren<TextMesh>().text = "SETTINGS";
 
         inactivateBlocks();
 
@@ -249,13 +251,11 @@ public class Menu : MonoBehaviour {
         while (menu.transform.position.y > conHeight3)
         {
             menu.GetComponent<Rigidbody>().velocity = containerSpeedFast * Vector3.down;
-            //menu.GetComponent<Rigidbody>().AddForce(Vector3.down * 350);
             yield return new WaitForSeconds(.01f);
         }
         while (menu.transform.position.y > conHeight2)
         {
             menu.GetComponent<Rigidbody>().velocity = containerSpeedSlow * Vector3.down;
-            //menu.GetComponent<Rigidbody>().AddForce(Vector3.up * 100);
             yield return new WaitForSeconds(.01f);
         }
         menu.GetComponent<Rigidbody>().velocity = Vector3.zero;

@@ -53,10 +53,10 @@ public class GameMaster : MonoBehaviour
         levelScript = GetComponent<LevelManager>();
 
         // Call the InitGame function to initialize the first level.
-        //displaymenuGUI();
+        displaymenuGUI();
 
         //Temporary for testing.
-        CreateSoloGame();
+        //CreateSoloGame();
         //CreateCoopGame();
     }
 

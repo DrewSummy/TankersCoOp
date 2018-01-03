@@ -36,6 +36,9 @@ public class TankEnemyGreen : TankEnemy
                 case State.FIGHT:
                     Fight();
                     break;
+                case State.IDLE:
+                    Idle();
+                    break;
             }
             yield return null;
         }

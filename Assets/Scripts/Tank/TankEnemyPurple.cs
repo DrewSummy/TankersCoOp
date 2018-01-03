@@ -7,14 +7,15 @@ public class TankEnemyPurple : TankEnemy
 {
 
     // General variables
-    List<Vector3> hitAngles = new List<Vector3>();
-    List<float> hitWeights = new List<float>();
-    float hitCount = 0;
+    private List<Vector3> hitAngles = new List<Vector3>();
+    private List<float> hitWeights = new List<float>();
+    private float hitCount = 0;
 
     // State variables
-    float snipeDelay = 1.0f;
+    private float snipeDelay = 1.0f;
 
     // Shooting variables
+    private int numTestShots = 720;
     //float shootChance = .8f;
 
     // Driving variables
@@ -115,7 +116,6 @@ public class TankEnemyPurple : TankEnemy
         yield return new WaitForSeconds(snipeDelay);
         setToSnipe();
     }
-
     private void findShot()
     {
         selectDirectionAim();
@@ -137,7 +137,8 @@ public class TankEnemyPurple : TankEnemy
             hitAngles.Clear();
             hitWeights.Clear();
             hitCount = 0;
-            float eps = .1f;
+            float eps = 360 / numTestShots;
+            Debug.Log(eps);
             float angle = 0;
             Vector3 testShot = Vector3.forward;
 
@@ -150,7 +151,7 @@ public class TankEnemyPurple : TankEnemy
                 {
                     hitAngles.Add(testShot);
                     hitWeights.Add(weight);
-                    hitCount += 10f;
+                    hitCount += weight;
                 }
 
                 angle += eps;
@@ -160,7 +161,6 @@ public class TankEnemyPurple : TankEnemy
             // Set targetDirectionAim if hits isn't empty.
             if (hitAngles.Count != 0)
             {
-                //targetDirectionAim = hitAngles[Random.Range(0, hitAngles.Count)];
                 targetDirectionAim = selectWeightedTarget();
             }
             else
@@ -168,7 +168,7 @@ public class TankEnemyPurple : TankEnemy
                 needDirection = true;
 
                 // Change to idle and set a coroutine to set back to snipe.
-                //StartCoroutine(setBackToSnipe());
+                StartCoroutine(setBackToSnipe());
             }
         }
     }

@@ -675,12 +675,15 @@ public class TankEnemy : Tank
     */
     protected virtual void Idle()
     {
-        // Null
+        driveRandom();
     }
     public void setToIdle()
     {
         //Debug.Log("set to idle");
         state = TankEnemy.State.IDLE;
+
+        gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        gameObject.GetComponent<Rigidbody>().freezeRotation = true;
     }
 
 

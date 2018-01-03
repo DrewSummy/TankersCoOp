@@ -43,6 +43,7 @@ namespace Completed
         private Transform soloHolder;                              // Holds the buttons of solo.
         private Transform coopHolder;                              // Holds the buttons of coop.
         private Transform settingsHolder;                          // Holds the buttons of settings.
+        private float raiseTime = 2.0f;
 
         private float[] delayRange = new float[2];
 
@@ -225,10 +226,16 @@ namespace Completed
             {
                 menu.GetComponent<Menu>().containerMoving = true;
                 Debug.Log("selected Solo");
-                soloPlay.Select();
                 menu.GetComponent<Menu>().placeSolo();
                 currentButton = soloPlay;
+
+                StartCoroutine(delaySoloOnClick());
             }
+        }
+        private IEnumerator delaySoloOnClick()
+        {
+            yield return new WaitForSeconds(raiseTime);
+            soloPlay.Select();
         }
         public void coopOnClick()
         {
@@ -236,10 +243,16 @@ namespace Completed
             {
                 menu.GetComponent<Menu>().containerMoving = true;
                 Debug.Log("selected Coop");
-                coopPlay.Select();
                 menu.GetComponent<Menu>().placeCoop();
                 currentButton = coopPlay;
+
+                StartCoroutine(delayCoopOnClick());
             }
+        }
+        private IEnumerator delayCoopOnClick()
+        {
+            yield return new WaitForSeconds(raiseTime);
+            coopPlay.Select();
         }
         public void settingsOnClick()
         {
@@ -247,10 +260,16 @@ namespace Completed
             {
                 menu.GetComponent<Menu>().containerMoving = true;
                 Debug.Log("selected Settings");
-                setting1.Select();
                 menu.GetComponent<Menu>().placeSettings();
                 currentButton = setting1;
+
+                StartCoroutine(delaySettingsOnClick());
             }
+        }
+        private IEnumerator delaySettingsOnClick()
+        {
+            yield return new WaitForSeconds(raiseTime);
+            setting1.Select();
         }
         public void soloPlayOnClick()
         {
@@ -259,7 +278,6 @@ namespace Completed
                 menu.GetComponent<Menu>().containerMoving = true;
                 Debug.Log("selected SoloPlay");
                 startGame();
-                //clearMenu();
             }
         }
         public void soloBackOnClick()
@@ -280,7 +298,6 @@ namespace Completed
                 menu.GetComponent<Menu>().containerMoving = true;
                 Debug.Log("selected CoopPlay");
                 startGameCoop();
-                //clearMenu();
             }
         }
         public void coopBackOnClick()
@@ -319,9 +336,11 @@ namespace Completed
         // Functions called by GUI_Controller
         public void back()
         {
+            Debug.Log("is this called");
             if (currentButton == solo || currentButton == coop || currentButton == settings)
             {
                 // Do nothing
+                //TODO: add start screen where ai play each other
             }
             else
             {
@@ -329,11 +348,17 @@ namespace Completed
                 {
                     menu.GetComponent<Menu>().containerMoving = true;
                     Debug.Log("back");
-                    solo.Select();
                     menu.GetComponent<Menu>().placeMenu();
                     currentButton = solo;
+
+                    StartCoroutine(delayBack());
                 }
             }
+        }
+        private IEnumerator delayBack() 
+        {
+            yield return new WaitForSeconds(raiseTime);
+            solo.Select();
         }
         public void select()
         {
