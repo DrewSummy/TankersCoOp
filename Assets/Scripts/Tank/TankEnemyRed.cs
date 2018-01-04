@@ -45,7 +45,7 @@ public class TankEnemyRed : TankEnemy
         setToExplore();
     }
     
-    private new IEnumerator FSM()
+    protected override IEnumerator FSM()
     {
         while (alive)
         {

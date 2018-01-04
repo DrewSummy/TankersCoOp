@@ -80,16 +80,7 @@ namespace Completed
         public GameMaster GM;
         private int enemyCount = 0;
         private Object enemyCounterLock = new Object();
-
-        private void Update()
-        {
-            // Start each EnemyTank.
-            foreach (Transform enemy in enemyHolder)
-            {
-                Debug.Log(enemy.gameObject.activeInHierarchy);
-            }
-        }
-
+        
 
         // Instantiates the 2D arrays representing the room's obstacle course.
         private void SetObstacleCourses()
@@ -372,6 +363,10 @@ namespace Completed
                     player1.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
                     player1.GetComponent<Tank>().body.rotation = Quaternion.LookRotation(Vector3.back);
 
+                    // Freeze the player.
+                    player1.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    player1.GetComponent<Rigidbody>().freezeRotation = true;
+
                     // Prevent players from moving or shooting until battle starts.
                     player1.GetComponent<TankPlayer>().rotateOnly(true);
                     // Now place player 2 if not placed.
@@ -390,6 +385,10 @@ namespace Completed
                         player2.transform.position = playerSpawnLocations[location];
                         player2.GetComponent<Tank>().SetLeftoverProjectileHolder(player1.GetComponent<Tank>().projectileHolder);
                         player2.GetComponent<Tank>().body.rotation = Quaternion.LookRotation(Vector3.back);
+
+                        // Freeze the player.
+                        player2.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                        player2.GetComponent<Rigidbody>().freezeRotation = true;
 
                         // Prevent players from moving or shooting until battle starts.
                         player2.GetComponent<TankPlayer>().rotateOnly(true);

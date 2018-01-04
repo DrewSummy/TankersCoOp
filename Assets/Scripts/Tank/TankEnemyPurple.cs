@@ -137,8 +137,7 @@ public class TankEnemyPurple : TankEnemy
             hitAngles.Clear();
             hitWeights.Clear();
             hitCount = 0;
-            float eps = 360 / numTestShots;
-            Debug.Log(eps);
+            float eps = 360f / numTestShots;
             float angle = 0;
             Vector3 testShot = Vector3.forward;
 

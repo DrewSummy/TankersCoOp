@@ -22,6 +22,7 @@ public class TestManager : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
+        
         // Place tanks
         InitializeTanks();
 
@@ -149,6 +150,7 @@ public class TestManager : MonoBehaviour {
     // Go through all tanks and call their start function.
     private void EnableTanks()
     {
+        //return;
         List<GameObject> tempTanks = new List<GameObject>();
         tempTanks.AddRange(teamAInstance);
         tempTanks.AddRange(teamBInstance);

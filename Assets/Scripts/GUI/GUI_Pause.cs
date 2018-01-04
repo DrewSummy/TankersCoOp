@@ -51,7 +51,7 @@ namespace Completed
             killHolder2.position = panel.transform.position + new Vector3(230, 0, 0);
 
             // Load in the tank colors being used from the Resources folder in assets.
-            tankColors = Resources.LoadAll<Material>("TankResources/TankColors");
+            tankColors = Resources.LoadAll<Material>("Prefab/GameObjectPrefab/TankPrefab/TankColors");
         }
         
         private void PlaceMenu()

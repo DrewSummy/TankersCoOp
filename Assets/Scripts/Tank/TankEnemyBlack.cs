@@ -267,6 +267,9 @@ public class TankEnemyBlack : TankEnemy
                 tank.GetComponent<Tank>().DestroyTank();
             }
         }
+
+        // Destroy own tank.
+        GetComponent<Tank>().DestroyTank();
     }
 
 
@@ -316,5 +319,15 @@ public class TankEnemyBlack : TankEnemy
             }
         }
         return false;
+    }
+
+
+    /*
+    Functions for the IDLE state:
+    Idle() - Overrides the change Idle funciton to do nothing.
+    */
+    protected override void Idle()
+    {
+        // Null
     }
 }

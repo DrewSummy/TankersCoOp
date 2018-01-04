@@ -53,10 +53,10 @@ public class GameMaster : MonoBehaviour
         levelScript = GetComponent<LevelManager>();
 
         // Call the InitGame function to initialize the first level.
-        displaymenuGUI();
+        //displaymenuGUI();
 
         //Temporary for testing.
-        //CreateSoloGame();
+        CreateSoloGame();
         //CreateCoopGame();
     }
 
@@ -74,6 +74,10 @@ public class GameMaster : MonoBehaviour
         player1Script.m_PlayerNumber = 1;
         player1.GetComponent<Tank>().teamName = playerTeamName;
 
+        // Set the GUI variables.
+        player1Script.miniMapGUI = minimapGUI;
+        player1Script.pauseGUI = pauseGUI;
+
         // Player2
         if (coop)
         {
@@ -83,7 +87,11 @@ public class GameMaster : MonoBehaviour
             player2.name = "Player2";
             player2Script = player2.GetComponent<TankPlayer>();
             player2Script.m_PlayerNumber = 2;
-            player1.GetComponent<Tank>().teamName = playerTeamName;
+            player2.GetComponent<Tank>().teamName = playerTeamName;
+
+            // Set the GUI variables.
+            player2Script.miniMapGUI = minimapGUI;
+            player2Script.pauseGUI = pauseGUI;
         }
     }
 

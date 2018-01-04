@@ -31,8 +31,8 @@ namespace Completed
         private bool m_HasShot;                     // The boolean used to permit the tank to shoot once per trigger pull.
         private bool paused;                        // The boolean for if the game is paused.
         private float joystickMagnitude1;           // The magnitude of the joystick for moving.
-        private GUI_MiniMap miniMapGUI;
-        private GUI_Pause pauseGUI;
+        public GUI_MiniMap miniMapGUI;
+        public GUI_Pause pauseGUI;
 
         public int killAmount = 0;                  // The number of kills by this tank, kept track of for GUI_Pause.
         public int[] killCounter;                   // An array of number of kills for each type of tank.
@@ -92,14 +92,7 @@ namespace Completed
             m_FireName = "Right Trigger";
             m_PauseName = "Start";
             m_SelectName = "Back";
-
-            // Get access to GUIS.
-            ////////////////////////THIS SHOULD BE SET IN THE GUI START FUNCTION
-            //miniMapGUI = GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>();
-            //pauseGUI = GameObject.FindGameObjectWithTag("Pause").GetComponent<GUI_Pause>();
-
-
-
+                        
             // Load in the projectile being used from the Resources folder in assets.
             //projectile = Resources.Load("TankResources/Projectile/ShellPlayer") as GameObject;
 
