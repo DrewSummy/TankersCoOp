@@ -27,6 +27,7 @@ public class TankEnemyBlack : TankEnemy
     float explodeTriggerRadius = 7.5f;
     float explodeRadius = 10f;
     public GameObject suicideExplosion;
+    private bool isExploding = false;
 
     // Driving variables
     float speedChase = 17.5f;
@@ -121,21 +122,22 @@ public class TankEnemyBlack : TankEnemy
     /*
     Functions for the CHASE state:
     Chase() - Overrides the change Idle funciton to look around randomly.
-    setToChase() - 
-    recordRecentPos() - 
+    setToChase() - Change variables and record the a recent position.
+    recordRecentPos() - Coroutine that repeatedly gets the most recent position the target tank is at.
     chaseCS() - Change from CHASE state if an enemy tank hasn't been seen in chaseTime.
-    chaseCSTimer() - 
-    driveChase() - 
-    driveAt() - 
-    driveRemember() - 
-    aimRotate() - Continuously rotate the tower CW or CCW.
+    chaseCSTimer() - Starts a timer to change states after chaseTime.
+    driveChase() - Drives at the target tank or where the tank was is it isn't viewable.
+    driveAt() - Rotates toward the target tank and drives.
+    driveRemember() - Rotates toward the recent position the target tank was seen at.
+    aimSpin() - Continuously rotate the tower CW or CCW.
     tryToExplode() - Call explode if the tank is close enough to an enemy.
     isExplodeDistance() - Returns true if the tank is within explodeDistance of an enemy.
-    explode() - Destroys the tank and any tanks within the explodeRadius of the tank.
+    explode() - Destroys the tank and any tanks within the explodeRadius of the tank..
+    DestroyTank() - Overriden to explode if the coroutine for exploding hasn't started.
     */
     protected override void Chase()
     {
-        aimRotate();
+        aimSpin();
         driveChase();
 
         tryToExplode();
@@ -157,7 +159,7 @@ public class TankEnemyBlack : TankEnemy
     }
     private IEnumerator recordRecentPos()
     {//TODO: this isn't always updated since a tank can die inbetween collecting recentPos
-        recentPos = targetTank.transform.position;
+        recentPos = targetTank.transform.position - transform.position;
         yield return new WaitForSeconds(retrivalBuffer);
         retrieveRecentPos = StartCoroutine(recordRecentPos());
     }
@@ -207,27 +209,36 @@ public class TankEnemyBlack : TankEnemy
     }
     private void driveRemember()
     {
+        Debug.Log("remember");
         targetDirectionDrive = recentPos;
 
         rotateDirection();
         driveDirection();
     }
-    private void aimRotate()
+    private void aimSpin()
     {
+        Quaternion rotation;
+
         if (rotateCW)
         {
-            tower.Rotate(new Vector3(0, rotateRandomSpeed, 0));
+            rotation = Quaternion.Euler(0, -10, 0);
         }
         else
         {
-            tower.Rotate(new Vector3(0, -rotateRandomSpeed, 0));
+            rotation = Quaternion.Euler(0, 10, 0);
         }
+
+        targetDirectionAim = rotation * -tower.forward;
+        float step = towerRotateSpeed * Time.deltaTime;
+        Vector3 newDir = Vector3.RotateTowards(tower.forward, targetDirectionAim, step, .01F);
+        tower.rotation = Quaternion.LookRotation(newDir);
     }
     private void tryToExplode()
     {
         if (isExplodeDistance())
         {
-            StartCoroutine(explode());
+            //StartCoroutine(explode());
+            DestroyTank();
         }
     }
     private bool isExplodeDistance()
@@ -244,8 +255,7 @@ public class TankEnemyBlack : TankEnemy
     }
     private IEnumerator explode()
     {
-        Debug.Log("blow up");
-
+        isExploding = true;
 
         // Switch states to avoid previous momentum.
         setToIdle();
@@ -253,8 +263,10 @@ public class TankEnemyBlack : TankEnemy
         // Display the explosion.
         GameObject explosion = Instantiate(suicideExplosion, gameObject.transform.position, Quaternion.identity) as GameObject;
 
+        // Disappear tank.
+        enabled = false;
+
         yield return new WaitForSeconds(.5f);
-        
 
         // Destroy the tanks in targets and teammates if they are within explodeRadius.
         List<GameObject> targetsAndTeammates = new List<GameObject>();
@@ -269,7 +281,14 @@ public class TankEnemyBlack : TankEnemy
         }
 
         // Destroy own tank.
-        GetComponent<Tank>().DestroyTank();
+        base.DestroyTank();
+    }
+    public override void DestroyTank()
+    {
+        if (!isExploding)
+        {
+            StartCoroutine(explode());
+        }
     }
 
 

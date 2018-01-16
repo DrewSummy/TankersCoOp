@@ -43,5 +43,9 @@ public class TankPlayerTest : TankPlayer
         // Set projectile count to 0.
         projectileCount = 0;
         GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
+        
+        // Destroy tank.
+        //Destroy(this.gameObject);
+        //Debug.Log("here");
     }
 }

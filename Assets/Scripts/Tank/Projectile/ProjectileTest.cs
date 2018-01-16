@@ -31,7 +31,6 @@ public class ProjectileTest : MonoBehaviour {
 
     protected void Start()
     {
-        //TODO: test this with obstacles
         raycastLayer = ~(1 << LayerMask.NameToLayer("Ignore Raycasat"));
     }
 
@@ -42,7 +41,7 @@ public class ProjectileTest : MonoBehaviour {
         return shoot(shot, 0, debug);
     }
 
-    // Returns the distance traveled to hit an enemy. -1 is reserved for never hitting.
+    // Returns the distance traveled to hit an enemy. -1 is reserved for never hitting and -2 is reserved for hitting a teammate.
     private float shoot(pt s, float distWeight, bool debug = false)
     {
         if (debug)
@@ -69,13 +68,12 @@ public class ProjectileTest : MonoBehaviour {
             }
             else
             {
-                return -1;
+                return -2;
             }
         }
         // Else it hit a wall or block.
         else
         {
-
             // No more collisions
             if (s.collisionCounter >= maxCollisions)
             {

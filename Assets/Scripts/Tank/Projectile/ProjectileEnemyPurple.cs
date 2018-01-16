@@ -9,5 +9,6 @@ public class ProjectileEnemyPurple : ProjectileEnemy
     {
         maxCollisions = 2;
         projectileSpeed = 32f;
+        projectileSpeed = 28;
     }
 }

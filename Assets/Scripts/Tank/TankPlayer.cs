@@ -23,6 +23,8 @@ namespace Completed
         private float m_AimVerticalValue;           // The value of the vector for aiming.
         private string m_FireName;                  // The name of the float for shooting.
         private float m_FireValue;                  // The value of the float for the trigger.
+        private string m_LockName;                  // The name of the bool for locking the tower.
+        private bool m_LockValue;                   // The value of the bool for locking the tower.
         private string m_PauseName;                 // The name of the bool for pausing.
         private bool m_PauseValue;                  // The value of the bool for the pause.
         private Vector3 m_AimRotation;              // The target direction for the tower to point.
@@ -64,6 +66,7 @@ namespace Completed
             m_DriveHorizontalValue = 0f;
             m_DriveVerticalValue = 0f;
             m_FireValue = 0f;
+            m_LockValue = false;
             m_PauseValue = false;
 
             m_SelectValue1 = false;
@@ -90,6 +93,7 @@ namespace Completed
             m_DriveHorizontalName = "Left Stick Horizontal";
             m_DriveVerticalName = "Left Stick Vertical";
             m_FireName = "Right Trigger";
+            m_LockName = "Left Trigger";
             m_PauseName = "Start";
             m_SelectName = "Back";
                         
@@ -170,6 +174,9 @@ namespace Completed
             // Store the value for firing.
             m_FireValue = InputManager.GetAxis(m_FireName, PID);
 
+            // Store the value for firing.
+            m_LockValue = InputManager.GetAxis(m_LockName, PID) == 1;
+
             // Store the value for pauseing.
             m_PauseValue = InputManager.GetButtonDown(m_PauseName, PID);
 
@@ -223,9 +230,8 @@ namespace Completed
                 speed = -m_Speed;
             }
 
-            Vector3 movement = body.forward * speed * Time.deltaTime;
-            
-            m_RidgidbodyTank.MovePosition(m_RidgidbodyTank.position + movement);
+            Vector3 movement = body.forward * speed;
+            m_RidgidbodyTank.velocity = movement;
 
             // Update the velocity.
             velocity = -body.forward * speed;
@@ -263,9 +269,12 @@ namespace Completed
         private void Aim()
         {
 
-            // Keep track of the m_AimRotation for aiming.
-            Vector3 m_AimRotation = new Vector3(-m_AimVerticalValue, 0, m_AimHorizontalValue);
-            tower.LookAt(tower.position + m_AimRotation);
+            // If the tower isn't locked, keep track of the m_AimRotation for aiming.
+            if (!m_LockValue)
+            {
+                Vector3 m_AimRotation = new Vector3(-m_AimVerticalValue, 0, m_AimHorizontalValue);
+                tower.LookAt(tower.position + m_AimRotation);
+            }
         }
 
 

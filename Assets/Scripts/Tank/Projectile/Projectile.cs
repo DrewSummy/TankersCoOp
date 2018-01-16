@@ -132,7 +132,7 @@ public class Projectile : MonoBehaviour
     }
     protected void lastCollision()
     {
-        // Drop the current smoke trail.
+        // Drop the current smoke trail and destroy the object.
         KillProjectile();
     }
     protected void wallCollision(Collision ci)
@@ -215,13 +215,13 @@ public class Projectile : MonoBehaviour
 
     public virtual void DisableProjectile()
     {
-        //Debug.Log("disabling");
         // Makes projectiles fall at the completion of a room.
         ProjectileRigidbody.useGravity = true;
         disabled = true;
 
         // Add random force and torque to projectile.
         //TODO: don't use magic numbers
+        ProjectileRigidbody.velocity = Vector3.zero;
         ProjectileRigidbody.AddForce(new Vector3(Random.Range(1f, 5f), Random.Range(150f, 500f), Random.Range(1f, 5f)));
         ProjectileRigidbody.AddTorque(new Vector3(Random.Range(1f, 5f), Random.Range(1f, 20f), Random.Range(1f, 5f)));
 

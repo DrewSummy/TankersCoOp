@@ -5,111 +5,137 @@ namespace Completed
 {
     public class CameraControl : MonoBehaviour
     {
+        public Transform background;
         public GameObject m_Player1;                   // Reference to the player's transform.
         public GameObject m_Player2;                   // Reference to the player's transform.
-        public bool battling = false;
-        public bool gameOver = false;
+        public Transform camera;
 
-        private Vector3 m_CameraPosRel;             // The offset of the camera from the tank.
-        private float m_RoomLength = 50;            // The length of a side of the square room.
-        private float m_WallThickness = 1;
-        private float stepLength = 52;              // = m_RoomLength + 2 * m_WallThickness;
+
+        public Transform targetRoom;
         private Vector3 m_target;
-        private Vector3 patrolOffset;               // The offsets are set relative to each other.
-        private Vector3 battleOffset = new Vector3(0, 40, -15);
-        private Vector3 deadOffset;
-        private Quaternion m_cameraAngle = new Quaternion
-            (.6f, 0, 0, .8f);                       // The rotation put on the camera.
+
+        private float m_RoomLength = 50;
+        private float m_WallThickness = 1;
+        private float stepLength = 52;
+        private Vector3 centerOfRoom = new Vector3(25f, 0, 25f);
+
+        private Vector3 m_cameraAngle = new Vector3(80, 0, 0);
+        private Vector3 cameraOffset = Vector3.Normalize(new Vector3(0, 22, -1));
+        private Vector3 lookOffset = new Vector3(0, 0, -25);
+        //private Vector3 cameraOffset = new Vector3(0, 0, -4);
+        private float patrolOffset = 55;
+        private float battleOffset = 42;
+        private float deadOffset = 70;
+
         private float cameraSpeedMinimum = 45;
         private float cameraSpeedEnding = 5;
 
         private float shakeRadius = .25f;
         private float shakeTime = 1f;
 
-        //TODO: this can be more efficient by not using update but instead calling functions in the camera
+        // State Variables
+        private enum State
+        {
+            PATROL,
+            BATTLE,
+            GAMEOVER,
+            STATEFINISH
+        }
+        
+        private State state;
 
-        //TODO: figure out camera blur to hide the levels on the side during a battle
+        void Start()
+        {
+            //background.gameObject.SetActive(true);
+
+            state = CameraControl.State.BATTLE;
+            StartCoroutine(FSM());
+        }
+
+
+        // Finite State Machine representing the actions TankEnemy goes through
+        private IEnumerator FSM()
+        {
+            while (true)
+            {
+                Debug.Log(state);
+                switch (state)
+                {
+                    case State.PATROL:
+                        Patrol();
+                        break;
+                    case State.BATTLE:
+                        //Battle();
+                        break;
+                    case State.GAMEOVER:
+                        GameOverZoom();
+                        break;
+                    case State.STATEFINISH:
+                        //Null
+                        break;
+                }
+            yield return null;
+            }
+        }
         
 
-
-        private void Start()
+        private void Patrol()
         {
-            foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
-            {
-                if (tank.GetComponent<TankPlayer>().m_PlayerNumber == 1)
-                {
-                    m_Player1 = tank;
-                }
-                else
-                {
-                    m_Player2 = tank;
-                }
-            }
-            //playerScript2 = m_Player2.GetComponent<TankPlayer>();
-            // TODD: set up a better method for angling the camera
-            transform.rotation = m_cameraAngle;
+            Vector3 targetPos = patrolOffset * cameraOffset;
+            float step = Mathf.Max(Vector3.Distance(camera.transform.localPosition, targetPos), cameraSpeedMinimum) * Time.deltaTime;
+            camera.transform.localPosition = Vector3.MoveTowards(camera.transform.localPosition, targetPos, step);
 
-            //stepLength = m_RoomLength + 2 * m_WallThickness;
-
-            battleOffset.Set(0, 40, -15);
-            patrolOffset = battleOffset * 1.5f;
-            deadOffset = battleOffset * .5f;
+            camera.LookAt(transform);
         }
 
-        private void Update()
+        private void Battle()
         {
-            UpdateTargetPos();
-        }
-
-        private void UpdateTargetPos()
-        {
-            m_target = new Vector3(Mathf.Floor((m_Player1.transform.position.x + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2,
-                0,
-                Mathf.Floor((m_Player1.transform.position.z + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2);
-        }
-
-        private void FixedUpdate()
-        {
-            // Move the camera depending on the tank's position.if (playerScript1.alive)
-            if (!gameOver)
-            {
-                Move();
-            }
-            else
-            {
-                //TODO: this is searching for the player still and so it moves off screen
-                GameOverZoom();
-            }
-        }
-
-        private void Move()
-        {
-            if (battling)
-            {
-                float step = Mathf.Max(Vector3.Distance(transform.position, m_target + battleOffset), cameraSpeedMinimum) * Time.deltaTime;
-                transform.position = Vector3.MoveTowards(transform.position, m_target + battleOffset, step);
-            }
-            else
-            {
-                float step = Mathf.Max(Vector3.Distance(transform.position, m_target + patrolOffset), cameraSpeedMinimum) * Time.deltaTime;
-                transform.position = Vector3.MoveTowards(transform.position, m_target + patrolOffset, step);
-            }
+            /*Vector3 targetPos = battleOffset * m_cameraAngle - camera.forward * 15 + cameraOffset;
+            Debug.Log(targetPos);
+            float step = Mathf.Max(Vector3.Distance(camera.transform.position, battleOffset * m_cameraAngle), cameraSpeedMinimum) * Time.deltaTime;
+            camera.transform.position = Vector3.MoveTowards(camera.transform.position, targetPos, step);*/
         }
 
         private void GameOverZoom()
         {
-            float step = Mathf.Max(Vector3.Distance(transform.position, m_target + deadOffset), cameraSpeedEnding) * Time.deltaTime;
-            transform.position = Vector3.MoveTowards(transform.position, m_target + deadOffset, step);
+            Vector3 targetPos = deadOffset * cameraOffset;
+            float step = Mathf.Max(Vector3.Distance(camera.transform.localPosition, targetPos), cameraSpeedMinimum) * Time.deltaTime;
+            camera.transform.localPosition = Vector3.MoveTowards(camera.transform.localPosition, targetPos, step);
+
+            camera.LookAt(transform);
+
+            // Check if the state is finished.
+            if (camera.transform.localPosition == targetPos)
+            {
+                state = CameraControl.State.STATEFINISH;
+            }
         }
 
-        public void PlaceOnFirstRoom(Vector2 firstRoomCoord)//Transform room)
+        public void PlaceOnFirstRoom(Transform firstRoom)
         {
             //TODO: place player first
-            m_target = new Vector3(Mathf.Floor((m_Player1.transform.position.x + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2,
-            0,
-            Mathf.Floor((m_Player1.transform.position.z + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2);
-            
-            transform.position = m_target + patrolOffset;
+            /*m_target = firstRoom.position + centerOfRoom;
+            Debug.Log(m_target);
+            Debug.Log(centerOfRoom);
+
+            trackPlayer();
+            camera.transform.localPosition = -camera.forward * battleOffset + cameraOffset;
+
+            transform.position = m_target;
+            transform.position = firstRoom.position;*/
+            PlaceOnRoom(firstRoom);
+        }
+        private void PlaceOnRoom(Transform room)
+        {
+            //TODO: this might need to switch to patrol
+            transform.position = room.position + centerOfRoom;
+            camera.transform.localPosition = battleOffset * cameraOffset;
+
+            camera.LookAt(transform);
+        }
+        public void RoomEntered(Transform room)
+        {
+            PlaceOnRoom(room);
         }
 
         public IEnumerator shakeCamera()
@@ -126,7 +152,31 @@ namespace Completed
             }
 
             // Reset the camera's position to Vector3.zero.
-            transform.GetChild(0).transform.position = camPos;
+            camera.transform.GetChild(0).transform.position = camPos;
+        }
+        
+        public void startBattleCamera(Transform battleRoom)
+        {
+            state = CameraControl.State.BATTLE;
+            Debug.Log("camera battle start");
+
+            PlaceOnRoom(battleRoom);
+            //background.GetComponent<BackgroundWave>().activateMatch(true);
+        }
+
+        public IEnumerator endBattleCamera()
+        {
+            state = CameraControl.State.PATROL;
+            Debug.Log("camera battle end");
+
+            //yield return shakeCamera();
+            yield return new WaitForSeconds(.05f);
+            //background.GetComponent<BackgroundWave>().activateMatch(false);
+        }
+
+        public void gameOverCamera()
+        {
+            state = CameraControl.State.GAMEOVER;
         }
     }
 }

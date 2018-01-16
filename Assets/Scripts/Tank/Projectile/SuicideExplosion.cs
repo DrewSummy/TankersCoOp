@@ -22,7 +22,7 @@ public class SuicideExplosion : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update ()
+	void FixedUpdate ()
     {
         if (Vector3.Magnitude(sphere.transform.localScale) < Vector3.Magnitude(endSize))
         {

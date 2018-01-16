@@ -197,6 +197,7 @@ public class TankEnemyPurple : TankEnemy
     {
         aimRandom();
         aimDirection();
+
         if (-tower.forward == targetDirectionAim)
         {
             needDirection = true;

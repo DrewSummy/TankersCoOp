@@ -29,7 +29,6 @@ public class TankEnemyGreen : TankEnemy
     {
         while (alive)
         {
-            //Debug.Log(state);
             trackPlayer();
             switch (state)
             {

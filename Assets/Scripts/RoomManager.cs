@@ -22,8 +22,6 @@ namespace Completed
         private Transform m_room;                                                // Store a reference to the room transform.
         private int m_level;                                                     // Store a reference to our RoomManager which will set up the room.
         private Transform[] m_doors = new Transform[4];                          // An array of the doors.
-        private bool isPlayer1;                                                  // The bool for if player 2 is alive.
-        private bool isPlayer2;                                                  // The bool for if player 2 is alive.
         public GameObject player1;                                               // Reference to the player 1 game object.
         public GameObject player2;
         public GameObject[] enemyList;                                           // An array of enemies for the level.
@@ -284,8 +282,8 @@ namespace Completed
         private IEnumerator BeginSetUp()
         {
             // Place the unenabled enemies and players.
-            PlaceEnemies();
             PlacePlayers();
+            PlaceEnemies();
 
             if (isLastRoom)
             {
@@ -297,54 +295,18 @@ namespace Completed
                 GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().PlaceEnemies(enemyHolder);
 
                 GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().PlayCountDown();
+
+
+
                 yield return new WaitForSeconds(4f);
 
+
+                // Enable the tanks.
                 EnableTanks();
             }
         }
-        
-        private void PlaceEnemies()
-        {
-            //TODO: somehow make random and eliminate each point from the list
-            for (int location = 0; location < enemySpawnLocations.Count; location++)
-            {
-                GameObject enemy = Instantiate(enemyList[Random.Range(0, enemyList.Length)]) as GameObject;
-                enemy.transform.position = enemySpawnLocations[location];
-                enemy.transform.SetParent(enemyHolder);
 
-                // Send the projectile holder to each tank to hold projectiles when the enemy is killed.
-                enemy.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
-
-                // Pass the players.
-                enemy.GetComponent<TankEnemy>().player1 = player1;
-                if (player2)
-                {
-                    enemy.GetComponent<TankEnemy>().player2 = player2;
-                }
-
-                List<GameObject> playerTanks = new List<GameObject>();
-                playerTanks.Add(player1);
-                if (player2)
-                {
-                    playerTanks.Add(player2);
-                }
-                enemy.GetComponent<Tank>().targets = playerTanks;
-
-                // Set the TankEnemy's parentRoom.
-                enemy.GetComponent<TankEnemy>().parentRoom = this;
-
-                // Give the enemies the waypoints.
-                enemy.GetComponent<TankEnemy>().waypoints = waypoints;
-
-
-                enemy.GetComponent<TankEnemy>().teamName = enemyTeamName;
-                enemy.GetComponent<TankEnemy>().enemyTeamName = playerTeamName;
-
-                enemyCount++;
-            }
-        }
-
-
+        //change this
         public void PlacePlayers()
         {
             //TODO: need player1
@@ -396,6 +358,59 @@ namespace Completed
                     // Now place player 1 if not placed.
                     placePlayer = 1;
                 }
+            }
+        }
+
+        private void PlaceEnemies()
+        {
+            for (int location = 0; location < enemySpawnLocations.Count; location++)
+            {
+                GameObject enemy = Instantiate(enemyList[Random.Range(0, enemyList.Length)]) as GameObject;
+                enemy.transform.position = enemySpawnLocations[location];
+                enemy.transform.SetParent(enemyHolder);
+
+                // Send the projectile holder to each tank to hold projectiles when the enemy is killed.
+                enemy.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
+
+                List<GameObject> playerTanks = new List<GameObject>();
+                playerTanks.Add(player1);
+                if (player2)
+                {
+                    playerTanks.Add(player2);
+                }
+                enemy.GetComponent<Tank>().targets = playerTanks;
+
+                // Set the TankEnemy's parentRoom.
+                enemy.GetComponent<TankEnemy>().parentRoom = this;
+
+                // Give the enemies the waypoints.
+                enemy.GetComponent<TankEnemy>().waypoints = waypoints;
+
+
+                enemy.GetComponent<TankEnemy>().teamName = enemyTeamName;
+                enemy.GetComponent<TankEnemy>().enemyTeamName = playerTeamName;
+
+                enemyCount++;
+
+                //enemy.GetComponent<Tank>().InitializeRandomAim();
+
+                // Find the closest enemy.
+                Vector3 toEnemy = new Vector3();
+                float p1Dist = Vector3.Distance(enemy.transform.position, player1.transform.position);
+                float p2Dist = p1Dist + 1;
+                if (player2)
+                {
+                    p2Dist = Vector3.Distance(enemy.transform.position, player2.transform.position);
+                }
+                if (p1Dist < p2Dist)
+                {
+                    toEnemy = enemy.transform.position - player1.transform.position;
+                }
+                else
+                {
+                    toEnemy = enemy.transform.position - player2.transform.position;
+                }
+                enemy.GetComponent<Tank>().InitializeAim(toEnemy);
             }
         }
 
@@ -754,7 +769,6 @@ namespace Completed
                 //doorScript = placeNorthWall.GetComponentsInChildren<Transform>()[1].GetComponent<Gate>();
                 doorScript = placeNorthWall.GetComponentInChildren<Gate>();
                 doorScript.parentRoomScript = this;
-                doorScript.done();
                 // Place light.
                 GameObject northWallLight = new GameObject();
                 northWallLight.name = "NorthLight";
@@ -787,7 +801,6 @@ namespace Completed
                 m_doors[1] = placeEastWall.GetComponentsInChildren<Transform>()[1];
                 doorScript = placeEastWall.GetComponentsInChildren<Transform>()[1].GetComponent<Gate>();
                 doorScript.parentRoomScript = this;
-                doorScript.done();
                 // Place light.
                 GameObject northEastLight = new GameObject();
                 northEastLight.name = "EastLight";
@@ -819,7 +832,6 @@ namespace Completed
                 m_doors[2] = placeWestWall.GetComponentsInChildren<Transform>()[1];
                 doorScript = placeWestWall.GetComponentsInChildren<Transform>()[1].GetComponent<Gate>();
                 doorScript.parentRoomScript = this;
-                doorScript.done();
                 // Place light.
                 GameObject westWallLight = new GameObject();
                 westWallLight.name = "WestLight";
@@ -851,7 +863,6 @@ namespace Completed
                 m_doors[3] = placeSouthWall.GetComponentsInChildren<Transform>()[1];
                 doorScript = placeSouthWall.GetComponentsInChildren<Transform>()[1].GetComponent<Gate>();
                 doorScript.parentRoomScript = this;
-                doorScript.done();
                 // Place light.
                 GameObject southWallLight = new GameObject();
                 southWallLight.name = "SouthLight";
@@ -872,6 +883,7 @@ namespace Completed
                 placeSouthWall.tag = wallTag;
             }
         }
+        
 
         // Creates an obstacle course after the room is set up.
         public void CreateObstacleCourse()
@@ -1088,10 +1100,10 @@ namespace Completed
             lock(enemyCounterLock)
             {
                 enemyCount--;
-
-                if (enemyCount == 0)
+                
+                if (enemyCount == 0 && levelScript.playersAlive())
                 {
-                    StartCoroutine(endBattle());
+                    endBattle();
                 }
             }
         }
@@ -1112,7 +1124,7 @@ namespace Completed
                 StartCoroutine(materializeRoom());
 
                 // Set the camera's battling variable to true;
-                m_camera.GetComponent<CameraControl>().battling = true;
+                m_camera.GetComponent<CameraControl>().startBattleCamera(transform);
 
                 // Update the GUI.
                 updateGUIMiniMap();
@@ -1140,6 +1152,11 @@ namespace Completed
             }
         }
 
+        public void entered()
+        {
+            m_camera.GetComponent<CameraControl>().RoomEntered(transform);
+        }
+
 
         private IEnumerator endBattleLastRoom()
         {
@@ -1147,9 +1164,10 @@ namespace Completed
             //TODO: should play ending audio (special audio for last room)
 
             // Wait for camera to stop shaking.
-            yield return m_camera.GetComponent<CameraControl>().shakeCamera();
+            //yield return m_camera.GetComponent<CameraControl>().shakeCamera();
             // Set the camera's battling variable to false;
-            m_camera.GetComponent<CameraControl>().battling = false;
+            yield return new WaitForSeconds(.05f);
+            m_camera.GetComponent<CameraControl>().startBattleCamera(transform);
 
             //TODO: make roomIdle obsolete
             roomIdle = true;
@@ -1164,7 +1182,7 @@ namespace Completed
 
         // Function called when enemyCount == 0.
         //TODO: leave marks of where blocks were
-        private IEnumerator endBattle()
+        private void endBattle()
         {
             // Remove projectiles from the player and put them into their animation.
             removeProjectiles();
@@ -1180,12 +1198,16 @@ namespace Completed
             removeDoors();
             removeObstacles();
             StartCoroutine(FlickerLights());
+
             //TODO: should play ending audio
-            
+
             // Wait for camera to stop shaking.
+            StartCoroutine(m_camera.GetComponent<CameraControl>().endBattleCamera());
+
+                /*
             yield return m_camera.GetComponent<CameraControl>().shakeCamera();
             // Set the camera's battling variable to false;
-            m_camera.GetComponent<CameraControl>().battling = false;
+            m_camera.GetComponent<CameraControl>().battling = false;*/
 
             // Undisable shooting.
             if (player1) player1.GetComponent<TankPlayer>().disableShoot(false);
@@ -1237,19 +1259,19 @@ namespace Completed
                     {
                         if (door == 0)
                         {
-                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[3].GetComponent<Gate>().boundary.enabled = false;
+                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[3].GetComponent<Gate>().triggerBoundary.enabled = false;
                         }
                         if (door == 1)
                         {
-                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[2].GetComponent<Gate>().boundary.enabled = false;
+                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[2].GetComponent<Gate>().triggerBoundary.enabled = false;
                         }
                         if (door == 2)
                         {
-                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[1].GetComponent<Gate>().boundary.enabled = false;
+                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[1].GetComponent<Gate>().triggerBoundary.enabled = false;
                         }
                         if (door == 3)
                         {
-                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[0].GetComponent<Gate>().boundary.enabled = false;
+                            NEWSRoom[door].GetComponent<RoomManager>().m_doors[0].GetComponent<Gate>().triggerBoundary.enabled = false;
                         }
                     }
                 }

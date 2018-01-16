@@ -84,10 +84,10 @@ public class TestManager : MonoBehaviour {
             t.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
 
             // Set the tags.
-            if (t.GetComponent<TankEnemy>())
+            if (t.GetComponent<Tank>())
             {
-                t.GetComponent<TankEnemy>().teamName = teamBName;
-                t.GetComponent<TankEnemy>().enemyTeamName = teamAName;
+                t.GetComponent<Tank>().teamName = teamBName;
+                t.GetComponent<Tank>().enemyTeamName = teamAName;
             }
         }
     }

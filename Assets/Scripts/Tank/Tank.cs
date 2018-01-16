@@ -18,7 +18,7 @@ abstract public class Tank : MonoBehaviour {
     public bool testEnvironment = false;        // Bool to represent if the tank is in a test environment.
     public string teamName;
     public string enemyTeamName;
-    protected BoxCollider hitbox;               // Reference to the box collider in the body of the tank.
+    protected CapsuleCollider hitbox;           // Reference to the box collider in the body of the tank.
 
 
     protected Vector3 velocity;                 // The velocity of the tank, kept track of for ai.
@@ -26,11 +26,12 @@ abstract public class Tank : MonoBehaviour {
     protected float m_RotateSpeed = 6f;         // How fast the tank body rotates.
     protected Vector3 m_CurrentDirection;       // The current direction the tank points.
     protected Rigidbody m_RidgidbodyTank;       // Reference used to move the tank.
-    protected Rigidbody m_RigidbodyTower;       // Reference used to move the tank tower. 
+    protected Rigidbody m_RidgidbodyTower;      // Reference used to move the tank tower. 
     protected Rigidbody m_RidgidbodyBody;       // Reference used to move the tank body.
     public GameObject projectile;               // The GameObject of the projectile.
-    protected Transform tower;                  // The transform of the tower; the child of tank.
+    public Transform tower;                     // The transform of the tower; the child of tank.
     public Transform body;                      // The transform of the body; the child of tank.
+    public Transform collider;
     //private float m_OriginalPitch;            // TODO: The pitch of the audio source at the start of the scene.
     protected Transform m_ProjectileSpawnPoint; // The point the projectile spawns relative to the tower.
     protected string projectileTag = "Projectile";// String to apply the tag on horizontal walls.
@@ -48,6 +49,8 @@ abstract public class Tank : MonoBehaviour {
     protected void Awake()
     {
         m_RidgidbodyTank = GetComponent<Rigidbody>();
+        //m_RidgidbodyBody = body.GetComponent<Rigidbody>();
+        //m_RidgidbodyTower = tower.GetComponent<Rigidbody>();
 
         // Load in the tank colors being used from the Resources folder in assets.
         // This needs to be called early so that it is instantiated before GUI_HUD.
@@ -82,14 +85,11 @@ abstract public class Tank : MonoBehaviour {
         // Get the children of tank; body and tower.
         body = this.gameObject.transform.GetChild(0);
         tower = this.gameObject.transform.GetChild(1);
+        collider = this.gameObject.transform.GetChild(2);
         m_ProjectileSpawnPoint = tower.GetChild(3);
 
         // Get the reference to the hitbox.
-        hitbox = body.GetComponent<BoxCollider>();
-
-        // Load in the projectile being used from the Resources folder in assets.
-        //projectile = Resources.Load("TankResources/Projectile/Shell") as GameObject;
-        //projectile = Resources.Load("TankResource/Projectile/Shell") as GameObject;
+        hitbox = collider.GetComponent<CapsuleCollider>();
 
         // Store the original pitch of the audio source.
         //m_OriginalPitch = m_MovementAudio.pitch;
@@ -200,5 +200,32 @@ abstract public class Tank : MonoBehaviour {
     public void SetLeftoverProjectileHolder(Transform holder)
     {
         leftoverProjectileHolder = holder;
+    }
+
+    // Sets the tower to a random compass direction.
+    public void InitializeRandomAim()
+    {
+        List<Quaternion> possibleStartAims = new List<Quaternion>()
+        {
+            Quaternion.LookRotation(Vector3.forward),
+            Quaternion.LookRotation(Vector3.left),
+            Quaternion.LookRotation(Vector3.back),
+            Quaternion.LookRotation(Vector3.right)
+        };
+        tower.rotation = possibleStartAims[Random.Range(0, possibleStartAims.Count)];
+    }
+
+    // Sets the tower to a compass direction closest towards the input vector.
+    public void InitializeAim(Vector3 toEnemy)
+    {
+        if (Mathf.Abs(toEnemy.x) > Mathf.Abs(toEnemy.z))
+        {
+            toEnemy.z = 0;
+        }
+        else
+        {
+            toEnemy.x = 0;
+        }
+        tower.rotation = Quaternion.LookRotation(toEnemy);
     }
 }

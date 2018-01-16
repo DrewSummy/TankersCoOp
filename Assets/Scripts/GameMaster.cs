@@ -98,12 +98,22 @@ public class GameMaster : MonoBehaviour
     private void displaymenuGUI()
     {
         camera.SetActive(false);
+        //menu.SetActive(true);
+        //menuGUI.gameObject.SetActive(true);
+        menuGUI.initialDisplay();
+
+        controllerGUI.enabled = true;
+    }
+    /*
+    private IEnumerator displaymenuGUI2()
+    {
+        camera.SetActive(false);
         menu.SetActive(true);
         menuGUI.gameObject.SetActive(true);
         menuGUI.initialDisplay();
 
         controllerGUI.enabled = true;
-    }
+    }*/
 
     // Initializes the game for the first level.
     public void CreateSoloGame()

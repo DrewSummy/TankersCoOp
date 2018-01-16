@@ -52,13 +52,11 @@ namespace Completed
         private Coroutine lower;
 
 
-        // Use this for initialization
+        // Use this for initializing the logo and menu.
         public void initialDisplay()
         {
             // Display the logo and then the menu in this coroutine.
             StartCoroutine(initialDisplayHelper());
-
-            active = true;
         }
 
         // Helper so that the menu doesn't begin until the logo finishes.
@@ -67,6 +65,7 @@ namespace Completed
             yield return displayLogo();
             displayMenu();
             yield return fadeFromBlack();
+            active = true;
         }
 
         // Displays the logo.

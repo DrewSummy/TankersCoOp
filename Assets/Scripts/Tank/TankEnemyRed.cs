@@ -29,9 +29,11 @@ public class TankEnemyRed : TankEnemy
     protected override void resetVariables()
     {
         // Shooting variables
-        fireFreqFight = .35f;
+        fireFreqFight = .25f;
+        fireFreqExplore = .85f;
 
         // Driving variables
+        m_Speed = 10f;
         m_RotateSpeed = 5f;
         turningTimeMax = 2.5f;
         turningTimeMin = .5f;
@@ -64,6 +66,9 @@ public class TankEnemyRed : TankEnemy
                 case State.FIGHT:
                     Fight();
                     break;
+                case State.IDLE:
+                    Idle();
+                    break;
             }
             yield return null;
         }
@@ -83,6 +88,7 @@ public class TankEnemyRed : TankEnemy
     */
     protected void Aggressive()
     {
+        //Debug.Log(targetDirectionAim);
         driveAggressive();
         fireBurst();
 
@@ -104,7 +110,7 @@ public class TankEnemyRed : TankEnemy
         // Set variables
         canFire = true;
         fireFreq = fireBurstFreq;
-        targetDirectionAim = vectorTowardTarget;
+        targetDirectionAim = Vector3.Normalize(vectorTowardTarget);
     }
     protected void setToAggressiveNoCD()
     {
@@ -116,8 +122,7 @@ public class TankEnemyRed : TankEnemy
     private void aggressiveCS()
     {
         // Drive toward targetDirection if farther than fightDistance from player1.
-
-        if (Vector3.Distance(transform.position, player1.transform.position) < fightDistance)
+        if (Vector3.Distance(transform.position, targetTank.transform.position) < fightDistance)
         {
             setToFight();
         }
@@ -144,7 +149,7 @@ public class TankEnemyRed : TankEnemy
         float step = towerRotateSpeed * Time.deltaTime;
         Vector3 newDir = Vector3.RotateTowards(tower.forward, -targetDirectionAim, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
-
+        
         if (tower.forward == -targetDirectionAim && canFire)
         {
             Fire();
@@ -269,7 +274,6 @@ public class TankEnemyRed : TankEnemy
     }
     protected override void fightCS()
     {
-        
         if (!isFightDistance())
         {
             setToExplore();

@@ -57,6 +57,8 @@ namespace Completed
         public GameObject player1;                                               // Reference to the player 1 game object.
         public GameObject player2;
         private int playersLeft;
+        private Color colorMain;
+        private Color colorAccent;
 
         public GameMaster GM;
         private GameObject levelHolder;
@@ -305,6 +307,29 @@ namespace Completed
             }
         }
 
+        // Retrieves the main and accent colors using the level.
+        private void SetColors()
+        {
+            // Retrieve the colors and if main and accent are null, select random colors.
+            string fileLoc = "Prefab/GameObjectPrefab/Room/RoomColors/" + Level.ToString();
+            if (Resources.Load(fileLoc + "/main") as Material)
+            {
+                colorMain = (Resources.Load(fileLoc + "/main") as Material).color;
+            }
+            else
+            {
+                colorMain = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+            }
+            if (Resources.Load(fileLoc + "/accent"))
+            {
+                colorAccent = (Resources.Load(fileLoc + "/accent") as Material).color;
+            }
+            else
+            {
+                colorAccent = Random.ColorHSV(1f, 1f, 1f, 1f, 0.5f, 1f);
+            }
+        }
+
         // Sets up each room dependent on floorChart.
         private void SetUpFloor(int level)
         {
@@ -502,6 +527,9 @@ namespace Completed
             // Reset our list of spawn positions and clear floorChart.
             InitializeList();
 
+            // Get the main and accent color from resources depending on the level.
+            SetColors();
+
             // Sets up each room dependent on floorChart.
             SetUpFloor(level);
             
@@ -533,7 +561,8 @@ namespace Completed
             {
                 m_camera.GetComponent<CameraControl>().m_Player2 = player2;
             }
-            m_camera.GetComponent<CameraControl>().PlaceOnFirstRoom(firstRoomCoordinate);
+            //m_camera.GetComponent<CameraControl>().PlaceOnFirstRoom(firstRoomCoordinate);
+            m_camera.GetComponent<CameraControl>().PlaceOnFirstRoom(firstRoom);
 
             //TODO:fade from black to start
             StartCoroutine(fadeFromBlack());
@@ -578,6 +607,10 @@ namespace Completed
                 gameOver();
             }
         }
+        public bool playersAlive()
+        {
+            return (playersLeft > 0);
+        }
 
         // Resets the player count when
         public void resetPlayers()
@@ -607,7 +640,7 @@ namespace Completed
         {
             //TODO: this should also create some GUI and disable pause
             Debug.Log("GameOver");
-            m_camera.GetComponent<CameraControl>().gameOver = true;
+            m_camera.GetComponent<CameraControl>().gameOverCamera();
             
             currentRoom.GetComponent<RoomManager>().endRoom();
         }

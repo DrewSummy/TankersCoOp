@@ -17,21 +17,21 @@ namespace Completed
         private Vector3 originalPos;            // The original position of the gate.
         private Quaternion originalRot;         // The original rotation of the gate.
         public Transform gate;                  // Reference to the gate transform.
-        public BoxCollider boundary;            // Reference to the boundary for triggering the gate.
+        public BoxCollider triggerBoundary;     // Reference to the wall boundary.
+        public BoxCollider wall;                // Reference to the wall boundary before the room is completed.
+        public BoxCollider wallA;               // Reference to the wall boundary once the room is completed.
+        public BoxCollider wallB;               // Reference to the wall boundary once the room is completed.
         public bool triggered = false;          // Boolean for whether the gate was triggered.
-        private bool lastRoomAudioBool;         // Boolean for whether this is a gate of the last room.
 
-        public void done()
-        {
-            //Debug.Log(parentRoomScript);
-        }
-        
+        private bool lastRoomAudioBool;         // Boolean for whether this is a gate of the last room.
+        private float speed = 40f;              // The speed the gate shakes at on lowering.
+        private float amount = .08f;            // The distance the gate shakes at on lowering.
+
+
         private void Awake()
         {
             gate = GetComponent<Transform>();
             gateAudioSource = GetComponent<AudioSource>();
-            
-            boundary = gate.GetComponentsInChildren<BoxCollider>()[0];//[1];
         }
 
         private void Start()
@@ -48,10 +48,7 @@ namespace Completed
         // Lowers a door slowly.
         public IEnumerator lowerDoorSlow()
         {
-            // How fast it shakes.
-            float speed = 40f;
-            // How much it shakes.
-            float amount = .08f;
+            endRoomColliders();
 
             if (!audioPlayed)
             {
@@ -80,6 +77,8 @@ namespace Completed
         // Lowers a door quickly.
         public IEnumerator lowerDoorFast()
         {
+            endRoomColliders();
+
             float speed = 40f; // How fast it shakes.
             float amount = .08f; // How much it shakes.
 
@@ -111,13 +110,13 @@ namespace Completed
         // Lowers the last room's door.
         public void lowerDoorLastRoom()
         {
-            boundary.enabled = false;
+            endRoomColliders();
+
             // Play the last room audio, then lower the door slowly.
             if (lastRoomAudioBool)
             {
                 if (!audioPlayed)
                 {
-                    boundary.enabled = false;
                     gateAudioSource.clip = lastRoomAudio;
                     gateAudioSource.Play();
                     audioPlayed = true;
@@ -133,8 +132,18 @@ namespace Completed
             StartCoroutine(lowerDoorSlow());
         }
 
+        // Change the box colliders of the walls when the room is complete.
+        private void endRoomColliders()
+        {
+            triggerBoundary.enabled = false;
+            wall.enabled = false;
+            wallA.enabled = true;
+            wallB.enabled = true;
+        }
+
         protected void OnCollisionEnter(Collision collisionInfo)
         {
+            Debug.Log("hmm");
             // The object has collided with another projectile.
             if (collisionInfo.transform.tag == "Player")
             {
@@ -143,6 +152,8 @@ namespace Completed
                     //TODO: comment this out and test
                     //triggered = true;
                     //boundary.enabled = false;
+                    Debug.Log("room is entered");
+                    parentRoomScript.entered();
                 }
                 else
                 {
@@ -170,5 +181,6 @@ namespace Completed
                 }
             }
         }
+        ///////////////////////////FIND OUT WHEN A ROOM IS ENTERED
     }
 }
