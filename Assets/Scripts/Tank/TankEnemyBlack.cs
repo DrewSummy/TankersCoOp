@@ -5,11 +5,6 @@ using Random = UnityEngine.Random;
 
 public class TankEnemyBlack : TankEnemy
 {
-    /// <summary>
-    /// //////////////////////////////////////////////////
-    /// Change trackPlayer to keep track of the closest viewable player
-    /// </summary>
-
     // General variables
     List<Vector3> hitAngles = new List<Vector3>();
     List<float> hitWeights = new List<float>();
@@ -59,7 +54,7 @@ public class TankEnemyBlack : TankEnemy
     protected new void Start()
     {
         base.Start();
-
+        
         // The FSM begins on Evade.
         setToSearch();
     }
@@ -101,6 +96,7 @@ public class TankEnemyBlack : TankEnemy
     {
         while (alive)
         {
+            Debug.Log(state);
             trackPlayer();
             switch (state)
             {

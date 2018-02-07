@@ -135,7 +135,10 @@ public class GameMaster : MonoBehaviour
     {
         // Place the players.
         PlacePlayers();
-        
+
+        // Place camera.
+        camera.SetActive(true);
+
         // Prepare the GUIs.
         prepareGUIs();
 
@@ -155,7 +158,7 @@ public class GameMaster : MonoBehaviour
         //displaymenuGUI();
 
         startGame();
-        //camera.SetActive(true);
+        camera.SetActive(true);
     }
 
     private void clearGame()
@@ -180,7 +183,7 @@ public class GameMaster : MonoBehaviour
         menuGUI.gameObject.SetActive(false);
         HUDGUI.enableHUD();
         pauseGUI.enablePause();
-        camera.SetActive(true);
+        //camera.SetActive(true);
     }
 
     // Helper for CreateSoloGame().

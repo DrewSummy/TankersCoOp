@@ -1079,6 +1079,7 @@ namespace Completed
         }
 
 
+
         private void updateGUIMiniMap()
         {
             GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().visitedRoom(coordinate);
@@ -1135,16 +1136,12 @@ namespace Completed
                 levelScript.currentRoom = transform;
             }
         }
-
-        //TODO: how to properly run RoomManager
-        // call startBeginningBattle() [rename to startBattle]
-        // have a function enemyDead(this) called by enemyTanks
-        // in function if enemyCount == 0, call endBattle
-        // endbattle should be one function with coroutines
-
+        
         // Called by LevelManager when the game is over due to player loss
         public void endRoom()
         {
+            removeProjectiles();
+
             // Set every tank to do nothing.
             foreach (Transform enemy in enemyHolder)
             {
@@ -1167,7 +1164,9 @@ namespace Completed
             //yield return m_camera.GetComponent<CameraControl>().shakeCamera();
             // Set the camera's battling variable to false;
             yield return new WaitForSeconds(.05f);
-            m_camera.GetComponent<CameraControl>().startBattleCamera(transform);
+            //m_camera.GetComponent<CameraControl>().startBattleCamera(transform);
+            m_camera.GetComponent<CameraControl>().endBattleCamera();
+            
 
             //TODO: make roomIdle obsolete
             roomIdle = true;
@@ -1203,11 +1202,7 @@ namespace Completed
 
             // Wait for camera to stop shaking.
             StartCoroutine(m_camera.GetComponent<CameraControl>().endBattleCamera());
-
-                /*
-            yield return m_camera.GetComponent<CameraControl>().shakeCamera();
-            // Set the camera's battling variable to false;
-            m_camera.GetComponent<CameraControl>().battling = false;*/
+            
 
             // Undisable shooting.
             if (player1) player1.GetComponent<TankPlayer>().disableShoot(false);

@@ -8,7 +8,7 @@ namespace Completed
         public Transform background;
         public GameObject m_Player1;                   // Reference to the player's transform.
         public GameObject m_Player2;                   // Reference to the player's transform.
-        public Transform camera;
+        public new Transform camera;
 
 
         public Transform targetRoom;
@@ -22,16 +22,18 @@ namespace Completed
         private Vector3 m_cameraAngle = new Vector3(80, 0, 0);
         private Vector3 cameraOffset = Vector3.Normalize(new Vector3(0, 22, -1));
         private Vector3 lookOffset = new Vector3(0, 0, -25);
-        //private Vector3 cameraOffset = new Vector3(0, 0, -4);
         private float patrolOffset = 55;
         private float battleOffset = 42;
         private float deadOffset = 70;
 
         private float cameraSpeedMinimum = 45;
-        private float cameraSpeedEnding = 5;
+        //private float cameraSpeedEnding = 5;
 
         private float shakeRadius = .25f;
         private float shakeTime = 1f;
+
+        public Color colorMain;
+        public Color colorAccent;
 
         // State Variables
         private enum State
@@ -43,13 +45,29 @@ namespace Completed
         }
         
         private State state;
-
+        
         void Start()
         {
-            //background.gameObject.SetActive(true);
+            //Initialize();
+            //placeBackground();
 
             state = CameraControl.State.BATTLE;
             StartCoroutine(FSM());
+        }
+
+        public void Initialize(Transform room)
+        {
+            placeBackground();
+            PlaceOnRoom(room);
+
+            state = CameraControl.State.BATTLE;
+            StartCoroutine(FSM());
+        }
+
+        private void placeBackground()
+        {
+            background.gameObject.SetActive(true);
+            background.GetComponent<BackgroundWave>().Initialize(colorMain, colorAccent);
         }
 
 
@@ -58,14 +76,15 @@ namespace Completed
         {
             while (true)
             {
-                Debug.Log(state);
                 switch (state)
                 {
                     case State.PATROL:
+                        TrackPlayer();
                         Patrol();
                         break;
                     case State.BATTLE:
-                        //Battle();
+                        TrackPlayer();
+                        Battle();
                         break;
                     case State.GAMEOVER:
                         GameOverZoom();
@@ -78,7 +97,17 @@ namespace Completed
             }
         }
         
-
+        private void TrackPlayer()
+        {
+            if (m_Player1)
+            {
+                m_target = new Vector3(Mathf.Floor((m_Player1.transform.position.x + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2,
+                        0,
+                        Mathf.Floor((m_Player1.transform.position.z + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2);
+                float step = Mathf.Max(Vector3.Distance(transform.position, m_target), cameraSpeedMinimum) * Time.deltaTime;
+                transform.position = Vector3.MoveTowards(transform.position, m_target, step);
+            }
+        }
         private void Patrol()
         {
             Vector3 targetPos = patrolOffset * cameraOffset;
@@ -90,10 +119,14 @@ namespace Completed
 
         private void Battle()
         {
-            /*Vector3 targetPos = battleOffset * m_cameraAngle - camera.forward * 15 + cameraOffset;
-            Debug.Log(targetPos);
-            float step = Mathf.Max(Vector3.Distance(camera.transform.position, battleOffset * m_cameraAngle), cameraSpeedMinimum) * Time.deltaTime;
-            camera.transform.position = Vector3.MoveTowards(camera.transform.position, targetPos, step);*/
+            if (transform.position == m_target)
+            {
+                Vector3 targetPos = battleOffset * cameraOffset;
+                float step = Mathf.Max(Vector3.Distance(camera.transform.localPosition, targetPos), cameraSpeedMinimum) * Time.deltaTime;
+                camera.transform.localPosition = Vector3.MoveTowards(camera.transform.localPosition, targetPos, step);
+            }
+
+            camera.LookAt(transform);
         }
 
         private void GameOverZoom()
@@ -113,23 +146,12 @@ namespace Completed
 
         public void PlaceOnFirstRoom(Transform firstRoom)
         {
-            //TODO: place player first
-            /*m_target = firstRoom.position + centerOfRoom;
-            Debug.Log(m_target);
-            Debug.Log(centerOfRoom);
-
-            trackPlayer();
-            camera.transform.localPosition = -camera.forward * battleOffset + cameraOffset;
-
-            transform.position = m_target;
-            transform.position = firstRoom.position;*/
             PlaceOnRoom(firstRoom);
         }
         private void PlaceOnRoom(Transform room)
         {
             //TODO: this might need to switch to patrol
-            transform.position = room.position + centerOfRoom;
-            camera.transform.localPosition = battleOffset * cameraOffset;
+            //camera.transform.localPosition = battleOffset * cameraOffset;
 
             camera.LookAt(transform);
         }
@@ -158,16 +180,14 @@ namespace Completed
         public void startBattleCamera(Transform battleRoom)
         {
             state = CameraControl.State.BATTLE;
-            Debug.Log("camera battle start");
 
-            PlaceOnRoom(battleRoom);
+            //PlaceOnRoom(battleRoom);
             //background.GetComponent<BackgroundWave>().activateMatch(true);
         }
 
         public IEnumerator endBattleCamera()
         {
             state = CameraControl.State.PATROL;
-            Debug.Log("camera battle end");
 
             //yield return shakeCamera();
             yield return new WaitForSeconds(.05f);

@@ -19,25 +19,72 @@ public class BackgroundWave : MonoBehaviour
     private float delta = 2.5f;
     private float planeHeightUp = 4;
     private float planeHeightDown = -1;
-    private float platformSpeed = .05f;
+    private float platformSpeed = .25f;
     private float colorVar = .5f;
     private float accentProb = .005f;
+
+    public bool up = false;
+    public bool down = false;
 
 
     void Start()
     {
+        chaosHolder.gameObject.SetActive(true);
+        normalHolder.gameObject.SetActive(false);
+
+        Debug.Log(normalHolder.childCount);
+        for (int i = 0; i < normalHolder.childCount; i++)
+        {
+            normalCubes.Add(normalHolder.GetChild(i).gameObject);
+        }
+        for (int i = 0; i < chaosHolder.childCount; i++)
+        {
+            chaosCubes.Add(chaosHolder.GetChild(i).gameObject);
+        }
+
+
+        //PlaceObjects();
+        Debug.Log("start");
+    }
+
+    private void Update()
+    {
+        if (up)
+        {
+            //StartCoroutine(raisePlane());
+            activateMatch(true);
+            up = false;
+        }
+        if (down)
+        {
+            //StartCoroutine(lowerPlane());
+            activateMatch(false);
+            down = false;
+        }
+    }
+
+    public void Initialize(Color setColorMain, Color setColorAccent)
+    {
         //chaosHolder.gameObject.SetActive(true);
         //normalHolder.gameObject.SetActive(false);
 
-        //PlaceObjects();
-        //assignColors(Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f), Color.white);
+        for (int i = 0; i < normalHolder.childCount; i++)
+        {
+            normalCubes.Add(normalHolder.GetChild(i).gameObject);
+        }
+        for (int i = 0; i < chaosHolder.childCount; i++)
+        {
+            chaosCubes.Add(chaosHolder.GetChild(i).gameObject);
+        }
 
-        //activateMatch(true);
+        //PlaceObjects();
+        assignColors(setColorMain, setColorAccent);
     }
 
     private void PlaceObjects()
     {
         bool odd = true;
+
         for (float x = -xLength / 2; x < xLength / 2; x += delta)
         {
             // Stagger the odd rows.
@@ -56,7 +103,7 @@ public class BackgroundWave : MonoBehaviour
             for (float y = -yLength / 2; y < yLength / 2; y += delta)
             {
                 // Add to the normal transform.
-                Vector3 pos = new Vector3(x, 0, y) + transform.position + stagger;
+                Vector3 pos = new Vector3(x, 0, y) + transform.localPosition + stagger;
                 GameObject n = Instantiate(cube, pos, Quaternion.identity, normalHolder);
                 n.transform.position = pos;
                 n.transform.eulerAngles = new Vector3(45, 45, 45);
@@ -127,6 +174,7 @@ public class BackgroundWave : MonoBehaviour
     }
     private IEnumerator raisePlane()
     {
+        Debug.Log("plane raising");
         float time = 0;
         while (plane.transform.localPosition.y < planeHeightUp)
         {
@@ -139,6 +187,7 @@ public class BackgroundWave : MonoBehaviour
     }
     private IEnumerator lowerPlane()
     {
+        Debug.Log("plane lowering");
         float time = 0;
         while (plane.transform.localPosition.y > planeHeightDown)
         {
@@ -147,5 +196,6 @@ public class BackgroundWave : MonoBehaviour
             yield return new WaitForSeconds(.01f);
             time += .01f;
         }
+        Debug.Log("plane lowered");
     }
 }

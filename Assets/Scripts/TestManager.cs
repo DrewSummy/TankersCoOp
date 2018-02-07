@@ -18,6 +18,8 @@ public class TestManager : MonoBehaviour {
     private string teamAName = "A";
     private string teamBName = "B";
     public GUI_HUD HUDGUI;
+    
+    public Transform background;
 
     // Use this for initialization
     void Start()
@@ -33,6 +35,8 @@ public class TestManager : MonoBehaviour {
         EnableTanks();
 
         HUDGUI.enableHUD();
+
+        fakeCamera();
     }
 
     // Initialize the tank instances and add them to the correct lists.
@@ -173,5 +177,12 @@ public class TestManager : MonoBehaviour {
                 //tempTanks[tank].GetComponent<Tank>().teamName = playerTeamName;
             }
         }
+    }
+
+    private void fakeCamera()
+    {
+        background.gameObject.SetActive(true);
+        background.GetComponent<BackgroundWave>().Initialize(Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f), Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f));
+        background.GetComponent<BackgroundWave>().activateMatch(true);
     }
 }

@@ -34,9 +34,9 @@ public class ProjectilePlayer : Projectile
     {
         base.RemoveProjectile();
 
-        {
-            parentTank.GetComponent<Tank>().increaseProjCount();
-        }
+
+        parentTank.GetComponent<Tank>().increaseProjCount();
+
         GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
     }
 
@@ -45,9 +45,9 @@ public class ProjectilePlayer : Projectile
     {
         base.DisableProjectile();
 
-        {
-            parentTank.GetComponent<Tank>().increaseProjCount();
-        }
+
+        parentTank.GetComponent<Tank>().increaseProjCount();
+
         GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
     }
 }

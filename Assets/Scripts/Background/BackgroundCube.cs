@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class BackgroundCube : MonoBehaviour
 {
-    private float time;
-    private Vector3 startPos;
-    private float amplitude = .5f;
+    protected float time;
+    protected Vector3 startPos;
+    protected float amplitude = .5f;
 
     public float freq = Mathf.PI;
     public float vOffset = 0;
@@ -19,9 +19,8 @@ public class BackgroundCube : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        //startPos = transform.position;
         startPos = transform.localPosition;
-        transform.LookAt(Quaternion.Euler(45, 45, 0) * Vector3.forward);
+        //transform.LookAt(Quaternion.Euler(45, 45, 0) * Vector3.forward);
     }
 
     // Update is called once per frame
@@ -32,7 +31,6 @@ public class BackgroundCube : MonoBehaviour
             time += Time.deltaTime;
             float magnitude = -amplitude * Mathf.Sin(time * freq + vOffset);
             Vector3 pos = startPos + Vector3.up * magnitude;
-            transform.position = pos;
             transform.localPosition = pos;
             
             transform.RotateAround(transform.position, Vector3.up, speed * Time.deltaTime);

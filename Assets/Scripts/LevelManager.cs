@@ -189,6 +189,7 @@ namespace Completed
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));
+            firstRoomCoordinate = new Vector2(0, 0);
             floorChart[(int)firstRoomCoordinate.x, (int)firstRoomCoordinate.y] = true;
 
 
@@ -319,6 +320,7 @@ namespace Completed
             else
             {
                 colorMain = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+                Debug.Log("no");
             }
             if (Resources.Load(fileLoc + "/accent"))
             {
@@ -544,7 +546,6 @@ namespace Completed
 
             // Set the first room coordinates.
             Transform firstRoom = roomGrid[(int)firstRoomCoordinate.x, (int)firstRoomCoordinate.y];
-            firstRoom.GetComponent<RoomManager>().startBeginningBattle();
             // Link the players to their room and eachother.
             player1.GetComponent<TankPlayer>().currentRoom = firstRoom.gameObject;
             if (coop)
@@ -553,19 +554,29 @@ namespace Completed
                 player2.GetComponent<TankPlayer>().teammate = player1.GetComponent<TankPlayer>();
                 player2.GetComponent<TankPlayer>().currentRoom = firstRoom.gameObject;
             }
+            m_camera.gameObject.SetActive(true);
+            // Pass the colors.
+            m_camera.GetComponent<CameraControl>().colorMain = colorMain;
+            m_camera.GetComponent<CameraControl>().colorAccent = colorAccent;
 
-            // Start the first room with the camera on it.
-            //TODO: redundantly setting camera's tanks
+            m_camera.GetComponent<CameraControl>().Initialize(firstRoom);
+            m_camera.GetComponent<CameraControl>().m_Player1 = player1;
+            m_camera.GetComponent<CameraControl>().m_Player2 = player2;
+
+            /*
+            // Set the players.
             m_camera.GetComponent<CameraControl>().m_Player1 = player1;
             if (coop)
             {
                 m_camera.GetComponent<CameraControl>().m_Player2 = player2;
             }
-            //m_camera.GetComponent<CameraControl>().PlaceOnFirstRoom(firstRoomCoordinate);
-            m_camera.GetComponent<CameraControl>().PlaceOnFirstRoom(firstRoom);
+            // Start the first room with the camera on it.
+            */
+            //m_camera.GetComponent<CameraControl>().PlaceOnFirstRoom(firstRoom);
 
             //TODO:fade from black to start
             StartCoroutine(fadeFromBlack());
+            firstRoom.GetComponent<RoomManager>().startBeginningBattle();
         }
         
         // Fade panel to black.

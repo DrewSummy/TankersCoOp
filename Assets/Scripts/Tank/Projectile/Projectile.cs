@@ -25,6 +25,10 @@ public class Projectile : MonoBehaviour
     private string enemyTag = "Enemy";
     private float offset = .25f;
 
+    // Remove projectile variables
+    private float horProjExplVel = 7;
+    private float vertProjExplVel = 9;
+    private float horProjExplTor = 5;
 
     protected void Awake()
     {
@@ -220,10 +224,8 @@ public class Projectile : MonoBehaviour
         disabled = true;
 
         // Add random force and torque to projectile.
-        //TODO: don't use magic numbers
-        ProjectileRigidbody.velocity = Vector3.zero;
-        ProjectileRigidbody.AddForce(new Vector3(Random.Range(1f, 5f), Random.Range(150f, 500f), Random.Range(1f, 5f)));
-        ProjectileRigidbody.AddTorque(new Vector3(Random.Range(1f, 5f), Random.Range(1f, 20f), Random.Range(1f, 5f)));
+        ProjectileRigidbody.velocity = new Vector3(Random.Range(-horProjExplVel, horProjExplVel), vertProjExplVel, Random.Range(-horProjExplVel, horProjExplVel));
+        ProjectileRigidbody.AddTorque(new Vector3(Random.Range(-horProjExplTor, horProjExplTor), Random.Range(-horProjExplTor, horProjExplTor), Random.Range(-horProjExplTor, horProjExplTor)));
 
         // Wait and destroy the projectile after a random amount of time between 4 and 5 seconds.
         // Or set to detonate on next collision.

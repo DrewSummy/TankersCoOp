@@ -18,7 +18,7 @@ abstract public class Tank : MonoBehaviour {
     public bool testEnvironment = false;        // Bool to represent if the tank is in a test environment.
     public string teamName;
     public string enemyTeamName;
-    protected CapsuleCollider hitbox;           // Reference to the box collider in the body of the tank.
+    protected BoxCollider hitbox;           // Reference to the box collider in the body of the tank.
 
 
     protected Vector3 velocity;                 // The velocity of the tank, kept track of for ai.
@@ -31,7 +31,6 @@ abstract public class Tank : MonoBehaviour {
     public GameObject projectile;               // The GameObject of the projectile.
     public Transform tower;                     // The transform of the tower; the child of tank.
     public Transform body;                      // The transform of the body; the child of tank.
-    public Transform collider;
     //private float m_OriginalPitch;            // TODO: The pitch of the audio source at the start of the scene.
     protected Transform m_ProjectileSpawnPoint; // The point the projectile spawns relative to the tower.
     protected string projectileTag = "Projectile";// String to apply the tag on horizontal walls.
@@ -85,11 +84,11 @@ abstract public class Tank : MonoBehaviour {
         // Get the children of tank; body and tower.
         body = this.gameObject.transform.GetChild(0);
         tower = this.gameObject.transform.GetChild(1);
-        collider = this.gameObject.transform.GetChild(2);
         m_ProjectileSpawnPoint = tower.GetChild(3);
 
         // Get the reference to the hitbox.
-        hitbox = collider.GetComponent<CapsuleCollider>();
+        //hitbox = collider.GetComponent<CapsuleCollider>();
+        hitbox = body.GetComponent<BoxCollider>();
 
         // Store the original pitch of the audio source.
         //m_OriginalPitch = m_MovementAudio.pitch;
