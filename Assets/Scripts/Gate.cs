@@ -143,7 +143,6 @@ namespace Completed
 
         protected void OnCollisionEnter(Collision collisionInfo)
         {
-            Debug.Log("hmm");
             // The object has collided with another projectile.
             if (collisionInfo.transform.tag == "Player")
             {

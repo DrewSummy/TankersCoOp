@@ -509,6 +509,8 @@ namespace Completed
         
         public void MapAndUnmap()
         {
+            Debug.Log("is selected");
+            Debug.Log(selected);
             if (!selected)
             {
                 placeFull();

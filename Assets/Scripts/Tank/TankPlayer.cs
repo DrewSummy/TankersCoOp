@@ -497,7 +497,7 @@ namespace Completed
             {
                 GetComponentsInChildren<MeshRenderer>()[i].enabled = true;
             }
-            GetComponent<BoxCollider>().enabled = true;
+            //GetComponent<BoxCollider>().enabled = true;
 
             alive = true;
             // Place in the center of the room the player was in.

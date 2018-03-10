@@ -33,6 +33,7 @@ flashing red UI image over entire canvas when player dies/loses
 
 
 idea:
+    add sillhouette to important objects with OutlineShader
     minigame: pushbattle where bullets don't kill they just push (damage multiplier dictates how far you get pushed)
     minigame: players get hit and a hole is placed where the player got hit so that the player would fall through
     minigame: race where bullets stun competitors
@@ -47,5 +48,7 @@ bugs:
     projectile corner: projectiles ricochet unpredictably against corners of obstacles even when the corner is right against another obstacle
 
 
-    give credit to https://github.com/daemon3000/InputManager/wiki/Getting-Started
+    give credit to:
+    https://github.com/daemon3000/InputManager/wiki/Getting-Started
+    https://www.youtube.com/watch?v=00qMZlacZQo https://github.com/Shrimpey/Outlined-Diffuse-Shader-Fixed/blob/master/CustomOutline.shader (sillhouette)
 */

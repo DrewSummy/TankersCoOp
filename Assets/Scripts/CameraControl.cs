@@ -10,7 +10,7 @@ namespace Completed
         public GameObject m_Player2;                   // Reference to the player's transform.
         public new Transform camera;
 
-
+        
         public Transform targetRoom;
         private Vector3 m_target;
 
@@ -182,7 +182,8 @@ namespace Completed
             state = CameraControl.State.BATTLE;
 
             //PlaceOnRoom(battleRoom);
-            //background.GetComponent<BackgroundWave>().activateMatch(true);
+            Debug.Log("background on");
+            background.GetComponent<BackgroundWave>().activateMatch(true);
         }
 
         public IEnumerator endBattleCamera()
@@ -191,7 +192,8 @@ namespace Completed
 
             //yield return shakeCamera();
             yield return new WaitForSeconds(.05f);
-            //background.GetComponent<BackgroundWave>().activateMatch(false);
+            Debug.Log("background off");
+            background.GetComponent<BackgroundWave>().activateMatch(false);
         }
 
         public void gameOverCamera()

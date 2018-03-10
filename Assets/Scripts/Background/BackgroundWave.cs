@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class BackgroundWave : MonoBehaviour
 {
+    private bool debug = true;                     // No animations that slow the game down.
+
     public Color colorMain = Color.blue;
     public Color colorAccent = Color.white;
     public GameObject cube;
@@ -14,6 +16,8 @@ public class BackgroundWave : MonoBehaviour
 
     private List<GameObject> normalCubes = new List<GameObject>();
     private List<GameObject> chaosCubes = new List<GameObject>();
+    private Coroutine currentAction;
+    public bool goingToFight;
     private float xLength = 200;
     private float yLength = 150;
     private float delta = 2.5f;
@@ -29,17 +33,20 @@ public class BackgroundWave : MonoBehaviour
 
     void Start()
     {
-        chaosHolder.gameObject.SetActive(true);
-        normalHolder.gameObject.SetActive(false);
+        if (!debug)
+        {
+            chaosHolder.gameObject.SetActive(true);
+            normalHolder.gameObject.SetActive(false);
+            plane.SetActive(true);
 
-        Debug.Log(normalHolder.childCount);
-        for (int i = 0; i < normalHolder.childCount; i++)
-        {
-            normalCubes.Add(normalHolder.GetChild(i).gameObject);
-        }
-        for (int i = 0; i < chaosHolder.childCount; i++)
-        {
-            chaosCubes.Add(chaosHolder.GetChild(i).gameObject);
+            for (int i = 0; i < normalHolder.childCount; i++)
+            {
+                normalCubes.Add(normalHolder.GetChild(i).gameObject);
+            }
+            for (int i = 0; i < chaosHolder.childCount; i++)
+            {
+                chaosCubes.Add(chaosHolder.GetChild(i).gameObject);
+            }
         }
 
 
@@ -49,6 +56,7 @@ public class BackgroundWave : MonoBehaviour
 
     private void Update()
     {
+        //Debug.Log(currentAction);
         if (up)
         {
             //StartCoroutine(raisePlane());
@@ -67,18 +75,20 @@ public class BackgroundWave : MonoBehaviour
     {
         //chaosHolder.gameObject.SetActive(true);
         //normalHolder.gameObject.SetActive(false);
-
-        for (int i = 0; i < normalHolder.childCount; i++)
+        if (!debug)
         {
-            normalCubes.Add(normalHolder.GetChild(i).gameObject);
-        }
-        for (int i = 0; i < chaosHolder.childCount; i++)
-        {
-            chaosCubes.Add(chaosHolder.GetChild(i).gameObject);
-        }
+            for (int i = 0; i < normalHolder.childCount; i++)
+            {
+                normalCubes.Add(normalHolder.GetChild(i).gameObject);
+            }
+            for (int i = 0; i < chaosHolder.childCount; i++)
+            {
+                chaosCubes.Add(chaosHolder.GetChild(i).gameObject);
+            }
 
-        //PlaceObjects();
-        assignColors(setColorMain, setColorAccent);
+            //PlaceObjects();
+            assignColors(setColorMain, setColorAccent);
+        }
     }
 
     private void PlaceObjects()
@@ -147,14 +157,22 @@ public class BackgroundWave : MonoBehaviour
     
     public void activateMatch(bool b)
     {
-        Debug.Log("1");
-        if (b)
+        if (!debug)
         {
-            StartCoroutine(activate());
-        }
-        else
-        {
-            StartCoroutine(deactivate());
+            goingToFight = b;
+            if (currentAction != null)
+            {
+                StopCoroutine(currentAction);
+            }
+            Debug.Log("1");
+            if (b)
+            {
+                currentAction = StartCoroutine(activate());
+            }
+            else
+            {
+                currentAction = StartCoroutine(deactivate());
+            }
         }
     }
 

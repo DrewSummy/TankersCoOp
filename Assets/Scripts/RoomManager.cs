@@ -31,7 +31,7 @@ namespace Completed
         private string wallTag = "Wall";
         private string blockRemovableTag = "BlockRemovable";
         private string enemyTeamName = "Enemy";                                  // The string to pass to all the AI tanks.
-        private string playerTeamName = "Player";                                 // The string to pass to all the AI tanks.
+        private string playerTeamName = "Player";                                // The string to pass to all the AI tanks.
         private Transform enemyHolder;                                           // A variable to store a reference to the transform of the enemy object.
         private Transform projectileHolder;                                      // A variable to store a reference to the transform of the projectile holder object.
         private Transform wallHolder;                                            // A variable to store a reference to the transform of the wall holder object.
@@ -1108,9 +1108,8 @@ namespace Completed
                 }
             }
         }
-
-        // replacement for startBeginningBattle
-        // the problem is player1's projectileHolder isn't set up yet
+        
+        // Places player and enemy tanks in the room and starts the battle.
         public void startBeginningBattle()
         {
             if (!roomCompleted & !battleEnsuing)
@@ -1126,7 +1125,7 @@ namespace Completed
 
                 // Set the camera's battling variable to true;
                 m_camera.GetComponent<CameraControl>().startBattleCamera(transform);
-
+                
                 // Update the GUI.
                 updateGUIMiniMap();
                 GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().movePlayer();
@@ -1197,6 +1196,11 @@ namespace Completed
             removeDoors();
             removeObstacles();
             StartCoroutine(FlickerLights());
+
+            // Set tanks as alive
+            Debug.Log(player1.gameObject.activeSelf);
+            Debug.Log(player2.gameObject.activeSelf);
+
 
             //TODO: should play ending audio
 
