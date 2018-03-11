@@ -30,6 +30,11 @@ public class Projectile : MonoBehaviour
     private float vertProjExplVel = 9;
     private float horProjExplTor = 5;
 
+    // To avoid double collision
+    private float collisionThreshhold = 0.5f;      // Amount of time the projectile doesn't collide after a collision.
+    private Coroutine collisionCoroutine;           // Don't receive collisions until this coroutine is over.
+    private bool activeCollision = true;
+
     protected void Awake()
     {
         // Use the rigidbody and calculate the projectileSpeedVector.
@@ -73,39 +78,51 @@ public class Projectile : MonoBehaviour
     }
 
     // Adds a smokeTrail object behind the projectile at start and every ricochet.
-    protected void setTrail()
+    protected virtual void setTrail()
     {
         currentTrail = Instantiate(smokeTrail) as GameObject;
         currentTrail.transform.SetParent(transform);
         currentTrail.transform.rotation = transform.rotation;
-        currentTrail.transform.position = transform.position + offset * currentTrail.transform.forward;// currentTrail.transform.rotation * offset;
+        currentTrail.transform.position = transform.position + offset * currentTrail.transform.forward;
         currentTrail.GetComponent<Rigidbody>().velocity = projectileSpeedVector;
         ParticleSystem.MainModule ps = currentTrail.GetComponent<ParticleSystem>().main;
         ps.simulationSpeed = projectileSpeed / 16;
     }
 
+    private IEnumerator noColliding()
+    {
+        //activeCollision = false;
+        //consider disabling GetComponent<Collider>()
+        yield return new WaitForSeconds(collisionThreshhold);
+        activeCollision = true;
+    }
 
     protected void OnCollisionEnter(Collision collisionInfo)
     {
-        // The object has collided with another projectile.
-        if (collisionInfo.transform.tag == projTag)
+        if (activeCollision)
         {
-            projectileCollision();
-        }
-        // The object has collided with a tank.
-        else if (collisionInfo.transform.tag == playerTag || collisionInfo.transform.tag == enemyTag)
-        {
-            tankCollision(collisionInfo);
-        }
-        // The object has collided the max amount of times.
-        else if (collisionCounter >= maxCollisions)
-        {
-            lastCollision();
-        }
-        // The object has more collisions and needs to rotate and continue.
-        else
-        {
-            wallCollision(collisionInfo);
+            StartCoroutine(noColliding());
+
+            // The object has collided with another projectile.
+            if (collisionInfo.transform.tag == projTag)
+            {
+                projectileCollision();
+            }
+            // The object has collided with a tank.
+            else if (collisionInfo.transform.tag == playerTag || collisionInfo.transform.tag == enemyTag)
+            {
+                tankCollision(collisionInfo);
+            }
+            // The object has collided the max amount of times.
+            else if (collisionCounter >= maxCollisions)
+            {
+                lastCollision();
+            }
+            // The object has more collisions and needs to rotate and continue.
+            else
+            {
+                wallCollision(collisionInfo);
+            }
         }
     }
 
@@ -142,7 +159,7 @@ public class Projectile : MonoBehaviour
     protected void wallCollision(Collision ci)
     {
         // A collsion has occured.
-        ++collisionCounter;
+        collisionCounter++;
 
         if (!disabled)
         {
@@ -159,8 +176,7 @@ public class Projectile : MonoBehaviour
 
             // The vector normal to the collision.
             Vector3 normalCollision = ci.contacts[0].normal;
-
-
+            
             // The vector the projectile reflects at.
             Vector3 newProjectileSpeedVector =
                 Vector3.Reflect(projectileSpeedVector, normalCollision);
@@ -168,7 +184,6 @@ public class Projectile : MonoBehaviour
             ProjectileRigidbody.transform.forward = -newProjectileSpeedVector;
             ProjectileRigidbody.velocity = newProjectileSpeedVector;
             projectileSpeedVector = ProjectileRigidbody.velocity;
-
 
             // Update the trail.
             setTrail();

@@ -182,7 +182,6 @@ namespace Completed
             state = CameraControl.State.BATTLE;
 
             //PlaceOnRoom(battleRoom);
-            Debug.Log("background on");
             background.GetComponent<BackgroundWave>().activateMatch(true);
         }
 
@@ -192,7 +191,6 @@ namespace Completed
 
             //yield return shakeCamera();
             yield return new WaitForSeconds(.05f);
-            Debug.Log("background off");
             background.GetComponent<BackgroundWave>().activateMatch(false);
         }
 

@@ -28,11 +28,11 @@ namespace Completed
         private string m_PauseName;                 // The name of the bool for pausing.
         private bool m_PauseValue;                  // The value of the bool for the pause.
         private Vector3 m_AimRotation;              // The target direction for the tower to point.
-        private bool m_SelectValue1;
-        private string m_SelectName;                 // The name of the bool for pausing.
+        private bool m_SelectValue;
+        private string m_SelectName;                // The name of the bool for pausing.
         private bool m_HasShot;                     // The boolean used to permit the tank to shoot once per trigger pull.
         private bool paused;                        // The boolean for if the game is paused.
-        private float joystickMagnitude1;           // The magnitude of the joystick for moving.
+        private float joystickMagnitude;            // The magnitude of the joystick for moving.
         public GUI_MiniMap miniMapGUI;
         public GUI_Pause pauseGUI;
 
@@ -69,7 +69,7 @@ namespace Completed
             m_LockValue = false;
             m_PauseValue = false;
 
-            m_SelectValue1 = false;
+            m_SelectValue = false;
 
 
             // Also reset the input values.
@@ -96,13 +96,13 @@ namespace Completed
             m_LockName = "Left Trigger";
             m_PauseName = "Start";
             m_SelectName = "Back";
-                        
+
             // Load in the projectile being used from the Resources folder in assets.
             //projectile = Resources.Load("TankResources/Projectile/ShellPlayer") as GameObject;
 
             // Tanks hasn't shot yet. This is used to allow semi-auto shooting.
             m_HasShot = false;
-            
+
             paused = false;
 
             // Make the size of the killCounter the amount of colors.
@@ -142,12 +142,12 @@ namespace Completed
         {
             // Store the value of the input axes while exculding deadzones.
             // Get magnitude of joysticks inputs.
-            joystickMagnitude1 = Mathf.Pow(InputManager.GetAxis(m_DriveVerticalName, PID), 2) + Mathf.Pow(InputManager.GetAxis(m_DriveHorizontalName, PID), 2);
+            joystickMagnitude = Mathf.Pow(InputManager.GetAxis(m_DriveVerticalName, PID), 2) + Mathf.Pow(InputManager.GetAxis(m_DriveHorizontalName, PID), 2);
             float joystickMagnitude2 = Mathf.Pow(InputManager.GetAxis(m_AimVerticalName, PID), 2) + Mathf.Pow(InputManager.GetAxis(m_AimHorizontalName, PID), 2);
 
             // Create a deadzone so that small values are discarded.
             // Driving.
-            if (joystickMagnitude1 < .1)
+            if (joystickMagnitude < .1)
             {
                 // This is in the deadzone.
                 m_DriveHorizontalValue = 0;
@@ -181,7 +181,7 @@ namespace Completed
             m_PauseValue = InputManager.GetButtonDown(m_PauseName, PID);
 
             // Store the value for selecting.
-            m_SelectValue1 = InputManager.GetButtonDown(m_SelectName, PID);
+            m_SelectValue = InputManager.GetButtonDown(m_SelectName, PID);
         }
 
         private void FixedUpdate()
@@ -322,7 +322,7 @@ namespace Completed
 
         private void Select()
         {
-            if (m_SelectValue1)
+            if (m_SelectValue)
             {
                 miniMapGUI.MapAndUnmap();
             }
@@ -388,7 +388,7 @@ namespace Completed
 
         {
             // If there is a small input for driving, play the idle audio clip.
-            if (Mathf.Abs(joystickMagnitude1) < 0.1f)
+            if (Mathf.Abs(joystickMagnitude) < 0.1f)
             {
                 m_MovementAudio.clip = m_IdleAudio;
                 if (m_MovementAudio.clip == m_IdleAudio)

@@ -1197,11 +1197,6 @@ namespace Completed
             removeObstacles();
             StartCoroutine(FlickerLights());
 
-            // Set tanks as alive
-            Debug.Log(player1.gameObject.activeSelf);
-            Debug.Log(player2.gameObject.activeSelf);
-
-
             //TODO: should play ending audio
 
             // Wait for camera to stop shaking.

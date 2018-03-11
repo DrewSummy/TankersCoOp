@@ -7,7 +7,13 @@ namespace Completed
 {
     public class GUI_MiniMap : MonoBehaviour
     {
-        //TODO: figure out aspect ratio stuff http://answers.unity3d.com/questions/1065133/black-bars-on-top-bottom-in-aspect-ratio.html
+        /*floorSample = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_FloorSample") as GameObject;
+           unknownSample = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_UnknownSample") as GameObject;
+
+           floorFull = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_FloorFull") as GameObject;
+           unknownFull = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_UnknownFull") as GameObject;
+
+           playerSample = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_PlayerSample") as GameObject;*/
 
 
         public GameObject panelSample;                                           // The GameObject with the sample panel.
@@ -21,15 +27,15 @@ namespace Completed
 
         public GameObject player;                                                // The GameObject with the player sprite.
         public GameObject playerSample;                                          // The GameObject with the sample player image.
-        private GameObject playerIndicator;
+        public GameObject playerIndicator;
         public GameObject exit;                                                  // The GameObject with the exit sprite.
         public LevelManager levelScript;                                         // Store a reference to the LevelManager which will set up the level.
 
         private int[,] floorChart = new int[11, 11];                             // An array of arrays of ints representing room statuses.
         private Transform[,] floorsFull = new Transform[11, 11];
-        private RectTransform floorHolderFull;                                       // edit A variable to store a reference to the transform of the floor object.
-        private RectTransform floorHolderSample;                                       // edit A variable to store a reference to the transform of the floor object.
-        private RectTransform itemHolderFull;                                        // edit A variable to store a reference to the transform of the outline object.
+        public RectTransform floorHolderFull;                                       // edit A variable to store a reference to the transform of the floor object.
+        public RectTransform floorHolderSample;                                       // edit A variable to store a reference to the transform of the floor object.
+        public RectTransform itemHolderFull;                                        // edit A variable to store a reference to the transform of the outline object.
         
 
         private GameObject P1;                                                   // Reference to the player 1 game object.
@@ -44,51 +50,14 @@ namespace Completed
         private bool selected = false;
         private int sampleRadius = 1;
 
-        private GameObject tank; // Instance of player.
+        private GameObject tank;                                                  // Instance of player.
 
         private Vector2 topRight;                                                 //TODO: keeps track of the top and right most coordinate to adjust the full map to be in the furthest top right position
-
-
-        private void callAwake()
-        {
-            // Create the full floor holder.
-            floorHolderFull = new GameObject("Full Floor Holder").AddComponent<RectTransform>();
-            floorHolderFull.SetParent(panelFull.transform);
-            floorHolderFull.transform.position = panelFull.transform.position + mapOffset;
-
-            // Create the full item holder.
-            itemHolderFull = new GameObject("Items").AddComponent<RectTransform>();
-            itemHolderFull.SetParent(panelFull.transform);
-            itemHolderFull.transform.position = panelFull.transform.position + mapOffset;
-            
-            // Create the sample floor holder.
-            floorHolderSample = new GameObject("Sample Floor Holder").AddComponent<RectTransform>();
-            floorHolderSample.SetParent(panelSample.transform);
-            floorHolderSample.transform.position = panelSample.transform.position;
-
-            //TODO: sample item holder            
-        }
-
-        // Use this for initialization
-        private void callStart()
-        {
-            // Load relevant images.
-            floorSample = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_FloorSample") as GameObject;
-            unknownSample = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_UnknownSample") as GameObject;
-
-            floorFull = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_FloorFull") as GameObject;
-            unknownFull = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_UnknownFull") as GameObject;
-            
-            playerSample = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_PlayerSample") as GameObject;
-
-        }
+        public Transform refer;
 
         // This is called once to begin the display. Every update is displayed elsewhere.
         public void beginMap(bool[,] fC, Vector2 lR, Vector2 sR, GameObject player)
         {
-            callAwake();
-            callStart();
-
             // Initiate floorChart.
             initiateFloorChart(fC, lR);
 
@@ -104,7 +73,6 @@ namespace Completed
 
             // Go through floorChart and place the rooms while initializing floorsFull.
             initialPlacement();
-
             
             // Place the sample map and hide the full map to start.
             panelSample.SetActive(true);
@@ -170,7 +138,6 @@ namespace Completed
                         GameObject floor = Instantiate(unknownFull) as GameObject;
                         floor.transform.SetParent(currFloor);
                         floor.transform.position = currFloor.position;
-                        floor.GetComponent<RectTransform>().localScale = floor.GetComponent<RectTransform>().localScale;
                     }
                 }
             }
@@ -188,19 +155,21 @@ namespace Completed
 
 
             // Place the indicator for the middle room.
-            playerIndicator = Instantiate(playerSample) as GameObject;
-            playerIndicator.GetComponent<RectTransform>().SetParent(panelSample.transform);
-            playerIndicator.GetComponent<RectTransform>().position = floorHolderSample.position;
+            //playerIndicator = Instantiate(playerSample) as GameObject;
+            //playerIndicator.GetComponent<RectTransform>().SetParent(panelSample.transform);
+            //playerIndicator.GetComponent<RectTransform>().position = floorHolderSample.position;
             
             //TODO: color should be set by player tank color
             Color c = Color.blue;
-            playerIndicator.transform.GetChild(0).gameObject.GetComponent<Image>().color = c;
+            foreach (Transform bar in playerIndicator.transform)
+            {
+                bar.gameObject.GetComponent<Image>().color = c;
+            }
         }
 
         // Places sample map while adding to the outlineHolderFull and floorHolderSample.
         private void placeSample()
         {
-            //
             panelSample.SetActive(true);
 
             // Iterate through the rooms within the sampleRadius.
@@ -236,14 +205,26 @@ namespace Completed
                     {
                         RectTransform currFloor = new GameObject("Floor #" + (floorChart.GetLength(0) * column + row)).AddComponent<RectTransform>();
                         currFloor.transform.SetParent(floorHolderSample);
-                        currFloor.transform.position = floorHolderSample.position + new Vector3(row - (int)playerCoord[0], column - (int)playerCoord[1], 0) * roomLengthSample;                
 
-                        
-                        
+
+
+                        // Here //////////
+                        /*Canvas can = GetComponentInParent<Canvas>();
+
+                        currFloor.transform.position = floorHolderSample.position + new Vector3(row - (int)playerCoord[0], column - (int)playerCoord[1], 0) * roomLengthSample;
+                        Debug.Log(currFloor.transform.position - floorHolderSample.position);
+                        Debug.Log(roomLengthSample);
+                        Vector3 pos = floorHolderSample.position + new Vector3(row - (int)playerCoord[0], column - (int)playerCoord[1], 0) * roomLengthSample * can.scaleFactor;
+                        currFloor.transform.localPosition = new Vector3(28, 28, 0);
+                        Debug.Log(new Vector3(row - (int)playerCoord[0], column - (int)playerCoord[1], 0) * roomLengthSample);*/
+                        //^^delete^^
+                        currFloor.transform.localPosition = new Vector3(row - (int)playerCoord[0], column - (int)playerCoord[1], 0) * roomLengthSample;
+
+
                         GameObject floor = Instantiate(floorSample) as GameObject;
                         floor.transform.SetParent(currFloor);
                         floor.transform.position = currFloor.position;
-                        floor.GetComponent<RectTransform>().localScale = floor.GetComponent<RectTransform>().localScale;
+                        floor.GetComponent<RectTransform>().localScale = GetComponent<RectTransform>().lossyScale;
 
                         // Set the door indicators using FindCurrentNEWS.
                         bool[] currNEWS = FindCurrentNEWS(row, column);
@@ -261,12 +242,13 @@ namespace Completed
                     {
                         RectTransform currFloor = new GameObject("Floor #" + (floorChart.GetLength(0) * column + row)).AddComponent<RectTransform>();
                         currFloor.transform.SetParent(floorHolderSample);
-                        currFloor.transform.position = floorHolderSample.position + new Vector3(row - (int)playerCoord[0], column - (int)playerCoord[1], 0) * roomLengthSample;
+                        currFloor.transform.localPosition = new Vector3(row - (int)playerCoord[0], column - (int)playerCoord[1], 0) * roomLengthSample;
 
                         GameObject floor = Instantiate(unknownSample) as GameObject;
                         floor.transform.SetParent(currFloor);
                         floor.transform.position = currFloor.position;
-                        floor.GetComponent<RectTransform>().localScale = floor.GetComponent<RectTransform>().localScale;
+
+                        floor.GetComponent<RectTransform>().localScale = GetComponent<RectTransform>().lossyScale;
                     }
                 }
             }
@@ -351,7 +333,6 @@ namespace Completed
 
 
             // Destroy the children of the floor and outline.
-            //TODO: this is destroying the object itself
             foreach (Transform image in floorsFull[(int)row, (int)column])
             {
                 Destroy(image.gameObject);
@@ -364,7 +345,6 @@ namespace Completed
             GameObject floor = Instantiate(floorFull) as GameObject;
             floor.transform.SetParent(currFloor);
             floor.transform.position = currFloor.position;
-            floor.GetComponent<RectTransform>().localScale = floor.GetComponent<RectTransform>().localScale;
 
             // Set the door indicators using FindCurrentNEWS.
             bool[] currNEWS = FindCurrentNEWS(row, column);
@@ -509,8 +489,6 @@ namespace Completed
         
         public void MapAndUnmap()
         {
-            Debug.Log("is selected");
-            Debug.Log(selected);
             if (!selected)
             {
                 placeFull();
@@ -532,7 +510,6 @@ namespace Completed
             Destroy(floorHolderSample.gameObject);
             Destroy(itemHolderFull.gameObject);
             Destroy(tank);
-            Destroy(playerIndicator);
 
             clearFull();
             clearSample();

@@ -48,10 +48,6 @@ public class BackgroundWave : MonoBehaviour
                 chaosCubes.Add(chaosHolder.GetChild(i).gameObject);
             }
         }
-
-
-        //PlaceObjects();
-        Debug.Log("start");
     }
 
     private void Update()
