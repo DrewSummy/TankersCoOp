@@ -8,10 +8,12 @@ abstract public class ButtonPause : EventTrigger
     public GameObject image;                                      // Image for when the button isn't selected.
 
     protected Transform button;                                   // The transform of the button.
-    protected Text buttonText;                                    // The text of the button.
+    public Text buttonText;                                    // The text of the button.
     protected Vector3 selectOffset = new Vector3(50, 0, 0);         // The offset of the button when selected.
     protected Vector3 originalPos;                                // The original position of the button.
     protected Vector3 offsetPos;                                  // The position of the button when selected.
+    protected Vector3 originalSize;
+    protected float enlargeSize = 1.1f;
     protected Color originalColor;                                // The original color of the text.
     private Color colorRange = new Color(.2f, .2f, .2f, 0);       // The range the color changes when selected..
 
@@ -22,7 +24,8 @@ abstract public class ButtonPause : EventTrigger
     public override void OnSelect(BaseEventData eventData)
     {
         // Move and activate the button.
-        moveButton();
+        //moveButton();
+        enlargeButton();
         StartCoroutine(activeButton());
     }
 
@@ -31,7 +34,8 @@ abstract public class ButtonPause : EventTrigger
     {
         // Move the button back to its original position and color.
         buttonText.color = originalColor;
-        moveButtonBack();
+        //moveButtonBack();
+        unenlargeButton();
 
         // Deactivate the button.
         activateText = false;
@@ -46,7 +50,7 @@ abstract public class ButtonPause : EventTrigger
         Color maxColor = originalColor + colorRange / 2;
 
         // Flash the text.
-        buttonText.color = maxColor;
+        //buttonText.color = maxColor;
         yield return StartCoroutine(CoroutineUtilities.WaitForRealTime(.05f));
 
         // Make the text's color go between minColor and maxColor.
@@ -76,6 +80,18 @@ abstract public class ButtonPause : EventTrigger
     {
         // Move the button back to the original position.
         button.position = originalPos;
+    }
+
+    // Helper function for OnSelect().
+    protected virtual void enlargeButton()
+    {
+        button.localScale = button.localScale * enlargeSize;
+    }
+
+    // Helper function for OnDeselect().
+    protected virtual void unenlargeButton()
+    {
+        button.localScale = button.localScale / enlargeSize;
     }
 
     // Class for coroutines when timescale = 0.

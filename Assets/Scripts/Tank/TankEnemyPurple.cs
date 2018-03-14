@@ -95,9 +95,9 @@ public class TankEnemyPurple : TankEnemy
     setToSnipe() - 
     setBackToSnipe() -
     findShot() - 
-    selectDirectionAim() - 
+    selectDirectionAim() - Adds shots to hitWeights with shots that have more collisions weighted higher.
+    selectDirectionAimDeprecated() - Adds shots to hitWeights with shots that travelled more weighted higher.
     selectWeightedTarget() - Selects a random target direction based on weights.
-
     */
     protected void Snipe()
     {
@@ -143,14 +143,60 @@ public class TankEnemyPurple : TankEnemy
 
             while (angle < 360)
             {
-                float weight = projTestScript.beginShoot(tower.position, testShot, false);
+                ProjectileTest.ShotReport report = projTestScript.beginShoot(tower.position, testShot);
 
                 // If there was a hit, record it.
-                if (weight > -1)
+                if (report.isHit)
                 {
                     hitAngles.Add(testShot);
-                    hitWeights.Add(weight);
-                    hitCount += weight;
+                    hitWeights.Add(report.collisionCount);
+                    hitCount += report.collisionCount;
+                }
+
+                angle += eps;
+                testShot = new Vector3(-Mathf.Sin(angle * Mathf.PI / 180), 0, Mathf.Cos(angle * Mathf.PI / 180));
+            }
+
+            // Set targetDirectionAim if hits isn't empty.
+            if (hitAngles.Count != 0)
+            {
+                targetDirectionAim = selectWeightedTarget();
+            }
+            else
+            {
+                needDirection = true;
+
+                // Change to idle and set a coroutine to set back to snipe.
+                StartCoroutine(setBackToSnipe());
+            }
+        }
+    }
+    private void selectDirectionAimDeprecated()
+    {
+        if (needDirection)
+        {
+            // Goes through every possible shot and records everyone that hits a player tank.
+            needDirection = false;
+            hitAngles.Clear();
+            hitWeights.Clear();
+            hitCount = 0;
+            float eps = 360f / numTestShots;
+            float angle = 0;
+            Vector3 testShot = Vector3.forward;
+
+            while (angle < 360)
+            {
+                //float weight = projTestScript.beginShoot(tower.position, testShot, false);
+
+
+                ProjectileTest.ShotReport report = projTestScript.beginShoot(tower.position, testShot);
+
+                // If there was a hit, record it.
+                if (report.isHit)
+                {
+                    hitAngles.Add(testShot);
+                    hitWeights.Add(report.distanceTravelled);
+                    hitCount += report.distanceTravelled;
                 }
 
                 angle += eps;

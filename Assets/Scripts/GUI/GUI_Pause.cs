@@ -7,7 +7,7 @@ namespace Completed
 {
     public class GUI_Pause : MonoBehaviour
     {
-
+        public Text title;
         public GameObject panel;
         public GameObject tank;
 
@@ -21,16 +21,16 @@ namespace Completed
         public GameObject QuitYes;
         public GameObject QuitNo;
 
-
-        private Transform killHolder1;
-        private Transform killHolder2;
+        private Coroutine titleMovement;
+        public Transform killHolder1;
+        public Transform killHolder2;
         private GameObject P1;
         private GameObject P2;
         public GameObject killCountText;
         public Material[] tankColors;
 
         public GameMaster GM;
-        public GUI_Controller controllerGUi;
+        public GUI_Controller controllerGUI;
         public bool paused = false;
 
 
@@ -43,17 +43,17 @@ namespace Completed
         // Use this for initialization
         void Start()
         {
-            killHolder1 = new GameObject("KillHolder1").transform;
+            /*killHolder1 = new GameObject("KillHolder1").transform;
             killHolder1.SetParent(panel.transform);
             killHolder1.position = panel.transform.position + new Vector3(10, 0, 0);
             killHolder2 = new GameObject("KillHolder2").transform;
             killHolder2.SetParent(panel.transform);
-            killHolder2.position = panel.transform.position + new Vector3(230, 0, 0);
-
+            killHolder2.position = panel.transform.position + new Vector3(230, 0, 0);*/
+            
             // Load in the tank colors being used from the Resources folder in assets.
             tankColors = Resources.LoadAll<Material>("Prefab/GameObjectPrefab/TankPrefab/TankColors");
         }
-        
+                
         private void PlaceMenu()
         {
             foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
@@ -93,7 +93,7 @@ namespace Completed
                         tankImage.transform.SetParent(killHolder1);
                         tankImage.transform.position = killHolder1.position + new Vector3(0 + kill * 5 + offset, 20 - killType * 25, 0);
                         tankImage.GetComponent<Image>().color = tankColors[killType].color;
-                        tankImage.GetComponent<RectTransform>().localScale = new Vector3(.1f, .1f, 1);
+                        //tankImage.GetComponent<RectTransform>().localScale = new Vector3(.1f, .1f, 1);
                         killCountText.GetComponent<Text>().enabled = false;
                     }
                 }
@@ -185,10 +185,12 @@ namespace Completed
                 Restart.GetComponent<Button>().Select();
                 Resume.GetComponent<Button>().Select();
 
+                //TODO: display map
+
                 paused = true;
 
                 // Enable the controller.
-                controllerGUi.enabled = true;
+                controllerGUI.enabled = true;
             }
         }
         public void Unpause()
@@ -199,10 +201,15 @@ namespace Completed
                 RemoveKills();
                 panel.SetActive(false);
 
+                //TODO: undisplay map
+                //TODO: stop "PAUSED" coroutine
+                StopCoroutine(titleMovement);
+                Debug.Log("stop");
+
                 paused = false;
 
                 // Disable the controller.
-                controllerGUi.enabled = false;
+                controllerGUI.enabled = false;
             }
         }
 
@@ -245,17 +252,18 @@ namespace Completed
 
         // Functions called by GUI_Controller
         public void back()
-
         {
             if (currentButton == Resume.GetComponent<Button>() ||
                 currentButton == Restart.GetComponent<Button>() ||
                 currentButton == Quit.GetComponent<Button>())
             {
+                Debug.Log("res");
                 resume();
             }
             else if (currentButton == RestartYes.GetComponent<Button>() ||
                 currentButton == RestartNo.GetComponent<Button>())
             {
+                Debug.Log("rest");
                 currentButton = Restart.GetComponent<Button>();
             }
             else if (currentButton == QuitYes.GetComponent<Button>() ||
@@ -268,15 +276,22 @@ namespace Completed
         }
         public void select()
         {
-            currentButton.GetComponent<Button>().onClick.Invoke();
-
-            if (currentButton.GetComponent<Button>() == Restart.GetComponent<Button>())
+            //currentButton.GetComponent<Button>().onClick.Invoke();
+            Debug.Log(currentButton);
+            if (currentButton.GetComponent<Button>() == Resume.GetComponent<Button>())
+            {
+                Unpause();
+            }
+            else if (currentButton.GetComponent<Button>() == Restart.GetComponent<Button>())
             {
                 currentButton = RestartYes.GetComponent<Button>();
+                Restart.GetComponent<ButtonRestart>().restart();
             }
             else if (currentButton.GetComponent<Button>() == Quit.GetComponent<Button>())
             {
                 currentButton = QuitYes.GetComponent<Button>();
+                Quit.GetComponent<ButtonQuit>().quit();
+                Debug.Log(currentButton);
             }
             else if (currentButton.GetComponent<Button>() == RestartYes.GetComponent<Button>())
             {

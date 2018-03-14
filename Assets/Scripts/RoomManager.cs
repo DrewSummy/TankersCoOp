@@ -15,6 +15,7 @@ namespace Completed
         public GameObject exit;                                                  // The GameObject of the exit.
         public GameObject wallOpen;                                              // The GameObject of the open wall.
         public GameObject wallClosed;                                            // The GameObject of the closed wall.
+        public GameObject edges;
         public GameObject m_camera;
         public Vector2 coordinate;
         public bool coop;
@@ -36,6 +37,7 @@ namespace Completed
         private Transform projectileHolder;                                      // A variable to store a reference to the transform of the projectile holder object.
         private Transform wallHolder;                                            // A variable to store a reference to the transform of the wall holder object.
         private Transform courseHolder;                                          // A variable to store a reference to the transform of the obstacle course object.
+        private Transform edgeHolder;
         private float wallThickness = 1f;                                        // Thickness of outside walls.
         private float blockThickness = 2.5f;                                     // Thickness of blocks.
         private int m_RoomLength = 50;                                           // Length of each room declared elsewhere also.
@@ -294,11 +296,10 @@ namespace Completed
                 // Place the enemy sprite HUD based on the enemies in the room.
                 GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().PlaceEnemies(enemyHolder);
 
-                GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().PlayCountDown();
+                //GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().PlayCountDown();
 
 
-
-                yield return new WaitForSeconds(4f);
+                yield return StartCoroutine(Countdown());
 
 
                 // Enable the tanks.
@@ -306,7 +307,18 @@ namespace Completed
             }
         }
 
-        //change this
+        private IEnumerator Countdown()
+        {
+            //TODO: add audio
+            
+            foreach (EdgeCountdown edge in edgeHolder.GetComponentsInChildren<EdgeCountdown>())
+            {
+                edge.Pulse();
+            }
+            yield return new WaitForSeconds(4);
+        }
+
+
         public void PlacePlayers()
         {
             //TODO: need player1
@@ -691,16 +703,11 @@ namespace Completed
             exit = Resources.Load("Prefab/GameObjectPrefab/Miscellaneous/Ladder") as GameObject;
             wallOpen = Resources.Load("Prefab/GameObjectPrefab/Room/WallOpen") as GameObject;
             wallClosed = Resources.Load("Prefab/GameObjectPrefab/Room/WallClosed") as GameObject;
+            edges = Resources.Load("Prefab/GameObjectPrefab/Room/Edges") as GameObject;
 
             // Fill enemyList.
             enemyList = Resources.LoadAll<GameObject>("Prefab/GameObjectPrefab/TankPrefab/TankEnemy");
-
-            //TODO: temp for testing
-            GameObject[] temp = new GameObject[1];
-            temp[0] = enemyList[2];
-            //enemyList = temp;
-            //TODO: temp for testing
-
+            
             // Create enemyHolder for this room.
             enemyHolder = new GameObject("EnemyHolder").transform;
             enemyHolder.SetParent(m_room);
@@ -726,12 +733,21 @@ namespace Completed
             courseHolder.SetParent(m_room);
             courseHolder.position = m_room.position;
 
+            // Create projectileHolder for this room.
+            edgeHolder = new GameObject("EdgeHolder").transform;
+            edgeHolder.SetParent(m_room);
+            edgeHolder.position = m_room.position;
+
             // Place the floor.
             PlaceFloor();
 
             // Place the walls.
             PlaceWalls();
+
+            // Place the edges.
+            PlaceEdges();
         }
+
 
         // Helper for the SetUpRoom.
         private void PlaceFloor()
@@ -883,7 +899,19 @@ namespace Completed
                 placeSouthWall.tag = wallTag;
             }
         }
-        
+
+        // Helper for the SetUpRoom.
+        private void PlaceEdges()
+        {
+            GameObject es = Instantiate(edges, m_room.transform.position, Quaternion.identity) as GameObject;
+            es.transform.SetParent(edgeHolder);
+
+
+            for (int i = 0; i < edgeHolder.GetComponentsInChildren<MeshRenderer>().Length; i++)
+            {
+                edgeHolder.GetComponentsInChildren<MeshRenderer>()[i].enabled = false;
+            }
+        }
 
         // Creates an obstacle course after the room is set up.
         public void CreateObstacleCourse()
@@ -1018,6 +1046,12 @@ namespace Completed
                         //TODO: get materialze to vary opacity
                         child.GetComponent<Renderer>().enabled = true;
                     }
+
+
+                for (int i = 0; i < edgeHolder.GetComponentsInChildren<MeshRenderer>().Length; i++)
+                {
+                    edgeHolder.GetComponentsInChildren<MeshRenderer>()[i].enabled = true;
+                }
             }
 
             for (int i = 0; i < wallHolder.GetComponentsInChildren<MeshRenderer>().Length; i++)
@@ -1026,6 +1060,8 @@ namespace Completed
             }
 
             floor.GetComponent<MeshRenderer>().enabled = true;
+
+
 
             //This is here to keep function an enumerator, eventually will make things materialize slowly
             yield return new WaitForSeconds(.1f);

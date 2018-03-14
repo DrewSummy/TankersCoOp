@@ -59,39 +59,6 @@ public class TankEnemyBlack : TankEnemy
         setToSearch();
     }
 
-    /*
-    protected override void trackPlayer()
-    {
-        if (state == State.IDLE)
-        {
-            return;
-        }
-        else if (targets.Count == 0)
-        {
-            setToIdle();
-            return;
-        }
-
-        // Update vectorTowardTarget and remove destroyed tanks.
-        float minDist = float.PositiveInfinity;
-        for (int tankI = targets.Count - 1; tankI >= 0; tankI--)
-        {
-            if (!targets[tankI])
-            {
-                targets.RemoveAt(tankI);
-            }
-            else
-            {
-                if (Vector3.Distance(targets[tankI].transform.position, transform.position) < minDist)
-                {
-                    minDist = Vector3.Distance(targets[tankI].transform.position, transform.position);
-                    targetTank = targets[tankI];
-                }
-            }
-        }
-    }*/
-
-
     protected override IEnumerator FSM()
     {
         while (alive)
@@ -204,7 +171,6 @@ public class TankEnemyBlack : TankEnemy
     }
     private void driveRemember()
     {
-        Debug.Log("remember");
         targetDirectionDrive = recentPos;
 
         rotateDirection();

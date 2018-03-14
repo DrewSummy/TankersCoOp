@@ -6,14 +6,14 @@ using UnityEngine.UI;
 public class ButtonRestartSubButton : ButtonPause
 {
 
-    private Color subbuttonUnselected = Color.grey;
+    private Color subbuttonUnselected = new Color(0, 0, 0, 150);
     private Color subbuttonSelected = Color.white;
 
     private void Awake()
     {
         // Set the originalPos and color.
         originalPos = transform.position;
-        originalColor = transform.GetChild(0).GetComponent<Text>().color;
+        originalColor = transform.GetComponentInChildren<Text>().color;
 
         // Set the offset position.
         offsetPos = originalPos + selectOffset;
@@ -22,7 +22,7 @@ public class ButtonRestartSubButton : ButtonPause
         button = transform;
 
         // Set the button's text.
-        buttonText = transform.GetChild(0).GetComponent<Text>();
+        buttonText = transform.GetComponentInChildren<Text>();
     }
 
     protected override void moveButton()

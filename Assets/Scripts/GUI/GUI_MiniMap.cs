@@ -506,9 +506,9 @@ namespace Completed
         // Used by GameMaster when clearing a game.
         public void clearMap()
         {
-            Destroy(floorHolderFull.gameObject);
-            Destroy(floorHolderSample.gameObject);
-            Destroy(itemHolderFull.gameObject);
+            //Destroy(floorHolderFull.gameObject);
+            //Destroy(floorHolderSample.gameObject);
+            //Destroy(itemHolderFull.gameObject);
             Destroy(tank);
 
             clearFull();

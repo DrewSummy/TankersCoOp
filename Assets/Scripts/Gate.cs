@@ -146,13 +146,8 @@ namespace Completed
             // The object has collided with another projectile.
             if (collisionInfo.transform.tag == "Player")
             {
-                Debug.Log("player");
                 if (parentRoomScript.roomCompleted)
                 {
-                    //TODO: comment this out and test
-                    //triggered = true;
-                    //boundary.enabled = false;
-                    Debug.Log("room is entered");
                     parentRoomScript.entered();
                 }
                 else

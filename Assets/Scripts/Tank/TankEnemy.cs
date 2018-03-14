@@ -346,9 +346,10 @@ public class TankEnemy : Tank
         // Fire if there are bullets, fire frequency has elapsed, and the tower is predicting.
         if (tower.forward == targetDirectionAim)
         {
-            float weight = projTestScript.beginShoot(tower.position, -tower.forward, false);
+            //float weight = projTestScript.beginShoot(tower.position, -tower.forward, false);
+            ProjectileTest.ShotReport report = projTestScript.beginShoot(tower.position, -tower.forward);
 
-            if (weight > -2)
+            if (report.isHit)
             {
                 Fire();
             }
@@ -612,7 +613,8 @@ public class TankEnemy : Tank
     }
     protected bool isHit()
     {
-        return projTestScript.beginShoot(m_ProjectileSpawnPoint.position, -tower.forward) > -1;
+        ProjectileTest.ShotReport report = projTestScript.beginShoot(m_ProjectileSpawnPoint.position, -tower.forward);
+        return report.isHit;
     }
     protected void scanTo()
     {

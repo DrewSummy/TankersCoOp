@@ -29,11 +29,7 @@ public class Projectile : MonoBehaviour
     private float horProjExplVel = 7;
     private float vertProjExplVel = 9;
     private float horProjExplTor = 5;
-
-    // To avoid double collision
-    private float collisionThreshhold = 0.5f;      // Amount of time the projectile doesn't collide after a collision.
-    private Coroutine collisionCoroutine;           // Don't receive collisions until this coroutine is over.
-    private bool activeCollision = true;
+    
 
     protected void Awake()
     {
@@ -89,40 +85,28 @@ public class Projectile : MonoBehaviour
         ps.simulationSpeed = projectileSpeed / 16;
     }
 
-    private IEnumerator noColliding()
-    {
-        //activeCollision = false;
-        //consider disabling GetComponent<Collider>()
-        yield return new WaitForSeconds(collisionThreshhold);
-        activeCollision = true;
-    }
 
     protected void OnCollisionEnter(Collision collisionInfo)
     {
-        if (activeCollision)
+        // The object has collided with another projectile.
+        if (collisionInfo.transform.tag == projTag)
         {
-            StartCoroutine(noColliding());
-
-            // The object has collided with another projectile.
-            if (collisionInfo.transform.tag == projTag)
-            {
-                projectileCollision();
-            }
-            // The object has collided with a tank.
-            else if (collisionInfo.transform.tag == playerTag || collisionInfo.transform.tag == enemyTag)
-            {
-                tankCollision(collisionInfo);
-            }
-            // The object has collided the max amount of times.
-            else if (collisionCounter >= maxCollisions)
-            {
-                lastCollision();
-            }
-            // The object has more collisions and needs to rotate and continue.
-            else
-            {
-                wallCollision(collisionInfo);
-            }
+            projectileCollision();
+        }
+        // The object has collided with a tank.
+        else if (collisionInfo.transform.tag == playerTag || collisionInfo.transform.tag == enemyTag)
+        {
+            tankCollision(collisionInfo);
+        }
+        // The object has collided the max amount of times.
+        else if (collisionCounter >= maxCollisions)
+        {
+            lastCollision();
+        }
+        // The object has more collisions and needs to rotate and continue.
+        else
+        {
+            wallCollision(collisionInfo);
         }
     }
 

@@ -8,13 +8,14 @@ public class ButtonQuit : ButtonPause
     private Button yes;
     private Button no;
     private bool selectedQuit;
-    private Color subbuttonUnselected = Color.grey;
+    private Color subbuttonUnselected = new Color(0, 0, 0, 150);
+    private Color subbuttonSelected = Color.white;
 
     private void Awake()
     {
         // Set the originalPos and color.
         originalPos = transform.position;
-        originalColor = transform.GetChild(0).GetChild(3).GetComponent<Text>().color;
+        originalColor = transform.GetChild(1).GetComponent<Text>().color;
 
         // Set the offset position.
         offsetPos = originalPos + selectOffset;
@@ -23,22 +24,26 @@ public class ButtonQuit : ButtonPause
         button = transform;
 
         // Set the button's text.
-        buttonText = transform.GetChild(0).GetChild(3).GetComponent<Text>();
+        buttonText = transform.GetChild(1).GetComponent<Text>();
 
         // Set the buttons yes and no.
-        no = transform.GetChild(0).GetChild(4).GetComponent<Button>();
-        yes = transform.GetChild(0).GetChild(5).GetComponent<Button>();
+        yes = transform.GetComponentsInChildren<Button>()[1];
+        no = transform.GetComponentsInChildren<Button>()[2];
+        Debug.Log(yes);
+        Debug.Log(no);
     }
 
     // OnClick button for quit.
     public void quit()
     {
+        Debug.Log("selected quit");
         // Select the yes button to begin.
         selectedQuit = true;
         yes.GetComponent<Button>().Select();
 
-        // Make the no button greyed.
-        no.transform.GetChild(0).GetComponent<Text>().color = subbuttonUnselected;
+        // Make the subbotton colors.
+        yes.transform.GetComponentInChildren<Text>().color = subbuttonSelected;
+        no.transform.GetComponentInChildren<Text>().color = subbuttonUnselected;
     }
 
     // Occurs when the button is deselected.
@@ -53,12 +58,13 @@ public class ButtonQuit : ButtonPause
     // Occurs when the button is deselected.
     public override void OnSelect(BaseEventData data)
     {
+        Debug.Log(selectedQuit);
         // If coming from selectedQuit, we don't need to do anything to the button. Just make the subbuttons invisible.
         if (selectedQuit)
         {
             selectedQuit = false;
-            no.transform.GetChild(0).GetComponent<Text>().color = new Color(0, 0, 0, 0);
-            yes.transform.GetChild(0).GetComponent<Text>().color = new Color(0, 0, 0, 0);
+            no.transform.GetComponentInChildren<Text>().color = new Color(0, 0, 0, 0);
+            yes.transform.GetComponentInChildren<Text>().color = new Color(0, 0, 0, 0);
         }
         // ...or use the base function and add animation.
         else
@@ -66,21 +72,4 @@ public class ButtonQuit : ButtonPause
             base.OnSelect(data);
         }
     }
-
-
-
-    //TODO: these buttons: probably call a funtion in GameMaster
-    /*public void quitYes()
-    {
-        Debug.Log("wow you really did it, you really did you slut, Karen");
-    }
-    public void quitNo()
-    {
-        Debug.Log("thought so");
-        GetComponent<Button>().Select();
-    }
-    public void cancelSubButton()
-    {
-        GetComponent<Button>().Select();
-    }*/
 }

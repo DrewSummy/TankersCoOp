@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Completed;
 
 public class ProjectileTest : MonoBehaviour {
     
@@ -28,13 +29,27 @@ public class ProjectileTest : MonoBehaviour {
         }
     }
 
+    public struct ShotReport                       // A struct to report if the shot hit, how many collisions occurred, and the distance it travelled.
+    {
+        public bool isHit;
+        public int collisionCount;
+        public float distanceTravelled;
+
+        public ShotReport(bool ih, int cc, float dt)
+        {
+            isHit = ih;
+            collisionCount = cc;
+            distanceTravelled = dt;
+        }
+    }
+
 
     protected void Start()
     {
         raycastLayer = ~(1 << LayerMask.NameToLayer("Ignore Raycasat"));
     }
 
-    public float beginShoot(Vector3 position, Vector3 direction, bool debug = false)
+    public ShotReport beginShoot(Vector3 position, Vector3 direction, bool debug = false)
     {
         pt shot = new pt(position, direction);
 
@@ -42,7 +57,10 @@ public class ProjectileTest : MonoBehaviour {
     }
 
     // Returns the distance traveled to hit an enemy. -1 is reserved for never hitting and -2 is reserved for hitting a teammate.
-    private float shoot(pt s, float distWeight, bool debug = false)
+
+
+    // Returns a struct with a boolean for hitting, the number of walls hit, and the float for the distance travelled.
+    private ShotReport shoot(pt s, float distWeight, bool debug = false)
     {
         if (debug)
         {
@@ -57,18 +75,18 @@ public class ProjectileTest : MonoBehaviour {
         // If the raycast doesn't hit anything at all.
         if (hit.collider == null)
         {
-            return -1;
+            return new ShotReport(false, s.collisionCounter, distWeight);
         }
         // If it hit a tank.
         else if (hit.transform.GetComponent<Tank>())
         {
             if (hit.transform.GetComponent<Tank>().teamName == enemyTeamName)
             {
-                return distWeight;
+                return new ShotReport(true, s.collisionCounter, distWeight);
             }
             else
             {
-                return -2;
+                return new ShotReport(false, s.collisionCounter, distWeight);
             }
         }
         // Else it hit a wall or block.
@@ -77,7 +95,7 @@ public class ProjectileTest : MonoBehaviour {
             // No more collisions
             if (s.collisionCounter >= maxCollisions)
             {
-                return -1;
+                return new ShotReport(false, s.collisionCounter, distWeight);
             }
             // More collisionselse
             else

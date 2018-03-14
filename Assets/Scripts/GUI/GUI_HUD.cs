@@ -30,12 +30,13 @@ namespace Completed
         private int P2ProjectileCount;              // The current amount of player 1's projectiles available to fire.
         public RectTransform projectileHolder1;     // Transform for holding projectiles and projectileEmptys.
         public RectTransform projectileHolder2;     // Transform for holding projectiles and projectileEmptys.
-        private Transform enemyHolder;              // Transform for holding tanks.
-        public Transform enemyHolder2;              // Temp
-        private Transform countdownHolder;          // Transform for holding countDownSprites.
-        private Transform bannerHolder;
+        //private Transform enemyHolder;              // Transform for holding tanks.
+        public Transform enemyHolder;              // Temp
+        public Transform countdownHolder;          // Transform for holding countDownSprites.
+        public Transform bannerHolder;
         private GameObject P1;                      // Reference to the player 1 game object.
         private GameObject P2;                      // Reference to the player 2 game object.
+        private float iconDistance = 15;
 
         // Coroutine
         Coroutine countDown;
@@ -64,31 +65,31 @@ namespace Completed
         private void callStart()
         {
             // Create the enemy holder.
-            enemyHolder = new GameObject("EnemyHolder").AddComponent<RectTransform>();
-            enemyHolder.SetParent(enemyPanel.transform);
-            enemyHolder.position = enemyPanel.transform.position + new Vector3(50, -40, 0);
+            //enemyHolder = new GameObject("EnemyHolder").AddComponent<RectTransform>();
+            //enemyHolder.SetParent(enemyPanel.transform);
+            //enemyHolder.position = enemyPanel.transform.position + new Vector3(50, -40, 0);
 
             // Create the countdown holder.
-            countdownHolder = new GameObject("CountdownHolder").transform;
-            countdownHolder.SetParent(this.transform);
-            countdownHolder.position = this.transform.position;
+            //countdownHolder = new GameObject("CountdownHolder").transform;
+            //countdownHolder.SetParent(this.transform);
+            //countdownHolder.position = this.transform.position;
 
             // Create the banner holder.
-            bannerHolder = new GameObject("BannerHolder").transform;
-            bannerHolder.SetParent(this.transform);
-            bannerHolder.position = this.transform.position;
+            //bannerHolder = new GameObject("BannerHolder").transform;
+            //bannerHolder.SetParent(this.transform);
+            //bannerHolder.position = this.transform.position;
 
             // Load relevant sprites.
-            projectile = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_Projectile") as GameObject;
+            /*projectile = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_Projectile") as GameObject;
             projectileEmpty = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_ProjectileEmpty") as GameObject;
-            tank = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_TankBig") as GameObject;
-            blackBanner = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_Banner") as GameObject;
+            //tank = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_TankBig") as GameObject;
+            blackBanner = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_Banner") as GameObject;*/
 
             GameObject[] sprites = new GameObject[4];
-            sprites[0] = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_3") as GameObject;
-            sprites[1] = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_2") as GameObject;
-            sprites[2] = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_1") as GameObject;
-            sprites[3] = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_Start") as GameObject;
+            sprites[0] = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Deprecated/Image_3") as GameObject;
+            sprites[1] = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Deprecated/Image_2") as GameObject;
+            sprites[2] = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Deprecated/Image_1") as GameObject;
+            sprites[3] = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Deprecated/Image_Start") as GameObject;
             countDownSprites = sprites;
 
             // Load audio objects.
@@ -100,7 +101,10 @@ namespace Completed
         private void OnEnable()
         {
             projectileHolder1.gameObject.SetActive(true);
-            projectileHolder2.gameObject.SetActive(true);
+            if (P2)
+            {
+                projectileHolder2.gameObject.SetActive(true);
+            }
         }
         private void OnDisable()
         {
@@ -222,9 +226,9 @@ namespace Completed
                 if (enemy.gameObject.activeSelf)
                 {
                     GameObject tankImage = Instantiate(tank) as GameObject;
-                    //tankImage.transform.SetParent(enemyHolder);
-                    tankImage.transform.SetParent(enemyHolder2);
-                    tankImage.transform.position = enemyHolder2.position + new Vector3(currentChild * 90, 0, 0);
+                    tankImage.transform.SetParent(enemyHolder);
+                    tankImage.transform.SetSiblingIndex(0);
+                    tankImage.transform.position = enemyHolder.position + new Vector3(currentChild * iconDistance, 0, 0);
                     // The first child is the shadow.
                     tankImage.GetComponentsInChildren<Image>()[1].color = enemy.GetComponentInChildren<TankEnemy>().tankColor.color;
                     currentChild++;
@@ -236,7 +240,7 @@ namespace Completed
         {
             // Remove the objects.
             //foreach (Transform enemyImage in enemyHolder.transform)
-            foreach (Transform enemyImage in enemyHolder2.transform)
+            foreach (Transform enemyImage in enemyHolder.transform)
             {
                 GameObject.Destroy(enemyImage.gameObject);
             }
@@ -246,7 +250,7 @@ namespace Completed
 
         public void PlayCountDown()
         {
-            countDown = StartCoroutine(CountdownCoroutine());
+            //countDown = StartCoroutine(CountdownCoroutine());
 
             //TODO: play 3, 2, 1, countdown audio
             HUDAudio.clip = countdown;
@@ -302,7 +306,7 @@ namespace Completed
 
         public void resetHUD()
         {
-            StopCoroutine(countDown);
+            //StopCoroutine(countDown);
             
             /*oreach (Transform child in countdownHolder.transform)
             {
@@ -310,8 +314,8 @@ namespace Completed
             }*/
 
 
-            Destroy(countdownHolder.gameObject);
-            Destroy(enemyHolder.gameObject);
+            //Destroy(countdownHolder.gameObject);
+            //Destroy(enemyHolder.gameObject);
         }
     }
 }
