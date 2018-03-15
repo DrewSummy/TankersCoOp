@@ -8,17 +8,13 @@ public class ButtonQuit : ButtonPause
     private Button yes;
     private Button no;
     private bool selectedQuit;
-    private Color subbuttonUnselected = new Color(0, 0, 0, 150);
-    private Color subbuttonSelected = Color.white;
+    private Color subbuttonUnselected = new Color(0, 0, 0, 80);
+    private Color subbuttonSelected = new Color(255, 255, 255, 150);
 
     private void Awake()
     {
-        // Set the originalPos and color.
-        originalPos = transform.position;
+        // Set the color.
         originalColor = transform.GetChild(1).GetComponent<Text>().color;
-
-        // Set the offset position.
-        offsetPos = originalPos + selectOffset;
 
         // Set the button transform.
         button = transform;
@@ -29,21 +25,22 @@ public class ButtonQuit : ButtonPause
         // Set the buttons yes and no.
         yes = transform.GetComponentsInChildren<Button>()[1];
         no = transform.GetComponentsInChildren<Button>()[2];
-        Debug.Log(yes);
-        Debug.Log(no);
     }
 
     // OnClick button for quit.
     public void quit()
     {
-        Debug.Log("selected quit");
         // Select the yes button to begin.
         selectedQuit = true;
         yes.GetComponent<Button>().Select();
 
         // Make the subbotton colors.
+        Debug.Log(yes.transform.GetComponentInChildren<Text>().color);
+        Debug.Log(no.transform.GetComponentInChildren<Text>().color);
         yes.transform.GetComponentInChildren<Text>().color = subbuttonSelected;
         no.transform.GetComponentInChildren<Text>().color = subbuttonUnselected;
+        Debug.Log(yes.transform.GetComponentInChildren<Text>().color);
+        Debug.Log(no.transform.GetComponentInChildren<Text>().color);
     }
 
     // Occurs when the button is deselected.
@@ -58,7 +55,6 @@ public class ButtonQuit : ButtonPause
     // Occurs when the button is deselected.
     public override void OnSelect(BaseEventData data)
     {
-        Debug.Log(selectedQuit);
         // If coming from selectedQuit, we don't need to do anything to the button. Just make the subbuttons invisible.
         if (selectedQuit)
         {

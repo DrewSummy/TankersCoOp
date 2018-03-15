@@ -96,22 +96,12 @@ public class GameMaster : MonoBehaviour
     private void displaymenuGUI()
     {
         camera.SetActive(false);
-        //menu.SetActive(true);
-        //menuGUI.gameObject.SetActive(true);
-        menuGUI.initialDisplay();
-
-        controllerGUI.enabled = true;
-    }
-    /*
-    private IEnumerator displaymenuGUI2()
-    {
-        camera.SetActive(false);
         menu.SetActive(true);
         menuGUI.gameObject.SetActive(true);
         menuGUI.initialDisplay();
 
         controllerGUI.enabled = true;
-    }*/
+    }
 
     // Initializes the game for the first level.
     public void CreateSoloGame()
@@ -146,6 +136,7 @@ public class GameMaster : MonoBehaviour
 
     public void endGame()
     {
+        Debug.Log("ending");
         clearGame();
         displaymenuGUI();
     }
@@ -169,6 +160,7 @@ public class GameMaster : MonoBehaviour
 
         // Reset the HUD so that the count down doesn't display.
         HUDGUI.resetHUD();
+        HUDGUI.gameObject.SetActive(false);
         minimapGUI.clearMap();
         //menuGUI.clearMenu();
 }
@@ -179,6 +171,7 @@ public class GameMaster : MonoBehaviour
         // Enable the GUIs.
         menu.SetActive(false);
         menuGUI.gameObject.SetActive(false);
+        HUDGUI.gameObject.SetActive(true);
         HUDGUI.enableHUD();
         pauseGUI.enablePause();
         //camera.SetActive(true);

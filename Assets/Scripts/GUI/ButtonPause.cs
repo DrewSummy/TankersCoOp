@@ -10,8 +10,6 @@ abstract public class ButtonPause : EventTrigger
     protected Transform button;                                   // The transform of the button.
     public Text buttonText;                                    // The text of the button.
     protected Vector3 selectOffset = new Vector3(50, 0, 0);         // The offset of the button when selected.
-    protected Vector3 originalPos;                                // The original position of the button.
-    protected Vector3 offsetPos;                                  // The position of the button when selected.
     protected Vector3 originalSize;
     protected float enlargeSize = 1.1f;
     protected Color originalColor;                                // The original color of the text.
@@ -34,7 +32,6 @@ abstract public class ButtonPause : EventTrigger
     {
         // Move the button back to its original position and color.
         buttonText.color = originalColor;
-        //moveButtonBack();
         unenlargeButton();
 
         // Deactivate the button.
@@ -66,20 +63,6 @@ abstract public class ButtonPause : EventTrigger
                 buttonText.color = minColor;
             }
         }
-    }
-
-    // Helper function for OnSelect().
-    protected virtual void moveButton()
-    {
-        // Move the button to the offset position.
-        button.position = offsetPos;
-    }
-
-    // Helper function for OnDeselect().
-    protected virtual void moveButtonBack()
-    {
-        // Move the button back to the original position.
-        button.position = originalPos;
     }
 
     // Helper function for OnSelect().

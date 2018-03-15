@@ -105,6 +105,8 @@ namespace Completed
             {
                 projectileHolder2.gameObject.SetActive(true);
             }
+
+            enableHUD();
         }
         private void OnDisable()
         {
@@ -307,11 +309,16 @@ namespace Completed
         public void resetHUD()
         {
             //StopCoroutine(countDown);
-            
+
             /*oreach (Transform child in countdownHolder.transform)
             {
                 GameObject.Destroy(child.gameObject);
             }*/
+
+            foreach (Transform child in enemyHolder.transform)
+            {
+                GameObject.Destroy(child.gameObject);
+            }
 
 
             //Destroy(countdownHolder.gameObject);

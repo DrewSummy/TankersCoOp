@@ -5,32 +5,19 @@ using UnityEngine.UI;
 
 public class ButtonQuitSubButton : ButtonPause
 {
-    private Color subbuttonUnselected = new Color(0, 0, 0, 150);
-    private Color subbuttonSelected = Color.white;
+    private Color subbuttonUnselected = new Color(0, 0, 0, 80);
+    private Color subbuttonSelected = new Color(255, 255, 255, 150);
 
     private void Awake()
     {
-        // Set the originalPos and color.
-        originalPos = transform.position;
+        // Set the color.
         originalColor = transform.GetComponentInChildren<Text>().color;
-
-        // Set the offset position.
-        offsetPos = originalPos + selectOffset;
 
         // Set the button transform.
         button = transform;
 
         // Set the button's text.
         buttonText = transform.GetComponentInChildren<Text>();
-    }
-
-    protected override void moveButton()
-    {
-        return;
-    }
-    protected override void moveButtonBack()
-    {
-        return;
     }
 
 

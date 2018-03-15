@@ -5,33 +5,72 @@ using UnityEngine.UI;
 
 public class TitleWave : MonoBehaviour {
 
-    private Text title;
-    private Text titleShadow;
+    public Transform colorText;
+    public Transform shadowText;
+
+    private float period = .25f;
+    private float delay = .1f;
+    private float epsilon = .03f;
+    private Vector3 colorOffset = new Vector3(0, .25f, 0);
+    private Vector3 shadowOffset = new Vector3(.4f, -.15f, 0);
 
     // Use this for initialization
     void Start ()
     {
-        title = GetComponentsInChildren<Text>()[0];
-        titleShadow = GetComponentsInChildren<Text>()[1];
-        Debug.Log(title);
+        //Time.timeScale = 0;
 	}
-	
-	// Update is called once per frame
-	void Update ()
+
+    private void OnEnable()
     {
-        // while true
-		    // wait 1 sec
-            // iterate through each letter
-                // raise color and lower shadow
-	}
+        StartCoroutine(waveLetters());
+    }
 
     private IEnumerator waveLetters()
     {
-        for (int letter = 0; letter < title.text.Length; letter++)
+        while (true)
         {
-            Debug.Log(title.text[letter]);
-            yield return new WaitForSeconds(.5f);
+            yield return StartCoroutine(CoroutineUtilities.WaitForRealTime(3));
+
+            for (int letter = 0; letter < colorText.childCount; letter++)
+            {
+                StartCoroutine(moveLetters(colorText.GetChild(letter), shadowText.GetChild(letter)));
+                yield return StartCoroutine(CoroutineUtilities.WaitForRealTime(delay));
+            }
         }
-        Debug.Log("done");
+    }
+
+    private IEnumerator moveLetters(Transform c, Transform s)
+    {
+        Vector3 cPos = c.localPosition;
+        Vector3 sPos = s.localPosition;
+
+        float time = 0;
+        while (c.localPosition.y >= 0)
+        {
+            c.localPosition = c.localPosition + colorOffset * Mathf.Cos(time / period);
+            s.localPosition = s.localPosition + shadowOffset * Mathf.Cos(time / period);
+            yield return StartCoroutine(CoroutineUtilities.WaitForRealTime(epsilon));
+            time += epsilon;
+        }
+
+        c.localPosition = cPos;
+        s.localPosition = sPos;
+    }
+
+    // Class for coroutines when timescale = 0.
+    public static class CoroutineUtilities
+    {
+        public static IEnumerator WaitForRealTime(float delay)
+        {
+            while (true)
+            {
+                float pauseEndTime = Time.realtimeSinceStartup + delay;
+                while (Time.realtimeSinceStartup < pauseEndTime)
+                {
+                    yield return 0;
+                }
+                break;
+            }
+        }
     }
 }

@@ -10,6 +10,7 @@ namespace Completed
         public Text title;
         public GameObject panel;
         public GameObject tank;
+        public GameObject death;
 
         // Buttons
         public UnityEngine.UI.Selectable currentButton;
@@ -20,8 +21,7 @@ namespace Completed
         public GameObject Quit;
         public GameObject QuitYes;
         public GameObject QuitNo;
-
-        private Coroutine titleMovement;
+        
         public Transform killHolder1;
         public Transform killHolder2;
         private GameObject P1;
@@ -33,6 +33,12 @@ namespace Completed
         public GUI_Controller controllerGUI;
         public bool paused = false;
 
+        private Vector3 alignment = new Vector3(-25, 0, 0);
+        private Vector3 textOffset = new Vector3(40, 0, 0);
+        private Vector3 killOffset = new Vector3(12, 0, 0);
+        private Vector3 deathOffset = new Vector3(20, 0, 0);
+        
+
 
 
         void Awake()
@@ -43,13 +49,6 @@ namespace Completed
         // Use this for initialization
         void Start()
         {
-            /*killHolder1 = new GameObject("KillHolder1").transform;
-            killHolder1.SetParent(panel.transform);
-            killHolder1.position = panel.transform.position + new Vector3(10, 0, 0);
-            killHolder2 = new GameObject("KillHolder2").transform;
-            killHolder2.SetParent(panel.transform);
-            killHolder2.position = panel.transform.position + new Vector3(230, 0, 0);*/
-            
             // Load in the tank colors being used from the Resources folder in assets.
             tankColors = Resources.LoadAll<Material>("Prefab/GameObjectPrefab/TankPrefab/TankColors");
         }
@@ -76,7 +75,7 @@ namespace Completed
         {
             // Update player 1's kills.
             int[] P1Kills = P1.GetComponent<TankPlayer>().killCounter;
-            //TODO: the same for player 2
+            int P1Deaths = P1.GetComponent<TankPlayer>().deaths;
 
 
             for (int killType = 0; killType < P1Kills.Length; killType++)
@@ -90,29 +89,54 @@ namespace Completed
                         float offset = 8 * Mathf.Floor(kill / 5);
 
                         GameObject tankImage = Instantiate(tank) as GameObject;
-                        tankImage.transform.SetParent(killHolder1);
-                        tankImage.transform.position = killHolder1.position + new Vector3(0 + kill * 5 + offset, 20 - killType * 25, 0);
-                        tankImage.GetComponent<Image>().color = tankColors[killType].color;
-                        //tankImage.GetComponent<RectTransform>().localScale = new Vector3(.1f, .1f, 1);
-                        killCountText.GetComponent<Text>().enabled = false;
+                        tankImage.transform.SetParent(killHolder1.GetChild(killType));
+                        tankImage.transform.SetSiblingIndex(0);
+                        tankImage.transform.position = killHolder1.GetChild(killType).position + kill * killOffset + alignment;
+                        tankImage.GetComponentsInChildren<Image>()[1].color = tankColors[killType].color;
                     }
                 }
                 // Else, just print a counter representing the number of kills like "x 26".
                 else
                 {
                     GameObject tankImage = Instantiate(tank) as GameObject;
-                    tankImage.transform.SetParent(killHolder1);
-                    tankImage.transform.position = killHolder1.position + new Vector3(0, 20 - killType * 25, 0); ;
-                    tankImage.GetComponent<Image>().color = tankColors[killType].color;
-                    tankImage.GetComponent<RectTransform>().localScale = new Vector3(.1f, .1f, 1);
+                    tankImage.transform.SetParent(killHolder1.GetChild(killType));
+                    tankImage.transform.SetSiblingIndex(0);
+                    tankImage.transform.position = killHolder1.GetChild(killType).position + alignment;
+                    tankImage.GetComponentsInChildren<Image>()[1].color = tankColors[killType].color;
 
                     GameObject tankText = Instantiate(killCountText) as GameObject;
-                    tankText.transform.SetParent(killHolder1);
+                    tankText.transform.SetParent(killHolder1.GetChild(killType));
                     tankText.GetComponent<Text>().text = "x  " + P1Kills[killType];
                     tankText.GetComponent<Text>().fontSize = 14;
-                    tankText.transform.position = killHolder1.position + new Vector3(129, 22 - killType * 25, 0);
+                    tankText.transform.position = killHolder1.GetChild(killType).position + textOffset + alignment;
                     tankText.GetComponent<Text>().enabled = true;
                 }
+            }
+
+            P1Deaths = 5;
+            if (P1Deaths < 5)
+            {
+                for (int deathi = 0; deathi < P1Deaths; deathi++)
+                {
+                    GameObject tankImage = Instantiate(death) as GameObject;
+                    tankImage.transform.SetParent(killHolder1.GetChild(P1Kills.Length));
+                    tankImage.transform.SetSiblingIndex(0);
+                    tankImage.transform.position = killHolder1.GetChild(P1Kills.Length).position + deathi * deathOffset + alignment;
+                }
+            }
+            else
+            {
+                GameObject tankImage = Instantiate(death) as GameObject;
+                tankImage.transform.SetParent(killHolder1.GetChild(P1Kills.Length));
+                tankImage.transform.SetSiblingIndex(0);
+                tankImage.transform.position = killHolder1.GetChild(P1Kills.Length).position + alignment;
+
+                GameObject tankText = Instantiate(killCountText) as GameObject;
+                tankText.transform.SetParent(killHolder1.GetChild(P1Kills.Length));
+                tankText.GetComponent<Text>().text = "x  " + P1Deaths;
+                tankText.GetComponent<Text>().fontSize = 14;
+                tankText.transform.position = killHolder1.GetChild(P1Kills.Length).position + textOffset + alignment;
+                tankText.GetComponent<Text>().enabled = true;
             }
         }
 
@@ -202,9 +226,6 @@ namespace Completed
                 panel.SetActive(false);
 
                 //TODO: undisplay map
-                //TODO: stop "PAUSED" coroutine
-                StopCoroutine(titleMovement);
-                Debug.Log("stop");
 
                 paused = false;
 
@@ -257,13 +278,11 @@ namespace Completed
                 currentButton == Restart.GetComponent<Button>() ||
                 currentButton == Quit.GetComponent<Button>())
             {
-                Debug.Log("res");
                 resume();
             }
             else if (currentButton == RestartYes.GetComponent<Button>() ||
                 currentButton == RestartNo.GetComponent<Button>())
             {
-                Debug.Log("rest");
                 currentButton = Restart.GetComponent<Button>();
             }
             else if (currentButton == QuitYes.GetComponent<Button>() ||
@@ -276,8 +295,6 @@ namespace Completed
         }
         public void select()
         {
-            //currentButton.GetComponent<Button>().onClick.Invoke();
-            Debug.Log(currentButton);
             if (currentButton.GetComponent<Button>() == Resume.GetComponent<Button>())
             {
                 Unpause();
@@ -291,7 +308,6 @@ namespace Completed
             {
                 currentButton = QuitYes.GetComponent<Button>();
                 Quit.GetComponent<ButtonQuit>().quit();
-                Debug.Log(currentButton);
             }
             else if (currentButton.GetComponent<Button>() == RestartYes.GetComponent<Button>())
             {

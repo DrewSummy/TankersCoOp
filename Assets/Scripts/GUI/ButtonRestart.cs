@@ -8,17 +8,13 @@ public class ButtonRestart : ButtonPause
     private Button yes;
     private Button no;
     private bool selectedRestart;
-    private Color subbuttonUnselected = new Color(0, 0, 0, 150);
-    private Color subbuttonSelected = Color.white;
+    private Color subbuttonUnselected = new Color(0, 0, 0, 80);
+    private Color subbuttonSelected = new Color(255, 255, 255, 150);
 
     private void Awake()
     {
-        // Set the originalPos and color.
-        originalPos = transform.position;
+        // Set the color.
         originalColor = transform.GetChild(1).GetComponent<Text>().color;
-
-        // Set the offset position.
-        offsetPos = originalPos + selectOffset;
 
         // Set the button transform.
         button = transform;

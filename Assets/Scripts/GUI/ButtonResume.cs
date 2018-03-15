@@ -7,15 +7,11 @@ public class ButtonResume : ButtonPause
 {
     private void Awake()
     {
-        // Set the original position and color.
-        originalPos = transform.position;
+        // Set the and color.
         originalColor = transform.GetChild(1).GetComponent<Text>().color;
 
-        // Set the offset position.
-        offsetPos = originalPos + selectOffset;
-
         // Set the button transform.
-        button = transform;//.GetChild(0);
+        button = transform;
 
         // Set the button's text.
         buttonText = transform.GetChild(1).GetComponent<Text>();
