@@ -35,28 +35,30 @@ public class GUI_Controller : MonoBehaviour
     // Store the value of the input axes while exculding based on deadzones.
     private void TakeControllerInputs()
     {
+        PlayerID PID = TeamUtility.IO.PlayerID.One;
+
         // Left Joystick
-        jsLeftVerticalValue = -InputManager.GetAxis(jsLeftVerticalName);
+        jsLeftVerticalValue = -InputManager.GetAxis(jsLeftVerticalName, PID);
         if (Mathf.Abs(jsLeftVerticalValue) < deadzone)
         {
             jsLeftVerticalValue = 0;
         }
 
         // D-pad
-        dpVerticalValue = InputManager.GetAxis(dpVerticalName);
+        dpVerticalValue = InputManager.GetAxis(dpVerticalName, PID);
         if (Mathf.Abs(dpVerticalValue) < deadzone)
         {
             dpVerticalValue = 0;
         }
 
         // Start
-        startValue = InputManager.GetButtonDown(startName);
+        startValue = InputManager.GetButtonDown(startName, PID);
 
         // A
-        AButtonValue = InputManager.GetButtonDown(AButtonName);
+        AButtonValue = InputManager.GetButtonDown(AButtonName, PID);
 
         // B
-        BButtonValue = InputManager.GetButtonDown(BButtonName);
+        BButtonValue = InputManager.GetButtonDown(BButtonName, PID);
     }
 
 

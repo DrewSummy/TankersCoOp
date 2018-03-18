@@ -158,10 +158,6 @@ public class TankEnemy : Tank
             if (!targets[tankI].GetComponent<Tank>().alive)
             {
                 targets.RemoveAt(tankI);
-                /*if (!targets[tankI].GetComponent<TankPlayer>().alive)
-                {
-                    targets.RemoveAt(tankI);
-                }*/
             }
             else if (!targets[tankI])
             {
@@ -331,6 +327,7 @@ public class TankEnemy : Tank
     }
     protected new void Fire()
     {
+        return;
         if (canFire && projectileCount > 0)
         {
             StartCoroutine(delayFire());
@@ -389,7 +386,6 @@ public class TankEnemy : Tank
     }
     protected virtual void setToChase()
     {
-        Debug.Log("chase");
         fireFreq = fireFreqChase;
         state = TankEnemy.State.CHASE;
     }

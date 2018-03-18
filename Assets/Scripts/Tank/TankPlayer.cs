@@ -38,7 +38,7 @@ namespace Completed
 
         public int killAmount = 0;                  // The number of kills by this tank, kept track of for GUI_Pause.
         public int[] killCounter;                   // An array of number of kills for each type of tank.
-        public int deaths = 0;                      // The number of times this tank has died.
+        public int deathCounter = 0;                // The number of times this tank has died.
         private bool aimOnly = true;                // Boolean for whether the tank is enabled.
         public GameObject currentRoom;
         private int maxTimeApart = 3;               // Max amount of time players can be seperated.
@@ -381,7 +381,7 @@ namespace Completed
             GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
 
             // Update the death counter.
-            deaths++;
+            deathCounter++;
         }
 
 

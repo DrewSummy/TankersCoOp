@@ -188,16 +188,16 @@ namespace Completed
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));
-            firstRoomCoordinate = new Vector2(0, 0);
+            //firstRoomCoordinate = new Vector2(0, 0);
             floorChart[(int)firstRoomCoordinate.x, (int)firstRoomCoordinate.y] = true;
 
 
             // Go through all but the last room and instantiate them.
             // Add the neighbors to validNextRoom.
-            List<Vector2> validNextRooms = new List<Vector2>(); ;
+            List<Vector2> validNextRooms = new List<Vector2>();
             validNextRooms = AddNeighbors(validNextRooms, firstRoomCoordinate);
 
-            for (int rooms = 1; rooms < numberOfRooms; rooms++)
+            for (int rooms = 1; rooms < numberOfRooms - 1; rooms++)
             {
                 // Get random, valid room.
                 int randomRoomIndex = Random.Range(0, validNextRooms.Count);
@@ -210,7 +210,7 @@ namespace Completed
 
                 // Set the lastRoomCoordinate.
                 //TODO: fix this
-                if (rooms == numberOfRooms - 1)
+                if (rooms == numberOfRooms - 2)
                 {
                     floorChart[(int)validNextRooms[randomRoomIndex].x, (int)validNextRooms[randomRoomIndex].y] = true;
                     lastRoomCoordinate = validNextRooms[randomRoomIndex];

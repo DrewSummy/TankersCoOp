@@ -7,15 +7,6 @@ namespace Completed
 {
     public class GUI_MiniMap : MonoBehaviour
     {
-        /*floorSample = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_FloorSample") as GameObject;
-           unknownSample = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_UnknownSample") as GameObject;
-
-           floorFull = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_FloorFull") as GameObject;
-           unknownFull = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_UnknownFull") as GameObject;
-
-           playerSample = Resources.Load("Prefab/UIPrefab/GUI/MiniMapImages/Image_PlayerSample") as GameObject;*/
-
-
         public GameObject panelSample;                                           // The GameObject with the sample panel.
         public GameObject panelFull;                                             // The GameObject with the full panel.
         
@@ -29,6 +20,7 @@ namespace Completed
         public GameObject playerSample;                                          // The GameObject with the sample player image.
         public GameObject playerIndicator;
         public GameObject exit;                                                  // The GameObject with the exit sprite.
+        public GameObject exitSample;
         public LevelManager levelScript;                                         // Store a reference to the LevelManager which will set up the level.
 
         private int[,] floorChart = new int[11, 11];                             // An array of arrays of ints representing room statuses.
@@ -46,7 +38,7 @@ namespace Completed
         private int m_RoomLength = 50;                                           // Length of each room declared elsewhere also.
         private float wallThickness = 1f;                                        // Thickness of outside walls.
         private Vector2 playerCoord;                                             // Reference to coordinate of players position.
-        private Vector3 mapOffset = new Vector3(80, 100, 0);                                         // Amount to scale by on neighborless wall. Proportional to outlineBorderFull.
+        private Vector3 mapOffset = Vector3.zero;// = new Vector3(80, 100, 0);                                         // Amount to scale by on neighborless wall. Proportional to outlineBorderFull.
         private bool selected = false;
         private int sampleRadius = 1;
 
@@ -82,7 +74,7 @@ namespace Completed
         // Go through the floorChart from LevelManager and update GUI_MiniMap's floorChart.
         private void initiateFloorChart(bool[,] fC, Vector2 lR)
         {
-            // floorChart key
+            // floorChart Key
             // 0 - unoccupied
             // 1 - unvisited
             // 2 - visited
@@ -133,7 +125,7 @@ namespace Completed
 
                         // Initialize floorsFull where all rooms are initially unvisited.
                         floorsFull[row, column] = currFloor;
-                        
+
                         // The floor starts off as unknown.
                         GameObject floor = Instantiate(unknownFull) as GameObject;
                         floor.transform.SetParent(currFloor);
@@ -160,11 +152,11 @@ namespace Completed
             //playerIndicator.GetComponent<RectTransform>().position = floorHolderSample.position;
             
             //TODO: color should be set by player tank color
-            Color c = Color.blue;
+            /*Color c = Color.blue;
             foreach (Transform bar in playerIndicator.transform)
             {
                 bar.gameObject.GetComponent<Image>().color = c;
-            }
+            }*/
         }
 
         // Places sample map while adding to the outlineHolderFull and floorHolderSample.
@@ -205,19 +197,6 @@ namespace Completed
                     {
                         RectTransform currFloor = new GameObject("Floor #" + (floorChart.GetLength(0) * column + row)).AddComponent<RectTransform>();
                         currFloor.transform.SetParent(floorHolderSample);
-
-
-
-                        // Here //////////
-                        /*Canvas can = GetComponentInParent<Canvas>();
-
-                        currFloor.transform.position = floorHolderSample.position + new Vector3(row - (int)playerCoord[0], column - (int)playerCoord[1], 0) * roomLengthSample;
-                        Debug.Log(currFloor.transform.position - floorHolderSample.position);
-                        Debug.Log(roomLengthSample);
-                        Vector3 pos = floorHolderSample.position + new Vector3(row - (int)playerCoord[0], column - (int)playerCoord[1], 0) * roomLengthSample * can.scaleFactor;
-                        currFloor.transform.localPosition = new Vector3(28, 28, 0);
-                        Debug.Log(new Vector3(row - (int)playerCoord[0], column - (int)playerCoord[1], 0) * roomLengthSample);*/
-                        //^^delete^^
                         currFloor.transform.localPosition = new Vector3(row - (int)playerCoord[0], column - (int)playerCoord[1], 0) * roomLengthSample;
 
 
@@ -234,6 +213,14 @@ namespace Completed
                         for (int i = 0; i < doorCount; ++i)
                         {
                             doorIndicators.GetChild(i).gameObject.SetActive(currNEWS[i]);
+                        }
+
+                        if (lastRoom == new Vector2((int)row, (int)column))
+                        {
+                            // Place the exit as SetActive(false).
+                            GameObject ladder = Instantiate(exitSample) as GameObject;
+                            ladder.transform.SetParent(currFloor);
+                            ladder.transform.position = currFloor.position;
                         }
                     }
 
@@ -350,13 +337,9 @@ namespace Completed
             bool[] currNEWS = FindCurrentNEWS(row, column);
             Transform doorIndicators = floor.transform.GetChild(2);
             int doorCount = doorIndicators.childCount;
-            //Debug.Log(doorIndicators.name);
 
             // Set active the necessary door indicators.
-            for (int i = 0; i < doorCount; ++i)
-            {
-                doorIndicators.GetChild(i).gameObject.SetActive(currNEWS[i]);
-            }
+            floor.GetComponent<PauseRoom>().SetDoors(currNEWS);
 
             // If this is the last room, add an instance of exit to the floor.
             if (lastRoom == new Vector2((int)row, (int)column))
@@ -414,8 +397,15 @@ namespace Completed
             playerCoord = new Vector2(xCoord, yCoord);
         }
 
+        // Used by GUI_Pause to locate the player.
+        public Vector2 SendPlayerCoord()
+        {
+            FindOccupiedRoom();
+            return playerCoord;
+        }
+
         // Helper function for placeSample and initialPlacementFull.
-        private bool[] FindCurrentNEWS(int xCoord, int yCoord)
+        public bool[] FindCurrentNEWS(int xCoord, int yCoord)
         {
             // Initialized as false.
             bool[] NEWS = new bool[4];
@@ -503,16 +493,35 @@ namespace Completed
             }
         }
 
+        // Called by pause
+        public void Hide()
+        {
+            clearFull();
+            clearSample();
+        }
+        public void Reveal()
+        {
+            selected = !selected;
+            MapAndUnmap();
+        }
+        public Transform SendMap()
+        {
+            return panelFull.transform;
+        }
+
         // Used by GameMaster when clearing a game.
         public void clearMap()
         {
-            //Destroy(floorHolderFull.gameObject);
-            //Destroy(floorHolderSample.gameObject);
-            //Destroy(itemHolderFull.gameObject);
             Destroy(tank);
 
             clearFull();
             clearSample();
+        }
+
+        // Used by GUI_Pause to recreate the map.
+        public int[,] SendFloorChart()
+        {
+            return floorChart;
         }
     }
 }

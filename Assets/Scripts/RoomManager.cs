@@ -309,15 +309,19 @@ namespace Completed
 
         private IEnumerator Countdown()
         {
-            //TODO: add audio
-            
             foreach (EdgeCountdown edge in edgeHolder.GetComponentsInChildren<EdgeCountdown>())
             {
                 edge.Pulse();
+
+                PlayAudio();
             }
             yield return new WaitForSeconds(4);
         }
 
+        private void PlayAudio()
+        {
+            //TODO: Play
+        }
 
         public void PlacePlayers()
         {
@@ -423,6 +427,23 @@ namespace Completed
                     toEnemy = enemy.transform.position - player2.transform.position;
                 }
                 enemy.GetComponent<Tank>().InitializeAim(toEnemy);
+            }
+            // Add teammates.
+            List<GameObject> team = new List<GameObject>();
+
+            /*foreach (Tank tank in enemyHolder)
+            {
+                team.Add(tank.gameObject);
+            }*/
+            foreach (Tank tank in enemyHolder.GetComponentsInChildren<Tank>())
+            {
+                foreach (Tank teammate in enemyHolder.GetComponentsInChildren<Tank>())//team)
+                {
+                    if (tank.gameObject != teammate.gameObject)
+                    {
+                        tank.teammates.Add(teammate.gameObject);
+                    }
+                }
             }
         }
 
@@ -1080,10 +1101,7 @@ namespace Completed
             NEWSRoom = levelScript.SendNEWS(m_room);
         }
 
-        
-
         // Helpers for the end of a battle.
-
         private void removeProjectiles()
         {
 
@@ -1115,12 +1133,11 @@ namespace Completed
         }
 
 
-
         private void updateGUIMiniMap()
         {
             GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().visitedRoom(coordinate);
         }
-        
+
 
         // Helper function for setUpRoom().
         private void callStart()
@@ -1161,7 +1178,7 @@ namespace Completed
 
                 // Set the camera's battling variable to true;
                 m_camera.GetComponent<CameraControl>().startBattleCamera(transform);
-                
+
                 // Update the GUI.
                 updateGUIMiniMap();
                 GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().movePlayer();

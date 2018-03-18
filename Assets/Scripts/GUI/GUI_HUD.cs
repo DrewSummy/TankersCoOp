@@ -319,10 +319,6 @@ namespace Completed
             {
                 GameObject.Destroy(child.gameObject);
             }
-
-
-            //Destroy(countdownHolder.gameObject);
-            //Destroy(enemyHolder.gameObject);
         }
     }
 }

@@ -8,8 +8,8 @@ public class ButtonRestart : ButtonPause
     private Button yes;
     private Button no;
     private bool selectedRestart;
-    private Color subbuttonUnselected = new Color(0, 0, 0, 80);
-    private Color subbuttonSelected = new Color(255, 255, 255, 150);
+    private Color subbuttonUnselected = new Color(0, 0, 0, .3f);
+    private Color subbuttonSelected = new Color(.8f, .8f, .8f, 1);
 
     private void Awake()
     {

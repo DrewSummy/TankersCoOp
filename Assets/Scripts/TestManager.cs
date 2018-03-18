@@ -104,10 +104,7 @@ public class TestManager : MonoBehaviour {
             // Clear the lists.
             teamAInstance[t].GetComponent<Tank>().targets.Clear();
             teamAInstance[t].GetComponent<Tank>().teammates.Clear();
-
-            // Add targets with the helper function.
-            //deepCopyTeam(teamAInstance[t].GetComponent<Tank>(), teamBInstance);
-
+            
             // Add the targets to the tank.
             foreach (GameObject tank in teamBInstance)
             {
@@ -125,9 +122,6 @@ public class TestManager : MonoBehaviour {
             // Clear the lists.
             teamBInstance[t].GetComponent<Tank>().targets.Clear();
             teamBInstance[t].GetComponent<Tank>().teammates.Clear();
-
-            // Add targets with the helper function.
-            //deepCopyTeam(teamBInstance[t].GetComponent<Tank>(), teamAInstance);
 
             // Add the targets to the tank.
             foreach (GameObject tank in teamAInstance)
