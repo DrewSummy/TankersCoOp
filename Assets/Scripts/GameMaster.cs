@@ -174,7 +174,7 @@ public class GameMaster : MonoBehaviour
         HUDGUI.gameObject.SetActive(true);
         HUDGUI.enableHUD();
         pauseGUI.enablePause();
-        //camera.SetActive(true);
+        minimapGUI.clearMap();
     }
 
     // Helper for CreateSoloGame().

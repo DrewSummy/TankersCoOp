@@ -143,15 +143,15 @@ namespace Completed
                 state = CameraControl.State.STATEFINISH;
             }
         }
-
-        public void PlaceOnFirstRoom(Transform firstRoom)
-        {
-            PlaceOnRoom(firstRoom);
-        }
+        
         private void PlaceOnRoom(Transform room)
         {
-            //TODO: this might need to switch to patrol
-            //camera.transform.localPosition = battleOffset * cameraOffset;
+            Vector3 t = new Vector3(Mathf.Floor((room.transform.position.x + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2,
+                    0,
+                    Mathf.Floor((room.transform.position.z + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2);
+            
+            camera.transform.localPosition = battleOffset * cameraOffset;
+            transform.position = t;
 
             camera.LookAt(transform);
         }

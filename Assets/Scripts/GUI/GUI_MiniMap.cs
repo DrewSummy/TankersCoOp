@@ -106,6 +106,11 @@ namespace Completed
         // Place the full map initially and instantiate floorsFull.
         private void initialPlacementFull()
         {
+            foreach (Transform gO in floorHolderFull)
+            {
+                GameObject.Destroy(gO.gameObject);
+            }
+
             // Place the tank in the starting room.
             tank = Instantiate(player) as GameObject;
             tank.transform.SetParent(itemHolderFull);
@@ -512,6 +517,11 @@ namespace Completed
         // Used by GameMaster when clearing a game.
         public void clearMap()
         {
+            if (selected)
+            {
+                MapAndUnmap();
+            }
+
             Destroy(tank);
 
             clearFull();

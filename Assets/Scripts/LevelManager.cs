@@ -184,7 +184,7 @@ namespace Completed
             {
                 numberOfRooms = floorChart.GetLength(0) * floorChart.GetLength(1);
             }
-            numberOfRooms = 28;
+            numberOfRooms = 121;
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));
@@ -197,7 +197,7 @@ namespace Completed
             List<Vector2> validNextRooms = new List<Vector2>();
             validNextRooms = AddNeighbors(validNextRooms, firstRoomCoordinate);
 
-            for (int rooms = 1; rooms < numberOfRooms - 1; rooms++)
+            for (int rooms = 1; rooms < numberOfRooms; rooms++)
             {
                 // Get random, valid room.
                 int randomRoomIndex = Random.Range(0, validNextRooms.Count);
@@ -205,16 +205,17 @@ namespace Completed
                 // Update floorChart and update validNextRooms.
                 floorChart[(int)validNextRooms[randomRoomIndex].x, (int)validNextRooms[randomRoomIndex].y] = true;
 
-                validNextRooms = AddNeighbors(validNextRooms, validNextRooms[randomRoomIndex]);
-                validNextRooms.Remove(validNextRooms[randomRoomIndex]);
 
                 // Set the lastRoomCoordinate.
-                //TODO: fix this
-                if (rooms == numberOfRooms - 2)
+                if (rooms == numberOfRooms - 1)
                 {
                     floorChart[(int)validNextRooms[randomRoomIndex].x, (int)validNextRooms[randomRoomIndex].y] = true;
                     lastRoomCoordinate = validNextRooms[randomRoomIndex];
                 }
+
+                // Update the next valid rooms.
+                validNextRooms = AddNeighbors(validNextRooms, validNextRooms[randomRoomIndex]);
+                validNextRooms.Remove(validNextRooms[randomRoomIndex]);
             }
         }
 
@@ -561,19 +562,9 @@ namespace Completed
             m_camera.GetComponent<CameraControl>().Initialize(firstRoom);
             m_camera.GetComponent<CameraControl>().m_Player1 = player1;
             m_camera.GetComponent<CameraControl>().m_Player2 = player2;
-
-            /*
-            // Set the players.
-            m_camera.GetComponent<CameraControl>().m_Player1 = player1;
-            if (coop)
-            {
-                m_camera.GetComponent<CameraControl>().m_Player2 = player2;
-            }
-            // Start the first room with the camera on it.
-            */
-            //m_camera.GetComponent<CameraControl>().PlaceOnFirstRoom(firstRoom);
-
-            //TODO:fade from black to start
+            
+            
+            // Fade from black to start
             StartCoroutine(fadeFromBlack());
             firstRoom.GetComponent<RoomManager>().startBeginningBattle();
         }

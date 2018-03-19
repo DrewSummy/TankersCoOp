@@ -57,34 +57,11 @@ namespace Completed
                     P2 = tank;
                 }
             }
-            // TODO: this might be being done too soon in awake player1Alive = P1.GetComponent<TankPlayer>().alive;
-            // TODO: this might need to actually grab coop from gameMaster. player2Alive = P2.GetComponent<TankPlayer>().alive;
         }
 
         // Use this for initialization
         private void callStart()
         {
-            // Create the enemy holder.
-            //enemyHolder = new GameObject("EnemyHolder").AddComponent<RectTransform>();
-            //enemyHolder.SetParent(enemyPanel.transform);
-            //enemyHolder.position = enemyPanel.transform.position + new Vector3(50, -40, 0);
-
-            // Create the countdown holder.
-            //countdownHolder = new GameObject("CountdownHolder").transform;
-            //countdownHolder.SetParent(this.transform);
-            //countdownHolder.position = this.transform.position;
-
-            // Create the banner holder.
-            //bannerHolder = new GameObject("BannerHolder").transform;
-            //bannerHolder.SetParent(this.transform);
-            //bannerHolder.position = this.transform.position;
-
-            // Load relevant sprites.
-            /*projectile = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_Projectile") as GameObject;
-            projectileEmpty = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_ProjectileEmpty") as GameObject;
-            //tank = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_TankBig") as GameObject;
-            blackBanner = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Image_Banner") as GameObject;*/
-
             GameObject[] sprites = new GameObject[4];
             sprites[0] = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Deprecated/Image_3") as GameObject;
             sprites[1] = Resources.Load("Prefab/UIPrefab/GUI/HUDImages/Deprecated/Image_2") as GameObject;

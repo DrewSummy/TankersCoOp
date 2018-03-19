@@ -6,8 +6,6 @@ namespace Completed
 {
     public class TankPlayer : Tank
     {
-
-
         PlayerID PID;
         public int m_PlayerNumber = 1;              // Used to identify which tank belongs to which player. This is set by this tank's manager.
         public TankPlayer teammate = null;
@@ -499,7 +497,7 @@ namespace Completed
             {
                 GetComponentsInChildren<MeshRenderer>()[i].enabled = true;
             }
-            //GetComponent<BoxCollider>().enabled = true;
+            body.GetComponent<BoxCollider>().enabled = true;
 
             alive = true;
             // Place in the center of the room the player was in.
