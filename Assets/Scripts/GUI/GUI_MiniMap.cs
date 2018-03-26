@@ -9,7 +9,8 @@ namespace Completed
     {
         public GameObject panelSample;                                           // The GameObject with the sample panel.
         public GameObject panelFull;                                             // The GameObject with the full panel.
-        
+        public GameObject panelPause;                                            // The GameObject with the full panel.
+
         public GameObject floorSample;                                           // The GameObject with the sample floor image.
         public GameObject unknownSample;                                         // The GameObject with the sample unknown room image.
 
@@ -28,7 +29,6 @@ namespace Completed
         public RectTransform floorHolderFull;                                       // edit A variable to store a reference to the transform of the floor object.
         public RectTransform floorHolderSample;                                       // edit A variable to store a reference to the transform of the floor object.
         public RectTransform itemHolderFull;                                        // edit A variable to store a reference to the transform of the outline object.
-        
 
         private GameObject P1;                                                   // Reference to the player 1 game object.
         private Vector2 lastRoom;
@@ -41,6 +41,7 @@ namespace Completed
         private Vector3 mapOffset = Vector3.zero;// = new Vector3(80, 100, 0);                                         // Amount to scale by on neighborless wall. Proportional to outlineBorderFull.
         private bool selected = false;
         private int sampleRadius = 1;
+        private float pauseMapAlpha = .9f;
 
         private GameObject tank;                                                  // Instance of player.
 
@@ -65,7 +66,7 @@ namespace Completed
 
             // Go through floorChart and place the rooms while initializing floorsFull.
             initialPlacement();
-            
+
             // Place the sample map and hide the full map to start.
             panelSample.SetActive(true);
             panelFull.SetActive(false);
@@ -95,7 +96,7 @@ namespace Completed
                 }
             }
         }
-        
+
         // Place both maps.
         private void initialPlacement()
         {
@@ -155,7 +156,7 @@ namespace Completed
             //playerIndicator = Instantiate(playerSample) as GameObject;
             //playerIndicator.GetComponent<RectTransform>().SetParent(panelSample.transform);
             //playerIndicator.GetComponent<RectTransform>().position = floorHolderSample.position;
-            
+
             //TODO: color should be set by player tank color
             /*Color c = Color.blue;
             foreach (Transform bar in playerIndicator.transform)
@@ -244,7 +245,7 @@ namespace Completed
                     }
                 }
             }
-        }        
+        }
 
         // Destroys room objects for the sample map.
         private void clearSample()
@@ -304,7 +305,7 @@ namespace Completed
             {
                 topRight[0] = rightMost;
             }
-            
+
             int topMost = column;
             if (FindCurrentNEWS(row, column)[0])
             {
@@ -332,7 +333,7 @@ namespace Completed
 
             // Replace the children of the floor and outline.
             RectTransform currFloor = floorsFull[(int)row, (int)column].GetComponent<RectTransform>();
-            
+
             // The floor starts off as unknown.
             GameObject floor = Instantiate(floorFull) as GameObject;
             floor.transform.SetParent(currFloor);
@@ -354,7 +355,7 @@ namespace Completed
                 ladder.transform.SetParent(currFloor);
                 ladder.transform.position = currFloor.position;
             }
-            
+
             // Set active the current floor and the neighbors.
             currFloor.gameObject.SetActive(true);
             if (currNEWS[0])
@@ -481,7 +482,7 @@ namespace Completed
             }
             return false;
         }
-        
+
         public void MapAndUnmap()
         {
             if (!selected)
@@ -501,17 +502,45 @@ namespace Completed
         // Called by pause
         public void Hide()
         {
+            panelPause.SetActive(true);
             clearFull();
             clearSample();
         }
         public void Reveal()
         {
+            panelPause.SetActive(false);
             selected = !selected;
             MapAndUnmap();
         }
         public Transform SendMap()
         {
             return panelFull.transform;
+        }
+        public void PauseDisplay()
+        {
+            // Get rid of all the old map objects.
+            foreach (Transform child in panelPause.transform)
+            {
+                GameObject.Destroy(child.gameObject);
+            }
+
+            // Instantiate new map objects.
+            Transform floor = Instantiate(floorHolderFull) as Transform;
+            Transform item = Instantiate(itemHolderFull) as Transform;
+            floor.SetParent(panelPause.transform);
+            floor.transform.position = floorHolderFull.position;
+            floor.transform.localScale = floorHolderFull.localScale;
+            item.SetParent(panelPause.transform);
+            item.transform.position = itemHolderFull.position;
+            item.transform.localScale = itemHolderFull.localScale;
+
+            // Raise the alpha value of the panel pause.
+            foreach (Image image in panelPause.GetComponentsInChildren<Image>())
+            {
+                // Raise alpha.
+                Color c = new Color(image.color.r, image.color.g, image.color.b, pauseMapAlpha);
+                image.color = c;
+            }
         }
 
         // Used by GameMaster when clearing a game.

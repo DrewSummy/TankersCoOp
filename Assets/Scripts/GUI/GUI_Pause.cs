@@ -128,7 +128,7 @@ namespace Completed
                     tankText.GetComponent<Text>().enabled = true;
                 }
             }
-            
+
             if (P1Deaths <= 5)
             {
                 for (int deathi = 0; deathi < P1Deaths; deathi++)
@@ -197,7 +197,7 @@ namespace Completed
                     tankText.GetComponent<Text>().enabled = true;
                 }
             }
-            
+
             if (P2Deaths <= 5)
             {
                 for (int deathi = 0; deathi < P2Deaths; deathi++)
@@ -276,22 +276,24 @@ namespace Completed
                 }
             }
         }
-        
+
         private void DisplayMap()
         {
+            //TODO: instead just duplicate the map where it is and make it brighter
+
             // delete old
             RemoveMap();
 
             // get map object
             Transform toPlace = guiMiniMap.SendMap();
-            
+
             // place in center with MapInstance as parent object
 
             GameObject m = Instantiate(toPlace.gameObject) as GameObject;
             m.SetActive(true);
             m.transform.SetParent(mapInstance.transform);
             m.GetComponent<RectTransform>().position = toPlace.position;
-            
+
             // go through each object and make opaque
             foreach (Image i in mapInstance.transform.GetComponentsInChildren<Image>())
             {
@@ -299,7 +301,8 @@ namespace Completed
                 i.color = newColor;
             }
         }
-        
+
+
         private void RemoveMap()
         {
             foreach (Transform child in mapInstance.transform)
@@ -323,14 +326,15 @@ namespace Completed
                 // Display map and hide the GUI_MiniMap's map.
                 //DisplayMap();
                 //DisplayMap2();
-                DisplayMap();
+                //DisplayMap();
+                /////////switch to fullmap
                 guiMiniMap.Hide();
+                guiMiniMap.PauseDisplay();
 
                 paused = true;
 
                 // Enable the controller.
                 controllerGUI.enabled = true;
-
             }
         }
 

@@ -76,11 +76,11 @@ namespace Completed
         public bool isLastRoom = false;                                          // Boolean for if this is the last room.
         private GameObject[] waypoints;
 
-        
+
         public GameMaster GM;
         private int enemyCount = 0;
         private Object enemyCounterLock = new Object();
-        
+
 
         // Instantiates the 2D arrays representing the room's obstacle course.
         private void SetObstacleCourses()
@@ -437,7 +437,7 @@ namespace Completed
             }*/
             foreach (Tank tank in enemyHolder.GetComponentsInChildren<Tank>())
             {
-                foreach (Tank teammate in enemyHolder.GetComponentsInChildren<Tank>())//team)
+                foreach (Tank teammate in enemyHolder.GetComponentsInChildren<Tank>())
                 {
                     if (tank.gameObject != teammate.gameObject)
                     {
@@ -728,7 +728,7 @@ namespace Completed
 
             // Fill enemyList.
             enemyList = Resources.LoadAll<GameObject>("Prefab/GameObjectPrefab/TankPrefab/TankEnemy");
-            
+
             // Create enemyHolder for this room.
             enemyHolder = new GameObject("EnemyHolder").transform;
             enemyHolder.SetParent(m_room);
@@ -1151,17 +1151,17 @@ namespace Completed
         // Called by TankEnemy. This starts endBattleCorrected().
         public void enemyDecrement()
         {
-            lock(enemyCounterLock)
+            lock (enemyCounterLock)
             {
                 enemyCount--;
-                
+
                 if (enemyCount == 0 && levelScript.playersAlive())
                 {
                     endBattle();
                 }
             }
         }
-        
+
         // Places player and enemy tanks in the room and starts the battle.
         public void startBeginningBattle()
         {
@@ -1182,13 +1182,13 @@ namespace Completed
                 // Update the GUI.
                 updateGUIMiniMap();
                 GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().movePlayer();
-                
+
                 battleEnsuing = true;
 
                 levelScript.currentRoom = transform;
             }
         }
-        
+
         // Called by LevelManager when the game is over due to player loss
         public void endRoom()
         {
@@ -1218,7 +1218,7 @@ namespace Completed
             yield return new WaitForSeconds(.05f);
             //m_camera.GetComponent<CameraControl>().startBattleCamera(transform);
             m_camera.GetComponent<CameraControl>().endBattleCamera();
-            
+
 
             //TODO: make roomIdle obsolete
             roomIdle = true;
@@ -1254,7 +1254,7 @@ namespace Completed
 
             // Wait for camera to stop shaking.
             StartCoroutine(m_camera.GetComponent<CameraControl>().endBattleCamera());
-            
+
 
             // Undisable shooting.
             if (player1) player1.GetComponent<TankPlayer>().disableShoot(false);

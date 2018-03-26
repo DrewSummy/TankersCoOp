@@ -54,7 +54,7 @@ public class TankEnemyBlack : TankEnemy
     protected new void Start()
     {
         base.Start();
-        
+
         // The FSM begins on Evade.
         setToSearch();
     }
@@ -112,7 +112,7 @@ public class TankEnemyBlack : TankEnemy
 
         // Change the rotation direction.
         rotateCW = !rotateCW;
-        
+
         // Change the drive speed.
         speedCurrent = speedChase;
 
@@ -235,9 +235,12 @@ public class TankEnemyBlack : TankEnemy
         targetsAndTeammates.AddRange(teammates);
         foreach (GameObject tank in targetsAndTeammates)
         {
-            if (Vector3.Magnitude(transform.position - tank.transform.position) < explodeRadius)
+            if (tank)
             {
-                tank.GetComponent<Tank>().DestroyTank();
+                if (Vector3.Magnitude(transform.position - tank.transform.position) < explodeRadius)
+                {
+                    tank.GetComponent<Tank>().DestroyTank();
+                }
             }
         }
 
@@ -292,7 +295,7 @@ public class TankEnemyBlack : TankEnemy
             Physics.Raycast(tower.position, toEnemy, out hit, raycastLayer);
 
             //Debug.DrawLine(tower.position, tower.position + toEnemy * 30, Color.white, 1.5f);
-            
+
             if (hit.transform.gameObject == targets[tankI])
             {
                 return true;
