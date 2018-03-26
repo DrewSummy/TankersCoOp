@@ -1,5 +1,7 @@
 ﻿/*
 
+TODO: test commit
+
 improve moving shooting ai: make aggressive ai tank have two more states where it circles when too close
 delegate certain traits to ai tanks
 idea: when player in sight stop moving or rotating and wait an amount of time then shoot
