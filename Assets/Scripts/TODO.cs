@@ -1,5 +1,7 @@
 ﻿/*
 
+TODO: test commit
+
 improve moving shooting ai: make aggressive ai tank have two more states where it circles when too close
 delegate certain traits to ai tanks
 idea: when player in sight stop moving or rotating and wait an amount of time then shoot
@@ -46,9 +48,12 @@ idea:
     
 bugs:
     projectile corner: projectiles ricochet unpredictably against corners of obstacles even when the corner is right against another obstacle
+                        this is likely do to not rotating around the box collider correctly
 
 
     give credit to:
     https://github.com/daemon3000/InputManager/wiki/Getting-Started
     https://www.youtube.com/watch?v=00qMZlacZQo https://github.com/Shrimpey/Outlined-Diffuse-Shader-Fixed/blob/master/CustomOutline.shader (sillhouette)
+    explosion asset
+    aspect ratio/screen resolution help https://forum.unity.com/threads/force-camera-aspect-ratio-16-9-in-viewport.385541/
 */

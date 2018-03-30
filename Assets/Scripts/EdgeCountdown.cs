@@ -13,7 +13,7 @@ public class EdgeCountdown : MonoBehaviour
     public void Pulse()
     {
         StartCoroutine(PulseHelper());
-        StartCoroutine(timeTest());
+        //StartCoroutine(timeTest());
     }
 
     private IEnumerator PulseHelper()
@@ -46,12 +46,12 @@ public class EdgeCountdown : MonoBehaviour
     private IEnumerator timeTest()
     {
         yield return new WaitForSeconds(1);
-        //Debug.Log("tick");
+        Debug.Log("tick");
         yield return new WaitForSeconds(1);
-        //Debug.Log("tick");
+        Debug.Log("tick");
         yield return new WaitForSeconds(1);
-        //Debug.Log("tick");
+        Debug.Log("tick");
         yield return new WaitForSeconds(1);
-        //Debug.Log("tick");
+        Debug.Log("tick");
     }
 }

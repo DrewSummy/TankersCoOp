@@ -33,7 +33,7 @@ public class TankEnemyRed : TankEnemy
         fireFreqExplore = .85f;
 
         // Driving variables
-        m_Speed = 10f;
+        m_Speed = 6.5f;
         m_RotateSpeed = 5f;
         turningTimeMax = 2.5f;
         turningTimeMin = .5f;

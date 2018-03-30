@@ -155,8 +155,8 @@ namespace Completed
             else
             {
                 // Get the horizontal and vertical components.
-                m_DriveHorizontalValue = -InputManager.GetAxis(m_DriveHorizontalName, PID);
-                m_DriveVerticalValue = -InputManager.GetAxis(m_DriveVerticalName, PID);
+                m_DriveHorizontalValue = InputManager.GetAxis(m_DriveHorizontalName, PID);
+                m_DriveVerticalValue = InputManager.GetAxis(m_DriveVerticalName, PID);
             }
             // Aiming.
             if (joystickMagnitude2 < .1)
@@ -241,7 +241,7 @@ namespace Completed
         {
             // moves very slightly and the body doesn't follow. This would cause the speed to be 0 from calculate speed.
             // Keep track of the direction the joystick is pointed toward.
-            Vector3 m_TargetDirection = new Vector3(-m_DriveHorizontalValue, 0, m_DriveVerticalValue);
+            Vector3 m_TargetDirection = new Vector3(m_DriveHorizontalValue, 0, -m_DriveVerticalValue);
 
             float step = m_RotateSpeed * Time.deltaTime;
             Vector3 newDir = Vector3.RotateTowards(body.forward, m_TargetDirection, step, .01F);

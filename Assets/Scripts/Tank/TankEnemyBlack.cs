@@ -189,13 +189,14 @@ public class TankEnemyBlack : TankEnemy
             rotation = Quaternion.Euler(0, 10, 0);
         }
 
-        targetDirectionAim = rotation * -tower.forward;
+        targetDirectionAim = rotation * tower.forward;
         float step = towerRotateSpeed * Time.deltaTime;
         Vector3 newDir = Vector3.RotateTowards(tower.forward, targetDirectionAim, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
     }
     private void tryToExplode()
     {
+        return;
         if (isExplodeDistance())
         {
             //StartCoroutine(explode());
@@ -293,8 +294,6 @@ public class TankEnemyBlack : TankEnemy
 
             RaycastHit hit;
             Physics.Raycast(tower.position, toEnemy, out hit, raycastLayer);
-
-            //Debug.DrawLine(tower.position, tower.position + toEnemy * 30, Color.white, 1.5f);
 
             if (hit.transform.gameObject == targets[tankI])
             {

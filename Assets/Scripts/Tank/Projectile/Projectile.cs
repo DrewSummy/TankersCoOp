@@ -12,7 +12,7 @@ public class Projectile : MonoBehaviour
 
     protected int maxCollisions = 1;               // The max number of collisions before the object is destroyed. 
     protected int collisionCounter = 0;            // Used to keep track of the number of collisions.
-    protected float projectileSpeed = 16;          // The speed the projectile fires at.
+    protected float projectileSpeed = 5;           // The speed the projectile fires at.
     protected Vector3 projectileSpeedVector;       // The vector the projectile moves at.
     protected Rigidbody ProjectileRigidbody;       // Reference used to move the projectile.
     public GameObject parentTank;                  // Reference to the parent tank game object.
@@ -24,11 +24,12 @@ public class Projectile : MonoBehaviour
     private string playerTag = "Player";
     private string enemyTag = "Enemy";
     private float offset = .25f;
+    private float maxDestroyTime = 20;
 
     // Remove projectile variables
-    private float horProjExplVel = 7;
-    private float vertProjExplVel = 9;
-    private float horProjExplTor = 5;
+    private float horProjExplVel = 2;
+    private float vertProjExplVel = 4.5f;
+    private float horProjExplTor = 2;
     
 
     protected void Awake()
@@ -43,7 +44,7 @@ public class Projectile : MonoBehaviour
         resetVariables();
 
         // Add velocity to the projectile.
-        ProjectileRigidbody.velocity = -ProjectileRigidbody.transform.forward * projectileSpeed;
+        ProjectileRigidbody.velocity = ProjectileRigidbody.transform.forward * projectileSpeed;
         projectileSpeedVector = ProjectileRigidbody.velocity;
 
         // Use the rigidbody and calculate the projectileSpeedVector.
@@ -79,10 +80,11 @@ public class Projectile : MonoBehaviour
         currentTrail = Instantiate(smokeTrail) as GameObject;
         currentTrail.transform.SetParent(transform);
         currentTrail.transform.rotation = transform.rotation;
+        currentTrail.transform.Rotate(new Vector3(0, 180, 0));
         currentTrail.transform.position = transform.position + offset * currentTrail.transform.forward;
         currentTrail.GetComponent<Rigidbody>().velocity = projectileSpeedVector;
         ParticleSystem.MainModule ps = currentTrail.GetComponent<ParticleSystem>().main;
-        ps.simulationSpeed = projectileSpeed / 16;
+        ps.simulationSpeed = projectileSpeed / ps.simulationSpeed;
     }
 
 
@@ -160,12 +162,12 @@ public class Projectile : MonoBehaviour
 
             // The vector normal to the collision.
             Vector3 normalCollision = ci.contacts[0].normal;
-            
+
             // The vector the projectile reflects at.
             Vector3 newProjectileSpeedVector =
                 Vector3.Reflect(projectileSpeedVector, normalCollision);
 
-            ProjectileRigidbody.transform.forward = -newProjectileSpeedVector;
+            ProjectileRigidbody.transform.forward = newProjectileSpeedVector;
             ProjectileRigidbody.velocity = newProjectileSpeedVector;
             projectileSpeedVector = ProjectileRigidbody.velocity;
 
@@ -228,7 +230,7 @@ public class Projectile : MonoBehaviour
 
         // Wait and destroy the projectile after a random amount of time between 4 and 5 seconds.
         // Or set to detonate on next collision.
-        StartCoroutine(DestroyAfter(Random.Range(4f, 5f)));
+        StartCoroutine(DestroyAfter(maxDestroyTime));
         setToDetonate();
     }
     
@@ -240,7 +242,7 @@ public class Projectile : MonoBehaviour
             currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
         }
         yield return new WaitForSeconds(time);
-        //GameObject.Destroy(this.gameObject);
+        GameObject.Destroy(this.gameObject);
         KillProjectile();
     }
 
@@ -256,6 +258,11 @@ public class Projectile : MonoBehaviour
     // Helper function for DisableProjectile used by RoomManager.
     private void setToDetonate()
     {
+        if (currentTrail)
+        {
+            currentTrail.GetComponent<SmokeTrailScript>().removeSmokeTrail(projectileSpeedVector);
+        }
+
         collisionCounter = maxCollisions;
     }
 }

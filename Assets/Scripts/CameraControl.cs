@@ -14,17 +14,16 @@ namespace Completed
         public Transform targetRoom;
         private Vector3 m_target;
 
-        private float m_RoomLength = 50;
+        private float m_RoomLength = 25;
         private float m_WallThickness = 1;
-        private float stepLength = 52;
-        private Vector3 centerOfRoom = new Vector3(25f, 0, 25f);
+        private float stepLength = 26;
+        private Vector3 centerOfRoom = new Vector3(6, 0, 6);
 
         private Vector3 m_cameraAngle = new Vector3(80, 0, 0);
-        private Vector3 cameraOffset = Vector3.Normalize(new Vector3(0, 22, -1));
-        private Vector3 lookOffset = new Vector3(0, 0, -25);
-        private float patrolOffset = 55;
-        private float battleOffset = 42;
-        private float deadOffset = 70;
+        private Vector3 cameraOffset = Vector3.Normalize(new Vector3(0, 22, 2));
+        private float patrolOffset = 27;
+        private float battleOffset = 21;
+        private float deadOffset = 35;
 
         private float cameraSpeedMinimum = 45;
         //private float cameraSpeedEnding = 5;

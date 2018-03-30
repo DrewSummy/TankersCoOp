@@ -22,7 +22,7 @@ abstract public class Tank : MonoBehaviour {
 
 
     protected Vector3 velocity;                 // The velocity of the tank, kept track of for ai.
-    protected float m_Speed = 12f;              // How fast the tank drives.
+    protected float m_Speed = 6.5f;              // How fast the tank drives.
     protected float m_RotateSpeed = 6f;         // How fast the tank body rotates.
     protected Vector3 m_CurrentDirection;       // The current direction the tank points.
     protected Rigidbody m_RidgidbodyTank;       // Reference used to move the tank.
@@ -48,8 +48,6 @@ abstract public class Tank : MonoBehaviour {
     protected void Awake()
     {
         m_RidgidbodyTank = GetComponent<Rigidbody>();
-        //m_RidgidbodyBody = body.GetComponent<Rigidbody>();
-        //m_RidgidbodyTower = tower.GetComponent<Rigidbody>();
 
         // Load in the tank colors being used from the Resources folder in assets.
         // This needs to be called early so that it is instantiated before GUI_HUD.

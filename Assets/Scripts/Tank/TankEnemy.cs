@@ -332,7 +332,7 @@ public class TankEnemy : Tank
         {
             StartCoroutine(delayFire());
             base.Fire();
-            recordShot(-tower.forward);
+            recordShot(tower.forward);
         }
     }
     protected void firePredict()
@@ -344,7 +344,7 @@ public class TankEnemy : Tank
         if (tower.forward == targetDirectionAim)
         {
             //float weight = projTestScript.beginShoot(tower.position, -tower.forward, false);
-            ProjectileTest.ShotReport report = projTestScript.beginShoot(tower.position, -tower.forward);
+            ProjectileTest.ShotReport report = projTestScript.beginShoot(tower.position, tower.forward);
 
             if (report.isHit)
             {
@@ -355,7 +355,7 @@ public class TankEnemy : Tank
     private void aimPredict()
     {
         float step = towerRotateSpeed * Time.deltaTime;
-        targetDirectionAim = Vector3.Normalize(-vectorTowardTarget + vectorVelocityTarget);
+        targetDirectionAim = Vector3.Normalize(vectorTowardTarget - vectorVelocityTarget);
         Vector3 newDir = Vector3.RotateTowards(tower.forward, targetDirectionAim, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
     }
@@ -474,7 +474,7 @@ public class TankEnemy : Tank
         // TankEnemy looks directly at the player.
         // TODO: incorporate player2.
         float step = towerRotateSpeed * Time.deltaTime;
-        targetDirectionAim = Vector3.Normalize(-vectorTowardTarget);
+        targetDirectionAim = Vector3.Normalize(vectorTowardTarget);
         Vector3 newDir = Vector3.RotateTowards(tower.forward, targetDirectionAim, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
     }
@@ -616,7 +616,7 @@ public class TankEnemy : Tank
     {
         aimDirection();
 
-        if (-tower.forward == targetDirectionAim)
+        if (tower.forward == targetDirectionAim)
         {
             selectDirectionAim();
             Fire();
@@ -625,7 +625,7 @@ public class TankEnemy : Tank
     protected void aimDirection()
     {
         float step = towerRotateSpeed * Time.deltaTime;
-        Vector3 newDir = Vector3.RotateTowards(tower.forward, -targetDirectionAim, step, .01F);
+        Vector3 newDir = Vector3.RotateTowards(tower.forward, targetDirectionAim, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
     }
     private void selectDirectionAim()

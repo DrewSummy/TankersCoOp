@@ -37,10 +37,10 @@ namespace Completed
         private Transform projectileHolder;                                      // A variable to store a reference to the transform of the projectile holder object.
         private Transform wallHolder;                                            // A variable to store a reference to the transform of the wall holder object.
         private Transform courseHolder;                                          // A variable to store a reference to the transform of the obstacle course object.
-        private Transform edgeHolder;
+        public Transform edgeHolder;
         private float wallThickness = 1f;                                        // Thickness of outside walls.
         private float blockThickness = 2.5f;                                     // Thickness of blocks.
-        private int m_RoomLength = 50;                                           // Length of each room declared elsewhere also.
+        private float m_RoomLength = 23;                                           // Length of each room declared elsewhere also.
         private struct obstacleCourse                                            // A struct for an obstacle course.
         {
             public int[,] room;
@@ -339,7 +339,6 @@ namespace Completed
                     }
                     player1.transform.position = playerSpawnLocations[location];
                     player1.GetComponent<Tank>().SetLeftoverProjectileHolder(projectileHolder);
-                    player1.GetComponent<Tank>().body.rotation = Quaternion.LookRotation(Vector3.back);
 
                     // Freeze the player.
                     player1.GetComponent<Rigidbody>().velocity = Vector3.zero;
@@ -362,7 +361,7 @@ namespace Completed
                         }
                         player2.transform.position = playerSpawnLocations[location];
                         player2.GetComponent<Tank>().SetLeftoverProjectileHolder(player1.GetComponent<Tank>().projectileHolder);
-                        player2.GetComponent<Tank>().body.rotation = Quaternion.LookRotation(Vector3.back);
+                        //player2.GetComponent<Tank>().body.rotation = Quaternion.LookRotation(Vector3.back);
 
                         // Freeze the player.
                         player2.GetComponent<Rigidbody>().velocity = Vector3.zero;
@@ -722,9 +721,9 @@ namespace Completed
             blockTall = Resources.Load("Prefab/GameObjectPrefab/Obstacles/Blocks/BlockTall") as GameObject;
             blockShort = Resources.Load("Prefab/GameObjectPrefab/Obstacles/Blocks/BlockShort") as GameObject;
             exit = Resources.Load("Prefab/GameObjectPrefab/Miscellaneous/Ladder") as GameObject;
-            wallOpen = Resources.Load("Prefab/GameObjectPrefab/Room/WallOpen") as GameObject;
-            wallClosed = Resources.Load("Prefab/GameObjectPrefab/Room/WallClosed") as GameObject;
-            edges = Resources.Load("Prefab/GameObjectPrefab/Room/Edges") as GameObject;
+            wallOpen = Resources.Load("Prefab/GameObjectPrefab/Room/New/WallOpen") as GameObject;
+            wallClosed = Resources.Load("Prefab/GameObjectPrefab/Room/New/WallClosed") as GameObject;
+            edges = Resources.Load("Prefab/GameObjectPrefab/Room/New/Edges") as GameObject;
 
             // Fill enemyList.
             enemyList = Resources.LoadAll<GameObject>("Prefab/GameObjectPrefab/TankPrefab/TankEnemy");
@@ -778,7 +777,7 @@ namespace Completed
             + m_room.transform.position;
             floor.name = "Floor";
             floor.transform.SetParent(m_room);
-            floor.transform.localScale = new Vector3(5, 1, 5);
+            floor.transform.localScale = new Vector3(2.5f, 1, 2.5f);
             floor.GetComponent<MeshRenderer>().material = floorMaterials[Random.Range(0, floorMaterials.Length)];
             // Set the texture of the floor depending on the level.
             floor.GetComponent<MeshRenderer>().material.SetTextureScale
@@ -960,9 +959,9 @@ namespace Completed
             //instructionCourse.transform.position = 
             //new Vector3(m_RoomLength / 2 + m_room.position.x, 0, m_RoomLength / 2 + m_room.position.z);
             //instructionCourse.transform.SetParent(courseHolder);
-            playerSpawnLocations.Add(new Vector3(25f, 0, 25f) + m_room.transform.position);
-            playerSpawnLocations.Add(new Vector3(25f, 0, 45f) + m_room.transform.position);
-            enemySpawnLocations.Add(new Vector3(10f, 0f, 10f) + m_room.transform.position);
+            playerSpawnLocations.Add(new Vector3(12.5f, 0, 12.5f) + m_room.transform.position);
+            playerSpawnLocations.Add(new Vector3(12.5f, 0, 20f) + m_room.transform.position);
+            enemySpawnLocations.Add(new Vector3(5f, 0f, 5f) + m_room.transform.position);
 
 
             GameObject wp1 = new GameObject("StartRoom Spawn Pos");

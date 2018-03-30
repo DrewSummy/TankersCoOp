@@ -13,6 +13,7 @@ public class TankEnemyBlue : TankEnemy
         fireFreq = 2f;
 
         // Driving variables
+        m_Speed = 6.25f;
         m_RotateSpeed = 3f;
     }
 }

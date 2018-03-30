@@ -47,6 +47,9 @@ public class GameMaster : MonoBehaviour
         // Sets this to not be destroyed when reloading scene
         DontDestroyOnLoad(gameObject);
 
+        // Set resolution.
+        Screen.SetResolution(1600, 900, true);
+
         // Get a component reference to the attached LevelManager script
         levelScript = GetComponent<LevelManager>();
 
@@ -54,8 +57,8 @@ public class GameMaster : MonoBehaviour
         //displaymenuGUI();
 
         //Temporary for testing.
-        //CreateSoloGame();
-        CreateCoopGame();
+        CreateSoloGame();
+        //CreateCoopGame();
     }
 
     private void PlacePlayers()
