@@ -50,7 +50,7 @@ namespace Completed
         public Vector2 lastRoomCoordinate;                                       // A Vector2 for the last room.
         private Transform roomHolder;                                            // A variable to store a reference to the transform of the Room object.
         private Transform obstacleHolder;                                        // A variable to store a reference to the transform of the Obstacle object.
-        private int m_RoomLength = 50;                                           // Length of each room declared elsewhere also.
+        private int m_RoomLength = 23;                                           // Length of each room declared elsewhere also.
         private float wallThickness = 1f;                                        // Thickness of outside walls.
         private int numberOfRooms;                                               // Number of rooms based on level
         public Transform currentRoom;                                            // The transform for the current room.

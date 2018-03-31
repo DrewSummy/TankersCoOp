@@ -19,13 +19,13 @@ public class TankEnemyBlack : TankEnemy
     // Shooting variables
     bool rotateCW = true;
     float rotateRandomSpeed = 10f;
-    float explodeTriggerRadius = 7.5f;
-    float explodeRadius = 10f;
+    float explodeTriggerRadius = 2.5f;
+    float explodeRadius = 3.25f;
     public GameObject suicideExplosion;
     private bool isExploding = false;
 
     // Driving variables
-    float speedChase = 17.5f;
+    float speedChase = 8f;
     Vector3 recentPos;
     float retrivalBuffer = 1f;
     Coroutine retrieveRecentPos;

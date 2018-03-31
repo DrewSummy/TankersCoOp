@@ -56,4 +56,7 @@ bugs:
     https://www.youtube.com/watch?v=00qMZlacZQo https://github.com/Shrimpey/Outlined-Diffuse-Shader-Fixed/blob/master/CustomOutline.shader (sillhouette)
     explosion asset
     aspect ratio/screen resolution help https://forum.unity.com/threads/force-camera-aspect-ratio-16-9-in-viewport.385541/
+    https://assetstore.unity.com/packages/2d/textures-materials/floors/cracked-stone-filled-with-lava-8294
+    https://assetstore.unity.com/packages/2d/textures-materials/floors/hand-painted-stone-texture-73949
+    https://assetstore.unity.com/packages/2d/textures-materials/floors/five-seamless-tileable-ground-textures-57060
 */

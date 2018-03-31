@@ -41,6 +41,8 @@ namespace Completed
         private float wallThickness = 1f;                                        // Thickness of outside walls.
         private float blockThickness = 2.5f;                                     // Thickness of blocks.
         private float m_RoomLength = 23;                                           // Length of each room declared elsewhere also.
+        private float textScaleMin = 4f;
+        private float textScaleMax = 10f;
         private struct obstacleCourse                                            // A struct for an obstacle course.
         {
             public int[,] room;
@@ -778,10 +780,12 @@ namespace Completed
             floor.name = "Floor";
             floor.transform.SetParent(m_room);
             floor.transform.localScale = new Vector3(2.5f, 1, 2.5f);
+            floor.transform.localScale = new Vector3(2.5f, 1, 2.5f);//delete
             floor.GetComponent<MeshRenderer>().material = floorMaterials[Random.Range(0, floorMaterials.Length)];
             // Set the texture of the floor depending on the level.
+            float scale = Random.Range(textScaleMin, textScaleMax);
             floor.GetComponent<MeshRenderer>().material.SetTextureScale
-                ("_MainTex", new Vector2(1f, 1f));
+                ("_MainTex", new Vector2(scale, scale));
             // Set a random offset on the texture.
             floor.GetComponent<MeshRenderer>().material.SetTextureOffset
                 ("_MainTex", new Vector2((float)Random.Range(0, m_RoomLength) / (float)m_RoomLength, (float)Random.Range(0, m_RoomLength) / (float)m_RoomLength));
