@@ -12,7 +12,7 @@ public class Projectile : MonoBehaviour
 
     protected int maxCollisions = 1;               // The max number of collisions before the object is destroyed. 
     protected int collisionCounter = 0;            // Used to keep track of the number of collisions.
-    protected float projectileSpeed = 5;           // The speed the projectile fires at.
+    protected float projectileSpeed = 6.6f;           // The speed the projectile fires at.
     protected Vector3 projectileSpeedVector;       // The vector the projectile moves at.
     protected Rigidbody ProjectileRigidbody;       // Reference used to move the projectile.
     public GameObject parentTank;                  // Reference to the parent tank game object.

@@ -10,7 +10,7 @@ public class SuicideExplosion : MonoBehaviour {
     private float epsO = .01f;
 
     private Vector3 startSize = new Vector3(0, 0, 0);
-    private Vector3 endSize = new Vector3(20, 20, 20);
+    private Vector3 endSize = new Vector3(3.25f, 3.25f, 3.25f);
     private Color startC = Color.red;
 
     // Use this for initialization

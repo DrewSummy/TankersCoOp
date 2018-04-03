@@ -83,8 +83,10 @@ namespace Completed
             if (P2)
             {
                 PlaceP2Kills();
-                PlaceCrown();
             }
+
+
+            PlaceCrown();
         }
 
         private void PlaceP1Kills()
@@ -226,6 +228,13 @@ namespace Completed
 
         private void PlaceCrown()
         {
+            if (!P2)
+            {
+                crown1.gameObject.SetActive(false);
+                crown2.gameObject.SetActive(false);
+                return;
+            }
+
             int p1Kills = 0;
             int p2Kills = 0;
             int[] P1Kills = P1.GetComponent<TankPlayer>().killCounter;
@@ -241,15 +250,18 @@ namespace Completed
                 p2Kills += P2Kills[killType];
             }
 
+            Debug.Log("here");
             crown1.gameObject.SetActive(false);
             crown2.gameObject.SetActive(false);
-            if (true)//p2Kills > p1Kills)
+            if (p2Kills > p1Kills)
             {
+                Debug.Log("2");
                 crown1.gameObject.SetActive(false);
                 crown2.gameObject.SetActive(true);
             }
             else if (p2Kills < p1Kills)
             {
+                Debug.Log("1");
                 crown1.gameObject.SetActive(true);
                 crown2.gameObject.SetActive(false);
             }
@@ -342,6 +354,8 @@ namespace Completed
         {
             if (enabled)
             {
+                currentButton = Resume.GetComponent<Button>();
+
                 Time.timeScale = 1f;
                 RemoveKills();
                 panel.SetActive(false);

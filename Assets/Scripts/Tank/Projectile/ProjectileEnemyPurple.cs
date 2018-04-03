@@ -8,7 +8,6 @@ public class ProjectileEnemyPurple : ProjectileEnemy
     protected override void resetVariables()
     {
         maxCollisions = 2;
-        projectileSpeed = 32f;
-        projectileSpeed = 28;
+        projectileSpeed = 17;
     }
 }

@@ -120,7 +120,7 @@ public class TankEnemyPurple : TankEnemy
     {
         selectDirectionAim();
         aimDirection();
-        if (-tower.forward == targetDirectionAim)
+        if (tower.forward == targetDirectionAim)
         {
             Fire();
             needDirection = true;

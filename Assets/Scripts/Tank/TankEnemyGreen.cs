@@ -13,7 +13,7 @@ public class TankEnemyGreen : TankEnemy
         fireFreq = 3f;
 
         // Driving variables
-        m_Speed = 5f;
+        m_Speed = 3.5f;
     }
     
     protected new void Start()

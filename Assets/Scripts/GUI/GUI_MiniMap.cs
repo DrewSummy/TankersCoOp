@@ -26,16 +26,16 @@ namespace Completed
 
         private int[,] floorChart = new int[11, 11];                             // An array of arrays of ints representing room statuses.
         private Transform[,] floorsFull = new Transform[11, 11];
-        public RectTransform floorHolderFull;                                       // edit A variable to store a reference to the transform of the floor object.
-        public RectTransform floorHolderSample;                                       // edit A variable to store a reference to the transform of the floor object.
-        public RectTransform itemHolderFull;                                        // edit A variable to store a reference to the transform of the outline object.
+        public RectTransform floorHolderFull;                                    // edit A variable to store a reference to the transform of the floor object.
+        public RectTransform floorHolderSample;                                  // edit A variable to store a reference to the transform of the floor object.
+        public RectTransform itemHolderFull;                                     // edit A variable to store a reference to the transform of the outline object.
 
         private GameObject P1;                                                   // Reference to the player 1 game object.
         private Vector2 lastRoom;
         private Vector2 startRoom;
-        private int roomLengthFull = 60;                                             // Length of each full room image on the canvas. Equal to the length of the outlineFull.
-        private int roomLengthSample = 28;                                             // Length of each sample room image on the canvas. Equal to the length of the outlineSample.
-        private int m_RoomLength = 50;                                           // Length of each room declared elsewhere also.
+        private int roomLengthFull = 60;                                         // Length of each full room image on the canvas. Equal to the length of the outlineFull.
+        private int roomLengthSample = 28;                                       // Length of each sample room image on the canvas. Equal to the length of the outlineSample.
+        private int m_RoomLength = 23;                                           // Length of each room declared elsewhere also.
         private float wallThickness = 1f;                                        // Thickness of outside walls.
         private Vector2 playerCoord;                                             // Reference to coordinate of players position.
         private Vector3 mapOffset = Vector3.zero;// = new Vector3(80, 100, 0);                                         // Amount to scale by on neighborless wall. Proportional to outlineBorderFull.
@@ -115,7 +115,7 @@ namespace Completed
             // Place the tank in the starting room.
             tank = Instantiate(player) as GameObject;
             tank.transform.SetParent(itemHolderFull);
-            tank.transform.position = itemHolderFull.position + new Vector3(startRoom[0] * roomLengthFull, startRoom[1] * roomLengthFull, 0);
+            tank.transform.position = floorHolderFull.position + new Vector3(startRoom[0] * roomLengthFull, startRoom[1] * roomLengthFull, 0);
 
             // Go through the floorChart and place all the rooms for full map and instantiate floorsFull.
             for (int row = 0; row < floorChart.GetLength(0); row++)

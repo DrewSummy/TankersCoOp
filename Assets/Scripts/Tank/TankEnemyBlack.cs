@@ -9,6 +9,8 @@ public class TankEnemyBlack : TankEnemy
     List<Vector3> hitAngles = new List<Vector3>();
     List<float> hitWeights = new List<float>();
     float hitCount = 0;
+    List<Vector3> shootVectors = new List<Vector3> { new Vector3(1, 0, 0), new Vector3(1, 0, 1), new Vector3(0, 0, 1), new Vector3(-1, 0, 1), new Vector3(-1, 0, 0), new Vector3(-1, 0, -1), new Vector3(0, 0, -1), new Vector3(1, 0, -1) };
+    int vectori = 0;
 
     // State variables
     float snipeDelay = 1f;
@@ -19,7 +21,7 @@ public class TankEnemyBlack : TankEnemy
     // Shooting variables
     bool rotateCW = true;
     float rotateRandomSpeed = 10f;
-    float explodeTriggerRadius = 2.5f;
+    float explodeTriggerRadius = 7f;
     float explodeRadius = 3.25f;
     public GameObject suicideExplosion;
     private bool isExploding = false;
@@ -44,8 +46,10 @@ public class TankEnemyBlack : TankEnemy
         // State variables
 
         // Shooting variables
-        fireFreq = 2f;
-        projectileAmount = 1;
+        fireFreq = .1f;
+        projectileAmount = 8;
+        projectileCount = projectileAmount;
+        towerRotateSpeed = 15;
 
         // Driving variables
         m_RotateSpeed = 3f;
@@ -57,6 +61,8 @@ public class TankEnemyBlack : TankEnemy
 
         // The FSM begins on Evade.
         setToSearch();
+
+        rotateShootVectors();
     }
 
     protected override IEnumerator FSM()
@@ -72,6 +78,9 @@ public class TankEnemyBlack : TankEnemy
                 case State.SEARCH:
                     Search();
                     break;
+                case State.EXPLODE:
+                    Explode();
+                    break;
                 case State.IDLE:
                     Idle();
                     break;
@@ -80,6 +89,18 @@ public class TankEnemyBlack : TankEnemy
         }
     }
 
+    private void rotateShootVectors()
+    {
+        List<Vector3> med = new List<Vector3>();
+
+        while (shootVectors.Count > 0)
+        {
+            int toUse = Random.Range(0, shootVectors.Count);
+            med.Add(shootVectors[toUse]);
+            shootVectors.RemoveAt(toUse);
+        }
+        shootVectors = med;
+    }
 
     /*
     Functions for the CHASE state:
@@ -196,11 +217,9 @@ public class TankEnemyBlack : TankEnemy
     }
     private void tryToExplode()
     {
-        return;
         if (isExplodeDistance())
         {
-            //StartCoroutine(explode());
-            DestroyTank();
+            setToExplode();
         }
     }
     private bool isExplodeDistance()
@@ -213,46 +232,6 @@ public class TankEnemyBlack : TankEnemy
         else
         {
             return false;
-        }
-    }
-    private IEnumerator explode()
-    {
-        isExploding = true;
-
-        // Switch states to avoid previous momentum.
-        setToIdle();
-
-        // Display the explosion.
-        GameObject explosion = Instantiate(suicideExplosion, gameObject.transform.position, Quaternion.identity) as GameObject;
-
-        // Disappear tank.
-        enabled = false;
-
-        yield return new WaitForSeconds(.5f);
-
-        // Destroy the tanks in targets and teammates if they are within explodeRadius.
-        List<GameObject> targetsAndTeammates = new List<GameObject>();
-        targetsAndTeammates.AddRange(targets);
-        targetsAndTeammates.AddRange(teammates);
-        foreach (GameObject tank in targetsAndTeammates)
-        {
-            if (tank)
-            {
-                if (Vector3.Magnitude(transform.position - tank.transform.position) < explodeRadius)
-                {
-                    tank.GetComponent<Tank>().DestroyTank();
-                }
-            }
-        }
-
-        // Destroy own tank.
-        base.DestroyTank();
-    }
-    public override void DestroyTank()
-    {
-        if (!isExploding)
-        {
-            StartCoroutine(explode());
         }
     }
 
@@ -303,6 +282,81 @@ public class TankEnemyBlack : TankEnemy
         return false;
     }
 
+
+    /*
+    Functions for the EXPLODE state:
+
+    */
+    private void Explode()
+    {
+        chooseShot();
+        aimDirection();
+    }
+    private void setToExplode()
+    {
+        state = TankEnemy.State.EXPLODE;
+
+        targetDirectionAim = Vector3.Normalize(shootVectors[0]);
+
+        GetComponent<Rigidbody>().freezeRotation = true;
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+    }
+    private void chooseShot()
+    {
+        if (tower.forward == targetDirectionAim)
+        {
+            Debug.Log(targetDirectionAim);
+            // Fire and get new direction.
+            Fire();
+
+            vectori++;
+            if (vectori == shootVectors.Count)
+            {
+                DestroyTank();
+            }
+            else
+            {
+                targetDirectionAim = Vector3.Normalize(shootVectors[vectori]);
+            }
+        }
+    }
+    private IEnumerator explode()
+    {
+        isExploding = true;
+
+        // Switch states to avoid previous momentum.
+        setToIdle();
+
+        // Display the explosion.
+        GameObject explosion = Instantiate(suicideExplosion, gameObject.transform.position, Quaternion.identity) as GameObject;
+
+        // Disappear tank.
+        enabled = false;
+
+        yield return new WaitForSeconds(.5f);
+
+        // Destroy the tanks in targets and teammates if they are within explodeRadius.
+        List<GameObject> targetsAndTeammates = new List<GameObject>();
+        targetsAndTeammates.AddRange(targets);
+        targetsAndTeammates.AddRange(teammates);
+        foreach (GameObject tank in targetsAndTeammates)
+        {
+            if (tank)
+            {
+                if (Vector3.Magnitude(transform.position - tank.transform.position) < explodeRadius)
+                {
+                    tank.GetComponent<Tank>().DestroyTank();
+                }
+            }
+        }
+
+        // Destroy own tank.
+        base.DestroyTank();
+    }
+    protected override IEnumerator delayFire()
+    {
+        yield return new WaitForSeconds(fireFreq);
+    }
 
     /*
     Functions for the IDLE state:

@@ -22,7 +22,7 @@ abstract public class Tank : MonoBehaviour {
 
 
     protected Vector3 velocity;                 // The velocity of the tank, kept track of for ai.
-    protected float m_Speed = 6.5f;              // How fast the tank drives.
+    protected float m_Speed = 5.5f;              // How fast the tank drives.
     protected float m_RotateSpeed = 6f;         // How fast the tank body rotates.
     protected Vector3 m_CurrentDirection;       // The current direction the tank points.
     protected Rigidbody m_RidgidbodyTank;       // Reference used to move the tank.

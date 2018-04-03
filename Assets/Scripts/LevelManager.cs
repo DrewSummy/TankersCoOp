@@ -51,7 +51,7 @@ namespace Completed
         private Transform roomHolder;                                            // A variable to store a reference to the transform of the Room object.
         private Transform obstacleHolder;                                        // A variable to store a reference to the transform of the Obstacle object.
         private int m_RoomLength = 23;                                           // Length of each room declared elsewhere also.
-        private float wallThickness = 1f;                                        // Thickness of outside walls.
+        private float wallThickness = .87f;                                      // Thickness of outside walls.
         private int numberOfRooms;                                               // Number of rooms based on level
         public Transform currentRoom;                                            // The transform for the current room.
         public GameObject player1;                                               // Reference to the player 1 game object.
@@ -184,11 +184,11 @@ namespace Completed
             {
                 numberOfRooms = floorChart.GetLength(0) * floorChart.GetLength(1);
             }
-            numberOfRooms = 2;
+            numberOfRooms = 13;
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));
-            //firstRoomCoordinate = new Vector2(0, 0);
+            firstRoomCoordinate = new Vector2(0, 0);
             floorChart[(int)firstRoomCoordinate.x, (int)firstRoomCoordinate.y] = true;
 
 

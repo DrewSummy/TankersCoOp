@@ -63,7 +63,8 @@ public class TankEnemy : Tank
         AGGRESSIVE,
         SNIPE,
         IDLE,
-        SEARCH
+        SEARCH,
+        EXPLODE
     }
 
     protected State state;
@@ -327,7 +328,6 @@ public class TankEnemy : Tank
     }
     protected new void Fire()
     {
-        return;
         if (canFire && projectileCount > 0)
         {
             StartCoroutine(delayFire());
@@ -343,7 +343,6 @@ public class TankEnemy : Tank
         // Fire if there are bullets, fire frequency has elapsed, and the tower is predicting.
         if (tower.forward == targetDirectionAim)
         {
-            //float weight = projTestScript.beginShoot(tower.position, -tower.forward, false);
             ProjectileTest.ShotReport report = projTestScript.beginShoot(tower.position, tower.forward);
 
             if (report.isHit)
@@ -478,11 +477,12 @@ public class TankEnemy : Tank
         Vector3 newDir = Vector3.RotateTowards(tower.forward, targetDirectionAim, step, .01F);
         tower.rotation = Quaternion.LookRotation(newDir);
     }
-    protected IEnumerator delayFire()
+    protected virtual IEnumerator delayFire()
     {
         canFire = false;
         yield return new WaitForSeconds(fireFreq);
         canFire = true;
+        Debug.Log("can fire");
     }
 
     /*

@@ -22,6 +22,7 @@ namespace Completed
         public BoxCollider wallA;               // Reference to the wall boundary once the room is completed.
         public BoxCollider wallB;               // Reference to the wall boundary once the room is completed.
         public bool triggered = false;          // Boolean for whether the gate was triggered.
+        public GameObject liner;
 
         private bool lastRoomAudioBool;         // Boolean for whether this is a gate of the last room.
         private float speed = 40f;              // The speed the gate shakes at on lowering.
@@ -135,6 +136,7 @@ namespace Completed
         // Change the box colliders of the walls when the room is complete.
         private void endRoomColliders()
         {
+            liner.SetActive(true);
             triggerBoundary.enabled = false;
             wall.enabled = false;
             wallA.enabled = true;
