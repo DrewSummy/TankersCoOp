@@ -5,6 +5,6 @@ public class ProjectileEnemyGreen : ProjectileEnemy
 {
     protected new void resetVariables()
     {
-        projectileSpeed = 8f;
+        projectileSpeed = 5f;
     }
 }

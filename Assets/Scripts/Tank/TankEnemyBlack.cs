@@ -305,17 +305,14 @@ public class TankEnemyBlack : TankEnemy
     {
         if (tower.forward == targetDirectionAim)
         {
-            Debug.Log(targetDirectionAim);
-            // Fire and get new direction.
-            Fire();
-
             vectori++;
             if (vectori == shootVectors.Count)
             {
-                DestroyTank();
+                setToIdle();
             }
             else
             {
+                Fire();
                 targetDirectionAim = Vector3.Normalize(shootVectors[vectori]);
             }
         }

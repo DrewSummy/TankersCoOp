@@ -20,7 +20,7 @@ abstract public class Tank : MonoBehaviour {
     public string enemyTeamName;
     protected BoxCollider hitbox;           // Reference to the box collider in the body of the tank.
 
-
+    private List<Vector3> towerStart = new List<Vector3> { new Vector3(1, 0, 0), new Vector3(1, 0, 1), new Vector3(0, 0, 1), new Vector3(-1, 0, 1), new Vector3(-1, 0, 0), new Vector3(-1, 0, -1), new Vector3(0, 0, -1), new Vector3(1, 0, -1) };
     protected Vector3 velocity;                 // The velocity of the tank, kept track of for ai.
     protected float m_Speed = 5.5f;              // How fast the tank drives.
     protected float m_RotateSpeed = 6f;         // How fast the tank body rotates.
@@ -83,6 +83,9 @@ abstract public class Tank : MonoBehaviour {
         body = this.gameObject.transform.GetChild(0);
         tower = this.gameObject.transform.GetChild(1);
         m_ProjectileSpawnPoint = tower.GetChild(3);
+
+        // Start the tower pointing at a random location.
+        tower.LookAt(tower.position + towerStart[Random.Range(0, towerStart.Count)]);
 
         // Get the reference to the hitbox.
         //hitbox = collider.GetComponent<CapsuleCollider>();
@@ -172,6 +175,8 @@ abstract public class Tank : MonoBehaviour {
 
     public virtual void DestroyTank()
     {
+        alive = false;
+
         // Give projectiles to the room's projectileHolder.
         TransferProjectiles();
 
