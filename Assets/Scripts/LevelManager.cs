@@ -66,6 +66,7 @@ namespace Completed
 
         // GUI stuff
         public GUI_Pause pause;                                                  // Reference to the GUI for pausing the game.
+        public GUI_GameOver gameoverGUI;
         public List<Vector2> roomsVisited;
         public List<Vector2> roomsUnvisited;
         //firstRoomCoordinate;
@@ -644,6 +645,9 @@ namespace Completed
             m_camera.GetComponent<CameraControl>().gameOverCamera();
             
             currentRoom.GetComponent<RoomManager>().endRoom();
+
+
+            gameoverGUI.Pause();
         }
 
         // End level.

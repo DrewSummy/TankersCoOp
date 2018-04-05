@@ -8,7 +8,6 @@ namespace Completed
     public class GUI_Pause : MonoBehaviour
     {
         public Canvas canvas;
-        public Text title;
         public GameObject panel;
         public GameObject tank;
         public GameObject death;
@@ -65,7 +64,7 @@ namespace Completed
             tankColors = Resources.LoadAll<Material>("Prefab/GameObjectPrefab/TankPrefab/TankColors");
         }
 
-        private void PlaceMenu()
+        protected void PlaceMenu()
         {
             foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
             {
@@ -89,7 +88,7 @@ namespace Completed
             PlaceCrown();
         }
 
-        private void PlaceP1Kills()
+        protected void PlaceP1Kills()
         {
             // Update player 1's kills.
             int[] P1Kills = P1.GetComponent<TankPlayer>().killCounter;
@@ -157,7 +156,7 @@ namespace Completed
             }
         }
 
-        private void PlaceP2Kills()
+        protected void PlaceP2Kills()
         {
             // Update player 2's kills.
             int[] P2Kills = P2.GetComponent<TankPlayer>().killCounter;
@@ -226,7 +225,7 @@ namespace Completed
             }
         }
 
-        private void PlaceCrown()
+        protected void PlaceCrown()
         {
             if (!P2)
             {
@@ -267,7 +266,7 @@ namespace Completed
             }
         }
 
-        private void RemoveKills()
+        protected void RemoveKills()
         {
             foreach (Transform child in killHolder1.transform)
             {
@@ -288,34 +287,8 @@ namespace Completed
                 }
             }
         }
-
-        private void DisplayMap()
-        {
-            //TODO: instead just duplicate the map where it is and make it brighter
-
-            // delete old
-            RemoveMap();
-
-            // get map object
-            Transform toPlace = guiMiniMap.SendMap();
-
-            // place in center with MapInstance as parent object
-
-            GameObject m = Instantiate(toPlace.gameObject) as GameObject;
-            m.SetActive(true);
-            m.transform.SetParent(mapInstance.transform);
-            m.GetComponent<RectTransform>().position = toPlace.position;
-
-            // go through each object and make opaque
-            foreach (Image i in mapInstance.transform.GetComponentsInChildren<Image>())
-            {
-                Color newColor = new Color(i.color.r, i.color.g, i.color.b, 1);
-                i.color = newColor;
-            }
-        }
-
-
-        private void RemoveMap()
+        
+        protected void RemoveMap()
         {
             foreach (Transform child in mapInstance.transform)
             {
@@ -323,7 +296,7 @@ namespace Completed
             }
         }
 
-        public void Pause()
+        public virtual void Pause()
         {
             if (enabled)
             {
@@ -336,10 +309,6 @@ namespace Completed
                 Resume.GetComponent<Button>().Select();
 
                 // Display map and hide the GUI_MiniMap's map.
-                //DisplayMap();
-                //DisplayMap2();
-                //DisplayMap();
-                /////////switch to fullmap
                 guiMiniMap.Hide();
                 guiMiniMap.PauseDisplay();
 
@@ -394,13 +363,13 @@ namespace Completed
         }
 
         // End and restart game.
-        private void endGame()
+        protected void endGame()
         {
             currentButton = Resume.GetComponent<Button>();
             Unpause();
             GM.endGame();
         }
-        private void restartGame()
+        protected void restartGame()
         {
             RemoveMap();
             guiMiniMap.clearMap();

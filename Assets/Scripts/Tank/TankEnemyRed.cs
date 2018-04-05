@@ -31,6 +31,7 @@ public class TankEnemyRed : TankEnemy
         // Shooting variables
         fireFreqFight = .25f;
         fireFreqExplore = .85f;
+        towerRotateSpeed = 4f;
 
         // Driving variables
         m_Speed = 6.5f;

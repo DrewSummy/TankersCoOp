@@ -306,13 +306,13 @@ public class TankEnemyBlack : TankEnemy
         if (tower.forward == targetDirectionAim)
         {
             vectori++;
+            Fire();
             if (vectori == shootVectors.Count)
             {
                 setToIdle();
             }
             else
             {
-                Fire();
                 targetDirectionAim = Vector3.Normalize(shootVectors[vectori]);
             }
         }

@@ -11,6 +11,7 @@ public class TankEnemyBlue : TankEnemy
 
         // Shooting variables
         fireFreq = 2f;
+        towerRotateSpeed = 3.5f;
 
         // Driving variables
         m_Speed = 6.25f;

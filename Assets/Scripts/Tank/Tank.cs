@@ -88,7 +88,6 @@ abstract public class Tank : MonoBehaviour {
         tower.LookAt(tower.position + towerStart[Random.Range(0, towerStart.Count)]);
 
         // Get the reference to the hitbox.
-        //hitbox = collider.GetComponent<CapsuleCollider>();
         hitbox = body.GetComponent<BoxCollider>();
 
         // Store the original pitch of the audio source.

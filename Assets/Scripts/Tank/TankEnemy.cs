@@ -482,7 +482,6 @@ public class TankEnemy : Tank
         canFire = false;
         yield return new WaitForSeconds(fireFreq);
         canFire = true;
-        Debug.Log("can fire");
     }
 
     /*
