@@ -72,13 +72,13 @@ namespace Completed
         private Transform[] NEWSRoom;                                            // sdsdsdStore a reference to our TankPlayer of player 1.
         public Transform roomTo;                                                 // TODO: might not need public. A variable to store a reference to the transform of the next room object.
         public LevelManager levelScript;                                         // Store a reference to the LevelManager which will set up the level.
+        public GameMaster GM;
         public int[] roomCoord = new int[2];                                     // Array of ints representing this rooms coordinates.
         private bool[] hasTriggeredNEWS = new bool[4];                           // Array of booleans representing which of hte surrounding rooms are triggered.
         public bool isLastRoom = false;                                          // Boolean for if this is the last room.
         private GameObject[] waypoints;
 
-
-        public GameMaster GM;
+        
         private int enemyCount = 0;
         private Object enemyCounterLock = new Object();
 
@@ -539,6 +539,7 @@ namespace Completed
                             pos,
                             Quaternion.identity) as GameObject;
                         block.transform.SetParent(courseHolder);
+                        Debug.Log(block);
                     }
                     else if (grid[row, column] == 3)
                     {
@@ -573,10 +574,10 @@ namespace Completed
             foreach (MeshRenderer b in courseHolder.GetComponentsInChildren<MeshRenderer>())
             {
                 // Set the texture of the blocks depending on the level.
-                b.GetComponent<MeshRenderer>().material = blockMaterials[m_level];
-                b.GetComponent<MeshRenderer>().material.SetTextureScale("_MainTex", new Vector2(.01f, .01f));
+                //b.GetComponent<MeshRenderer>().material = blockMaterials[m_level];
+                //b.GetComponent<MeshRenderer>().material.SetTextureScale("_MainTex", new Vector2(.01f, .01f));
                 // Set a random offset on the texture.
-                b.GetComponent<MeshRenderer>().material.SetTextureOffset("_MainTex", new Vector2((float)Random.Range(0, m_RoomLength) / (float)m_RoomLength, (float)Random.Range(0, m_RoomLength) / (float)m_RoomLength));
+                //b.GetComponent<MeshRenderer>().material.SetTextureOffset("_MainTex", new Vector2((float)Random.Range(0, m_RoomLength) / (float)m_RoomLength, (float)Random.Range(0, m_RoomLength) / (float)m_RoomLength));
             }
         }
 
@@ -620,7 +621,7 @@ namespace Completed
         }
 
         // Sets up room by taking in the transform of the room, the level, block and floor materials, and NEWSWall.
-        public void SetUpRoom(Transform room, int level, Material[] blockM, Material[] floorM, bool[] NEWSWall, GameMaster gM)
+        public void SetUpRoom(Transform room, int level, Material[] blockM, Material[] floorM, bool[] NEWSWall, GameMaster gameMaster)
         {
             // Some general stuff like reference to player and doors.
             callStart();
@@ -639,7 +640,7 @@ namespace Completed
             m_NEWSWall = NEWSWall;
 
             // Set GM.
-            GM = gM;
+            GM = gameMaster;
 
             // Load in the GameObjects.
             blockTall = Resources.Load("Prefab/GameObjectPrefab/Obstacles/New/Blocks/BlockTall") as GameObject;
@@ -872,10 +873,10 @@ namespace Completed
         // Creates an obstacle course after the room is set up.
         public void CreateObstacleCourse()
         {
-
             // Place a random obstacle course.
             SetObstacleCourses();
             int randomCourseIndex = Random.Range(0, obstacleCourses.Count);
+            Debug.Log(randomCourseIndex);
             PlaceObstacleCourse(randomCourseIndex);
         }
 
@@ -925,6 +926,7 @@ namespace Completed
 
             ladderExit.transform.SetParent(courseHolder);
             ladderExit.tag = exitTag;
+            ladderExit.GetComponent<NextLevelTrigger>().GM = GM;
         }
 
         // Helper function for endBattle.
@@ -961,7 +963,7 @@ namespace Completed
 
             foreach (MeshRenderer b in courseHolder.GetComponentsInChildren<MeshRenderer>())
             {
-                b.GetComponent<Renderer>().enabled = false;
+                //b.GetComponent<Renderer>().enabled = false;
             }
 
             for (int i = 0; i < wallHolder.GetComponentsInChildren<MeshRenderer>().Length; i++)

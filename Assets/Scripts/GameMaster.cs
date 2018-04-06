@@ -147,10 +147,16 @@ public class GameMaster : MonoBehaviour
     public void restart()
     {
         clearGame();
-        //displaymenuGUI();
 
         startGame();
         camera.SetActive(true);
+    }
+
+    public void nextLevel()
+    {
+        //Level++;
+
+        restart();
     }
 
     private void clearGame()
@@ -165,7 +171,6 @@ public class GameMaster : MonoBehaviour
         HUDGUI.resetHUD();
         HUDGUI.gameObject.SetActive(false);
         minimapGUI.clearMap();
-        //menuGUI.clearMenu();
 }
 
     // Helper for CreateSoloGame().

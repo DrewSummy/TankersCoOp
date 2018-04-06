@@ -319,7 +319,7 @@ namespace Completed
             }
         }
 
-        public void Unpause()
+        public virtual void Unpause()
         {
             if (enabled)
             {
@@ -363,13 +363,13 @@ namespace Completed
         }
 
         // End and restart game.
-        protected void endGame()
+        protected virtual void endGame()
         {
             currentButton = Resume.GetComponent<Button>();
             Unpause();
             GM.endGame();
         }
-        protected void restartGame()
+        protected virtual void restartGame()
         {
             RemoveMap();
             guiMiniMap.clearMap();
@@ -379,7 +379,7 @@ namespace Completed
         }
 
         // Functions called by GUI_Controller
-        public void back()
+        public virtual void back()
         {
             if (currentButton == Resume.GetComponent<Button>() ||
                 currentButton == Restart.GetComponent<Button>() ||
@@ -400,7 +400,7 @@ namespace Completed
 
             currentButton.Select();
         }
-        public void select()
+        public virtual void select()
         {
             if (currentButton.GetComponent<Button>() == Resume.GetComponent<Button>())
             {

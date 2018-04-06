@@ -35,12 +35,8 @@ public class ButtonQuit : ButtonPause
         yes.GetComponent<Button>().Select();
 
         // Make the subbotton colors.
-        Debug.Log(yes.transform.GetComponentInChildren<Text>().color);
-        Debug.Log(no.transform.GetComponentInChildren<Text>().color);
         yes.transform.GetComponentInChildren<Text>().color = subbuttonSelected;
         no.transform.GetComponentInChildren<Text>().color = subbuttonUnselected;
-        Debug.Log(yes.transform.GetComponentInChildren<Text>().color);
-        Debug.Log(no.transform.GetComponentInChildren<Text>().color);
     }
 
     // Occurs when the button is deselected.

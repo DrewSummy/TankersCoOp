@@ -69,8 +69,6 @@ namespace Completed
         public GUI_GameOver gameoverGUI;
         public List<Vector2> roomsVisited;
         public List<Vector2> roomsUnvisited;
-        //firstRoomCoordinate;
-        //lastRoomCoordinate;
 
 
         // Helper function to print out room grid and see what it looks like.
@@ -185,7 +183,7 @@ namespace Completed
             {
                 numberOfRooms = floorChart.GetLength(0) * floorChart.GetLength(1);
             }
-            numberOfRooms = 13;
+            numberOfRooms = 12;
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));
@@ -654,8 +652,15 @@ namespace Completed
         public void endLevel()
         {
             InitializeList();
-
+            
             Destroy(levelHolder);
+        }
+
+        public void levelSuccess()
+        {
+
+
+            endLevel();
         }
     }
 }

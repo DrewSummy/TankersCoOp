@@ -14,7 +14,7 @@ public class TankEnemyBlue : TankEnemy
         towerRotateSpeed = 3.5f;
 
         // Driving variables
-        m_Speed = 6.25f;
+        m_Speed = 4.25f;
         m_RotateSpeed = 3f;
     }
 }

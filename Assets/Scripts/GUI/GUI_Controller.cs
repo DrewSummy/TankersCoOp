@@ -24,7 +24,8 @@ public class GUI_Controller : MonoBehaviour
 
     // Miscellaneous
     public GUI_Menu menuGUI;                                            // GUI
-    public GUI_Pause pauseGUI; 
+    public GUI_Pause pauseGUI;
+    public GUI_GameOver gameoverGUI;
     private float deadzone = .3f;
     private float repeatDelay = .5f;
     private bool canUp = true;
@@ -83,6 +84,10 @@ public class GUI_Controller : MonoBehaviour
             {
                 pauseGUI.select();
             }
+            if (gameoverGUI.paused)
+            {
+                gameoverGUI.select();
+            }
         }
     }
 
@@ -97,6 +102,10 @@ public class GUI_Controller : MonoBehaviour
             if (pauseGUI.paused)
             {
                 pauseGUI.back();
+            }
+            if (gameoverGUI.paused)
+            {
+                gameoverGUI.back();
             }
         }
     }
@@ -128,6 +137,10 @@ public class GUI_Controller : MonoBehaviour
                 {
                     pauseGUI.up();
                 }
+                if (gameoverGUI.paused)
+                {
+                    gameoverGUI.up();
+                }
             }
         }
         else if (v < 0)
@@ -148,6 +161,10 @@ public class GUI_Controller : MonoBehaviour
                 if (pauseGUI.paused)
                 {
                     pauseGUI.down();
+                }
+                if (gameoverGUI.paused)
+                {
+                    gameoverGUI.down();
                 }
             }
         }
