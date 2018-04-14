@@ -47,6 +47,10 @@ public class Menu : MonoBehaviour {
     private void initialization()
     {
         // Set holder.
+        if (blockHolder)
+        {
+            Destroy(blockHolder.gameObject);
+        }
         blockHolder = new GameObject("Blocks").transform;
         blockHolder.SetParent(transform);
 
@@ -59,6 +63,10 @@ public class Menu : MonoBehaviour {
     private void placeContainers()
     {
         // Menu
+        if (menu)
+        {
+            Destroy(menu);
+        }
         menu = Instantiate(container) as GameObject;
         menu.transform.position = conHeight1 * Vector3.up;
         menu.name = "Container Menu";

@@ -181,6 +181,10 @@ namespace Completed
         private void initializeHoldersEtc()
         {
             // Main Holder
+            if (mainHolder)
+            {
+                //Destroy(mainHolder.gameObject);
+            }
             mainHolder = new GameObject("Main Holder").AddComponent<RectTransform>();
             mainHolder.SetParent(panel);
             mainHolder.anchorMin = new Vector2(0, 0.5f);
@@ -277,6 +281,10 @@ namespace Completed
                 menu.GetComponent<Menu>().containerMoving = true;
                 Debug.Log("selected SoloPlay");
                 startGame();
+
+                solo.Select();
+                menu.GetComponent<Menu>().placeMenu();
+                currentButton = solo;
             }
         }
         public void soloBackOnClick()

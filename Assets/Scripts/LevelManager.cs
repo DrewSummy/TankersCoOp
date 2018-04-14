@@ -183,7 +183,7 @@ namespace Completed
             {
                 numberOfRooms = floorChart.GetLength(0) * floorChart.GetLength(1);
             }
-            numberOfRooms = 2;
+            numberOfRooms = 12;
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));
@@ -560,7 +560,8 @@ namespace Completed
             
             // Fade from black to start
             StartCoroutine(fadeFromBlack());
-            firstRoom.GetComponent<RoomManager>().startBeginningBattle();
+            //firstRoom.GetComponent<RoomManager>().startBeginningBattle();
+            firstRoom.GetComponent<RoomManager>().startFirstRoom();
         }
         
         // Fade panel to black.

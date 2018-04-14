@@ -155,8 +155,8 @@ namespace Completed
             else
             {
                 // Get the horizontal and vertical components.
-                m_DriveHorizontalValue = InputManager.GetAxis(m_DriveHorizontalName, PID);
-                m_DriveVerticalValue = InputManager.GetAxis(m_DriveVerticalName, PID);
+                m_DriveHorizontalValue = -InputManager.GetAxis(m_DriveHorizontalName, PID);
+                m_DriveVerticalValue = -InputManager.GetAxis(m_DriveVerticalName, PID);
             }
             // Aiming.
             if (joystickMagnitude2 < .1)
@@ -166,8 +166,8 @@ namespace Completed
             else
             {
                 // Get the horizontal and vertical components.
-                m_AimHorizontalValue = InputManager.GetAxis(m_AimHorizontalName, PID);
-                m_AimVerticalValue = InputManager.GetAxis(m_AimVerticalName, PID);
+                m_AimHorizontalValue = -InputManager.GetAxis(m_AimHorizontalName, PID);
+                m_AimVerticalValue = -InputManager.GetAxis(m_AimVerticalName, PID);
             }
 
             // Store the value for firing.
@@ -308,7 +308,6 @@ namespace Completed
                     }
                 }
             }
-            // Input.GetAxisRaw("Fire1") != 1
             else
             {
                 m_HasShot = false;
@@ -351,35 +350,38 @@ namespace Completed
 
         public override void DestroyTank()
         {
-            // Freeze the tank from moving.
-            m_RidgidbodyTank.velocity = Vector3.zero;
-            m_RidgidbodyTank.freezeRotation = true;
-            
-            // Give projectiles to the room's projectileHolder.
-            TransferProjectiles();
-
-            // Immaterialize the tank.
-            for (int i = 0; i < GetComponentsInChildren<MeshRenderer>().Length; i++)
+            if (alive)
             {
-                GetComponentsInChildren<MeshRenderer>()[i].enabled = false;
+                // Freeze the tank from moving.
+                m_RidgidbodyTank.velocity = Vector3.zero;
+                m_RidgidbodyTank.freezeRotation = true;
+
+                // Give projectiles to the room's projectileHolder.
+                TransferProjectiles();
+
+                // Immaterialize the tank.
+                for (int i = 0; i < GetComponentsInChildren<MeshRenderer>().Length; i++)
+                {
+                    GetComponentsInChildren<MeshRenderer>()[i].enabled = false;
+                }
+                hitbox.enabled = false;
+
+                // Set alive to be false. Other scripts depend on this.
+                alive = false;
+
+                // Decrease LevelManager's player counter.
+                LM.playerDied();
+
+                // Set projectile count to 0.
+                projectileCount = 0;
+                GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
+
+                // Update the death counter.
+                deathCounter++;
+
+                // Move tank downward to avoid getting hit again.
+                transform.position += new Vector3(0, -10, 0);
             }
-
-            hitbox.enabled = false;
-
-            //TODO: place explosion or some animation
-
-            // Set alive to be false. Other scripts depend on this.
-            alive = false;
-            
-            // Decrease LevelManager's player counter.
-            LM.playerDied();
-
-            // Set projectile count to 0.
-            projectileCount = 0;
-            GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
-
-            // Update the death counter.
-            deathCounter++;
         }
 
 

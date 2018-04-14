@@ -1089,13 +1089,19 @@ public class TankEnemy : Tank
 
     public override void DestroyTank()
     {
-        base.DestroyTank();
-
-        // Update the enemy count in the parent room.
-        if (!testEnvironment)
+        if (alive)
         {
-            parentRoom.GetComponent<RoomManager>().enemyDecrement();
-            GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateEnemies(this.transform.parent);
+            base.DestroyTank();
+
+            // Update the enemy count in the parent room.
+            if (!testEnvironment)
+            {
+                parentRoom.GetComponent<RoomManager>().enemyDecrement();
+                GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateEnemies(this.transform.parent);
+            }
+
+            // Move tank downward to avoid getting hit again.
+            transform.position += new Vector3(0, -10, 0);
         }
     }
 }

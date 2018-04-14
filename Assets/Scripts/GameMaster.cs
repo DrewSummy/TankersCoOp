@@ -54,10 +54,10 @@ public class GameMaster : MonoBehaviour
         levelScript = GetComponent<LevelManager>();
 
         // Call the InitGame function to initialize the first level.
-        //displaymenuGUI();
+        displaymenuGUI();
 
         //Temporary for testing.
-        CreateSoloGame();
+        //CreateSoloGame();
         //CreateCoopGame();
     }
 
@@ -136,7 +136,7 @@ public class GameMaster : MonoBehaviour
         // Fade from black.
         createLevel();
     }
-
+    
     public void endGame()
     {
         Debug.Log("ending");

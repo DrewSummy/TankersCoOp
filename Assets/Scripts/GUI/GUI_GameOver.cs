@@ -22,7 +22,7 @@ namespace Completed
                 panel.SetActive(true);
                 StartCoroutine(panelFadeIn());
                 Time.timeScale = timeSlowSpeed;
-                Time.fixedDeltaTime = timeSlowSpeed;
+                //Time.fixedDeltaTime = timeSlowSpeed;
 
                 // Set the resume button as selected. For some reason there has to be a different button selected previously.
                 Quit.GetComponent<Button>().Select();

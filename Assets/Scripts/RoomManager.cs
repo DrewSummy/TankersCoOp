@@ -7,6 +7,8 @@ namespace Completed
     using System.Collections.Generic;       //Allows us to use Lists.
     public class RoomManager : MonoBehaviour
     {
+        private bool debug = false;                                              // Start with enemies in the first room.
+
         public GameObject blockTall;                                             // The GameObject of the tall block.
         public GameObject blockShort;                                            // The GameObject of the short block.
         public GameObject floor;                                                 // Array of open wall prefabs.
@@ -897,12 +899,24 @@ namespace Completed
         // Creates a starting room after the room is set up.
         public void CreateStartingRoom()
         {
-            playerSpawnLocations.Add(new Vector3(12f, 0, 12f) + m_room.transform.position);
-            playerSpawnLocations.Add(new Vector3(8f, 0, 7f) + m_room.transform.position);
-            enemySpawnLocations.Add(new Vector3(3f, 0f, 3f) + m_room.transform.position);
+            if (coop)
+            {
+                playerSpawnLocations.Add(new Vector3(8.85f, 0, 11.75f) + m_room.transform.position);
+                playerSpawnLocations.Add(new Vector3(14.85f, 0, 11.75f) + m_room.transform.position);
+            }
+            else
+            {
+                playerSpawnLocations.Add(new Vector3(11.85f, 0, 11.75f) + m_room.transform.position);
+            }
+            
+            if (debug)
+            {
+                playerSpawnLocations.Add(new Vector3(8f, 0, 7f) + m_room.transform.position);
+                enemySpawnLocations.Add(new Vector3(3f, 0f, 3f) + m_room.transform.position);
 
-            SetObstacleCourses();
-            PlaceObstacleCourse(3);
+                SetObstacleCourses();
+                PlaceObstacleCourse(3);
+            }
         }
 
         // Creates a starting room with instructions after the room is set up.
@@ -1085,6 +1099,21 @@ namespace Completed
                     endBattle();
                 }
             }
+        }
+
+        public void startFirstRoom()
+        {
+            // Set the camera's battling variable to true;
+            m_camera.GetComponent<CameraControl>().startBattleCamera(transform);
+
+            // Update the GUI.
+            updateGUIMiniMap();
+            GameObject.FindGameObjectWithTag("MiniMap").GetComponent<GUI_MiniMap>().movePlayer();
+            
+            levelScript.currentRoom = transform;
+            
+            PlacePlayers();
+            endBattle();
         }
 
         // Places player and enemy tanks in the room and starts the battle.
