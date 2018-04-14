@@ -17,7 +17,7 @@ public class GameMaster : MonoBehaviour
     public GUI_Controller controllerGUI;
 
     private LevelManager levelScript;                          // Store a reference to our LevelManager which will set up the level.
-    public int Level = 1;                                      // Current level number.
+    private int Level = 1;                                      // Current level number.
     private bool coop = false;                                 // Makes a player 2 if true.
 
 
@@ -154,7 +154,7 @@ public class GameMaster : MonoBehaviour
 
     public void nextLevel()
     {
-        //Level++;
+        Level++;
 
         restart();
     }

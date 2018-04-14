@@ -16,6 +16,7 @@ namespace Completed
         public GameObject wallOpen;                                              // The GameObject of the open wall.
         public GameObject wallClosed;                                            // The GameObject of the closed wall.
         public GameObject edges;
+        public GameObject tutorial;
         public GameObject m_camera;
         public Vector2 coordinate;
         public bool coop;
@@ -38,11 +39,12 @@ namespace Completed
         private Transform wallHolder;                                            // A variable to store a reference to the transform of the wall holder object.
         private Transform courseHolder;                                          // A variable to store a reference to the transform of the obstacle course object.
         public Transform edgeHolder;
-        private float wallThickness = .87f;                                      // Thickness of outside walls.
-        private float blockThickness = .735f;                                     // Thickness of blocks.
+        private float wallThickness = .75f;                                      // Thickness of outside walls.
+        private float blockThickness = .75f;                                     // Thickness of blocks.
         private float m_RoomLength = 23;                                         // Length of each room declared elsewhere also.
         private float textScaleMin = 4f;
         private float textScaleMax = 10f;
+        private Vector3 mapOffset = new Vector3(.5f, -.1f, .75f);
         private struct obstacleCourse                                            // A struct for an obstacle course.
         {
             public int[,] room;
@@ -205,6 +207,43 @@ namespace Completed
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, }
             };
             obstacleCourses.Add(roomChart3);
+
+            obstacleCourse roomChart4 = new obstacleCourse
+            {
+                room = new int[31, 31] {
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 6, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 6, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, }
+            };
+            obstacleCourses.Add(roomChart4);
         }
 
         private IEnumerator BeginSetUp()
@@ -521,14 +560,16 @@ namespace Completed
             {
                 for (int column = 0; column < grid.GetLength(1); column++)
                 {
-                    Vector3 pos = new Vector3(column * blockThickness + blockThickness / 2, 0, m_RoomLength - (row + 1) * blockThickness + blockThickness / 2) + m_room.transform.position;
+                    Vector3 pos = new Vector3(column * blockThickness, 0, m_RoomLength - (row + 1) * blockThickness) + m_room.transform.position;
+                    Vector3 blockPos = pos + mapOffset;
+                    Vector3 tankPos = pos + new Vector3(mapOffset.x, 0, mapOffset.z);
 
                     // Place the objects for each coordinate.
                     if (grid[row, column] == 1)
                     {
                         GameObject block =
                             Instantiate(blockTall,
-                            pos,
+                            blockPos,
                             Quaternion.identity) as GameObject;
                         block.transform.SetParent(courseHolder);
                     }
@@ -536,16 +577,15 @@ namespace Completed
                     {
                         GameObject block =
                             Instantiate(blockShort,
-                            pos,
+                            blockPos,
                             Quaternion.identity) as GameObject;
                         block.transform.SetParent(courseHolder);
-                        Debug.Log(block);
                     }
                     else if (grid[row, column] == 3)
                     {
                         GameObject block =
                             Instantiate(blockTall,
-                            pos,
+                            blockPos,
                             Quaternion.identity) as GameObject;
                         block.transform.SetParent(courseHolder);
                         block.tag = blockRemovableTag;
@@ -554,23 +594,23 @@ namespace Completed
                     {
                         GameObject block =
                             Instantiate(blockShort,
-                            pos,
+                            blockPos,
                             Quaternion.identity) as GameObject;
                         block.transform.SetParent(courseHolder);
                         block.tag = blockRemovableTag;
                     }
                     else if (grid[row, column] == 5)
                     {
-                        playerSpawnLocations.Add(pos);
+                        playerSpawnLocations.Add(tankPos);
                     }
                     else if (grid[row, column] == 6)
                     {
-                        enemySpawnLocations.Add(pos);
+                        enemySpawnLocations.Add(tankPos);
                     }
                 }
             }
 
-
+            courseHolder.gameObject.SetActive(false);
             foreach (MeshRenderer b in courseHolder.GetComponentsInChildren<MeshRenderer>())
             {
                 // Set the texture of the blocks depending on the level.
@@ -580,40 +620,7 @@ namespace Completed
                 //b.GetComponent<MeshRenderer>().material.SetTextureOffset("_MainTex", new Vector2((float)Random.Range(0, m_RoomLength) / (float)m_RoomLength, (float)Random.Range(0, m_RoomLength) / (float)m_RoomLength));
             }
         }
-
-        // Give the object that levels texture and randomize the offset and scale.
-        private void Texturize(GameObject objectToChange, string objectType)
-        {
-            // Types of objectTypes are "plane", "cube", "wall", and "cylinder".
-            if (objectType == "plane")
-            {
-                objectToChange.GetComponent<MeshRenderer>().material = floorMaterials[m_level];
-                // Set the texture of the floor depending on the level.
-                objectToChange.GetComponent<MeshRenderer>().material.SetTextureScale
-                    ("_MainTex", new Vector2(1f, 1f));
-                // Set a random offset on the texture.
-                objectToChange.GetComponent<MeshRenderer>().material.SetTextureOffset
-                    ("_MainTex", new Vector2((float)Random.Range(0, m_RoomLength) / (float)m_RoomLength, (float)Random.Range(0, m_RoomLength) / (float)m_RoomLength));
-            }
-
-            else if (objectType == "cube")
-            {
-                // Set texture distributions.
-                SetTextureDistribution();
-                // now use textureDistributions
-
-                foreach (Renderer child in objectToChange.GetComponentsInChildren<Renderer>())
-                {
-                    child.material = blockMaterials[Random.Range(0, blockMaterials.Length)];
-                    // Set the texture of the floor depending on the level.
-                    child.material.SetTextureScale("_MainTex", new Vector2(.01f, .01f));
-                    // Set a random offset on the texture.
-                    child.material.SetTextureOffset("_MainTex", new Vector2((float)Random.Range(0, m_RoomLength) / (float)m_RoomLength, (float)Random.Range(0, m_RoomLength) / (float)m_RoomLength));
-
-                }
-            }
-        }
-
+        
         // TODO: Sets the texture distribution for this room dependent on the level.
         private void SetTextureDistribution()
         {
@@ -643,14 +650,20 @@ namespace Completed
             GM = gameMaster;
 
             // Load in the GameObjects.
-            blockTall = Resources.Load("Prefab/GameObjectPrefab/Obstacles/New/Blocks/BlockTall") as GameObject;
-            blockShort = Resources.Load("Prefab/GameObjectPrefab/Obstacles/New/Blocks/BlockShort") as GameObject;
+            blockTall = Resources.Load("Prefab/GameObjectPrefab/Obstacles/Blocks/BlockTall") as GameObject;
+            blockShort = Resources.Load("Prefab/GameObjectPrefab/Obstacles/Blocks/BlockShort") as GameObject;
             exit = Resources.Load("Prefab/GameObjectPrefab/Miscellaneous/Ladder") as GameObject;
             wallOpen = Resources.Load("Prefab/GameObjectPrefab/Room/WallOpen") as GameObject;
             wallClosed = Resources.Load("Prefab/GameObjectPrefab/Room/WallClosed") as GameObject;
             edges = Resources.Load("Prefab/GameObjectPrefab/Room/Edges") as GameObject;
-            blockMaterials = Resources.LoadAll<Material>("Prefab/GameObjectPrefab/Room/BlockMaterials" + "/" + m_level);
-
+            tutorial = Resources.Load("Prefab/GameObjectPrefab/Room/FloorMaterials/Tutorial/Tutorial") as GameObject;
+            blockMaterials = Resources.LoadAll<Material>("Prefab/GameObjectPrefab/Room/BlockMaterials/" + m_level);
+            int levelDifference = 0;
+            while (blockMaterials.Length == 0)
+            {
+                levelDifference++;
+                blockMaterials = Resources.LoadAll<Material>("Prefab/GameObjectPrefab/Room/BlockMaterials/" + (m_level - levelDifference));
+            }
 
             // Fill enemyList.
             enemyList = Resources.LoadAll<GameObject>("Prefab/GameObjectPrefab/TankPrefab/TankEnemy");
@@ -700,12 +713,14 @@ namespace Completed
         private void PlaceFloor()
         {
             floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            floor.transform.position = new Vector3(m_RoomLength / 2, 0, m_RoomLength / 2)
+            floor.transform.position = new Vector3(11.75f, 0, 11.75f)
             + m_room.transform.position;
             floor.name = "Floor";
             floor.transform.SetParent(m_room);
-            floor.transform.localScale = new Vector3(2.474f, 1, 2.474f);
-            floor.GetComponent<MeshRenderer>().material = floorMaterials[m_level];
+            floor.transform.localScale = new Vector3(2.475f, 1, 2.475f);
+            int floorI = Mathf.Min(floorMaterials.Length - 1, m_level);
+            floor.GetComponent<MeshRenderer>().material = floorMaterials[floorI];
+
             // Set the texture of the floor depending on the level.
             float scale = Random.Range(textScaleMin, textScaleMax);
             floor.GetComponent<MeshRenderer>().material.SetTextureScale
@@ -713,17 +728,17 @@ namespace Completed
             // Set a random offset on the texture.
             floor.GetComponent<MeshRenderer>().material.SetTextureOffset
                 ("_MainTex", new Vector2((float)Random.Range(0, m_RoomLength) / (float)m_RoomLength, (float)Random.Range(0, m_RoomLength) / (float)m_RoomLength));
-
         }
 
         // Helper for the SetUpRoom.
         private void PlaceWalls()
         {
+            List<Vector3> x = new List<Vector3> { new Vector3(11.75f, 0, 23.75f), new Vector3(23.75f, 0, 11.75f), new Vector3(-.25f, 0, 11.75f), new Vector3(11.75f, 0, -.25f) };
             // NorthWall
             if (m_NEWSWall[0])
             {
                 GameObject placeNorthWall = Instantiate(wallOpen,
-                    m_room.transform.position + new Vector3(m_RoomLength / 2, 0, m_RoomLength + .5f * wallThickness),
+                    m_room.transform.position + x[0],// new Vector3(m_RoomLength / 2, 0, m_RoomLength + .5f * wallThickness),
                     Quaternion.identity) as GameObject;
                 placeNorthWall.transform.Rotate(0, 90, 0);
                 placeNorthWall.transform.SetParent(wallHolder);
@@ -746,7 +761,7 @@ namespace Completed
             else
             {
                 GameObject placeNorthWall = Instantiate(wallClosed,
-                    m_room.transform.position + new Vector3(m_RoomLength / 2, 0, m_RoomLength + .5f * wallThickness),
+                    m_room.transform.position + x[0],// new Vector3(m_RoomLength / 2, 0, m_RoomLength + .5f * wallThickness),
                     Quaternion.identity) as GameObject;
                 placeNorthWall.transform.Rotate(0, 90, 0);
                 placeNorthWall.transform.SetParent(wallHolder);
@@ -756,7 +771,7 @@ namespace Completed
             if (m_NEWSWall[1])
             {
                 GameObject placeEastWall = Instantiate(wallOpen,
-                    m_room.transform.position + new Vector3(m_RoomLength + .5f * wallThickness, 0, m_RoomLength / 2),
+                    m_room.transform.position + x[1],// new Vector3(m_RoomLength / 2, 0, m_RoomLength + .5f * wallThickness),
                     Quaternion.identity) as GameObject;
                 placeEastWall.transform.Rotate(0, 180, 0);
                 placeEastWall.transform.SetParent(wallHolder);
@@ -778,7 +793,7 @@ namespace Completed
             else
             {
                 GameObject placeEastWall = Instantiate(wallClosed,
-                    m_room.transform.position + new Vector3(m_RoomLength + .5f * wallThickness, 0, m_RoomLength / 2),
+                    m_room.transform.position + x[1],// new Vector3(m_RoomLength / 2, 0, m_RoomLength + .5f * wallThickness),
                     Quaternion.identity) as GameObject;
                 placeEastWall.transform.Rotate(0, 180, 0);
                 placeEastWall.transform.SetParent(wallHolder);
@@ -788,7 +803,7 @@ namespace Completed
             if (m_NEWSWall[2])
             {
                 GameObject placeWestWall = Instantiate(wallOpen,
-                    m_room.transform.position + new Vector3(-.5f * wallThickness, 0, m_RoomLength / 2),
+                    m_room.transform.position + x[2],// new Vector3(m_RoomLength / 2, 0, m_RoomLength + .5f * wallThickness),
                     Quaternion.identity) as GameObject;
                 placeWestWall.transform.SetParent(wallHolder);
                 placeWestWall.tag = wallTag;
@@ -809,7 +824,7 @@ namespace Completed
             else
             {
                 GameObject placeWestWall = Instantiate(wallClosed,
-                    m_room.transform.position + new Vector3(-.5f * wallThickness, 0, m_RoomLength / 2),
+                    m_room.transform.position + x[2],// new Vector3(m_RoomLength / 2, 0, m_RoomLength + .5f * wallThickness),
                     Quaternion.identity) as GameObject;
                 placeWestWall.transform.SetParent(wallHolder);
                 placeWestWall.tag = wallTag;
@@ -818,7 +833,7 @@ namespace Completed
             if (m_NEWSWall[3])
             {
                 GameObject placeSouthWall = Instantiate(wallOpen,
-                    m_room.transform.position + new Vector3(m_RoomLength / 2, 0, -.5f * wallThickness),
+                    m_room.transform.position + x[3],// new Vector3(m_RoomLength / 2, 0, m_RoomLength + .5f * wallThickness),
                     Quaternion.identity) as GameObject;
                 placeSouthWall.transform.SetParent(wallHolder);
                 placeSouthWall.transform.Rotate(0, 270, 0);
@@ -840,7 +855,7 @@ namespace Completed
             else
             {
                 GameObject placeSouthWall = Instantiate(wallClosed,
-                    m_room.transform.position + new Vector3(m_RoomLength / 2, 0, -.5f * wallThickness),
+                    m_room.transform.position + x[3],// new Vector3(m_RoomLength / 2, 0, m_RoomLength + .5f * wallThickness),
                     Quaternion.identity) as GameObject;
                 placeSouthWall.transform.SetParent(wallHolder);
                 placeSouthWall.transform.Rotate(0, 270, 0);
@@ -876,44 +891,29 @@ namespace Completed
             // Place a random obstacle course.
             SetObstacleCourses();
             int randomCourseIndex = Random.Range(0, obstacleCourses.Count);
-            Debug.Log(randomCourseIndex);
             PlaceObstacleCourse(randomCourseIndex);
         }
 
         // Creates a starting room after the room is set up.
         public void CreateStartingRoom()
         {
-            playerSpawnLocations.Add(new Vector3(25f, 0, 25f) + m_room.transform.position);
-            playerSpawnLocations.Add(new Vector3(45f, 0, 45f) + m_room.transform.position);
-            enemySpawnLocations.Add(new Vector3(10f, 0f, 10f) + m_room.transform.position);
+            playerSpawnLocations.Add(new Vector3(12f, 0, 12f) + m_room.transform.position);
+            playerSpawnLocations.Add(new Vector3(8f, 0, 7f) + m_room.transform.position);
+            enemySpawnLocations.Add(new Vector3(3f, 0f, 3f) + m_room.transform.position);
+
+            SetObstacleCourses();
+            PlaceObstacleCourse(3);
         }
 
         // Creates a starting room with instructions after the room is set up.
         public void CreateStartingRoomWithInstructions()
         {
-            //TODO: add the instructions
-            //GameObject instructionCourse = new GameObject();
-            //instructionCourse.transform.position = 
-            //new Vector3(m_RoomLength / 2 + m_room.position.x, 0, m_RoomLength / 2 + m_room.position.z);
-            //instructionCourse.transform.SetParent(courseHolder);
-            playerSpawnLocations.Add(new Vector3(12.5f, 0, 12.5f) + m_room.transform.position);
-            playerSpawnLocations.Add(new Vector3(12.5f, 0, 20f) + m_room.transform.position);
-            enemySpawnLocations.Add(new Vector3(5f, 0f, 5f) + m_room.transform.position);
-
-
-            GameObject wp1 = new GameObject("StartRoom Spawn Pos");
-            wp1.transform.SetParent(transform);
-            wp1.transform.position = new Vector3(5f, 0, 10f) + m_room.transform.position;
-            GameObject wp2 = new GameObject("StartRoom Spawn Pos");
-            wp2.transform.SetParent(transform);
-            wp2.transform.position = new Vector3(25f, 0, 20f) + m_room.transform.position;
-            GameObject wp3 = new GameObject("StartRoom Spawn Pos");
-            wp3.transform.SetParent(transform);
-            wp3.transform.position = new Vector3(35f, 0, 10f) + m_room.transform.position;
-            waypoints = new GameObject[3];
-            waypoints[0] = wp1;
-            waypoints[1] = wp2;
-            waypoints[2] = wp3;
+            CreateStartingRoom();
+            
+            GameObject t = Instantiate(tutorial);
+            t.transform.SetParent(floor.transform);
+            t.transform.position = floor.transform.position + new Vector3(0, .01f, 0);
+            t.transform.localScale = new Vector3(1, 1, 1);
         }
 
         // Creates a last room after the room is set up.
@@ -923,7 +923,7 @@ namespace Completed
             // This is the last room, so place the exit in the room.
             GameObject ladderExit = Instantiate(exit) as GameObject;
             ladderExit.transform.position = m_room.transform.position + new Vector3(m_RoomLength / 2 - 2, 0, m_RoomLength / 2);
-
+            courseHolder.gameObject.SetActive(false);
             ladderExit.transform.SetParent(courseHolder);
             ladderExit.tag = exitTag;
             ladderExit.GetComponent<NextLevelTrigger>().GM = GM;
@@ -1006,8 +1006,8 @@ namespace Completed
             }
 
             floor.GetComponent<MeshRenderer>().enabled = true;
-
-
+            
+            courseHolder.gameObject.SetActive(true);
 
             //This is here to keep function an enumerator, eventually will make things materialize slowly
             yield return new WaitForSeconds(.1f);

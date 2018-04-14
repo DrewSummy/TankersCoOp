@@ -47,6 +47,9 @@ namespace Completed
 
         private Vector2 topRight;                                                 //TODO: keeps track of the top and right most coordinate to adjust the full map to be in the furthest top right position
         public Transform refer;
+        /// <summary>
+        /// change floorChart, playerCoord, and topRight
+        /// </summary>
 
         // This is called once to begin the display. Every update is displayed elsewhere.
         public void beginMap(bool[,] fC, Vector2 lR, Vector2 sR, GameObject player)
@@ -150,19 +153,6 @@ namespace Completed
 
             playerCoord = startRoom;
             placeSample();
-
-
-            // Place the indicator for the middle room.
-            //playerIndicator = Instantiate(playerSample) as GameObject;
-            //playerIndicator.GetComponent<RectTransform>().SetParent(panelSample.transform);
-            //playerIndicator.GetComponent<RectTransform>().position = floorHolderSample.position;
-
-            //TODO: color should be set by player tank color
-            /*Color c = Color.blue;
-            foreach (Transform bar in playerIndicator.transform)
-            {
-                bar.gameObject.GetComponent<Image>().color = c;
-            }*/
         }
 
         // Places sample map while adding to the outlineHolderFull and floorHolderSample.
@@ -204,7 +194,7 @@ namespace Completed
                         RectTransform currFloor = new GameObject("Floor #" + (floorChart.GetLength(0) * column + row)).AddComponent<RectTransform>();
                         currFloor.transform.SetParent(floorHolderSample);
                         currFloor.transform.localPosition = new Vector3(row - (int)playerCoord[0], column - (int)playerCoord[1], 0) * roomLengthSample;
-
+                        //currFloor.transform.localPosition = new Vector3((int)playerCoord[0] - row, (int)playerCoord[1] - column, 0) * roomLengthSample;
 
                         GameObject floor = Instantiate(floorSample) as GameObject;
                         floor.transform.SetParent(currFloor);
@@ -236,6 +226,7 @@ namespace Completed
                         RectTransform currFloor = new GameObject("Floor #" + (floorChart.GetLength(0) * column + row)).AddComponent<RectTransform>();
                         currFloor.transform.SetParent(floorHolderSample);
                         currFloor.transform.localPosition = new Vector3(row - (int)playerCoord[0], column - (int)playerCoord[1], 0) * roomLengthSample;
+                        //currFloor.transform.localPosition = new Vector3((int)playerCoord[0] - row, (int)playerCoord[1] - column, 0) * roomLengthSample;
 
                         GameObject floor = Instantiate(unknownSample) as GameObject;
                         floor.transform.SetParent(currFloor);

@@ -50,7 +50,7 @@ namespace Completed
         public Vector2 lastRoomCoordinate;                                       // A Vector2 for the last room.
         private Transform roomHolder;                                            // A variable to store a reference to the transform of the Room object.
         private Transform obstacleHolder;                                        // A variable to store a reference to the transform of the Obstacle object.
-        private int m_RoomLength = 23;                                           // Length of each room declared elsewhere also.
+        private float m_RoomLength = 23;                                           // Length of each room declared elsewhere also.
         private float wallThickness = .87f;                                      // Thickness of outside walls.
         private int numberOfRooms;                                               // Number of rooms based on level
         public Transform currentRoom;                                            // The transform for the current room.
@@ -92,11 +92,11 @@ namespace Completed
                 Debug.Log(printThis);
             }
         }
-
         
 
         private Transform[] FindCurrentNEWS()
         {
+            PrintRoomGrid();
             // Find the alive player and use that.
             GameObject player = player1;
             if (!player1.GetComponent<TankPlayer>().alive)
@@ -106,7 +106,7 @@ namespace Completed
 
             Transform[] NEWS = new Transform [4];
 
-            int stepLength = m_RoomLength + 2 * (int)wallThickness;
+            float stepLength = m_RoomLength + 2 * (int)wallThickness;//possible error
             int xCoord = (int)Mathf.Floor((player.transform.position.x + wallThickness) / stepLength);
             int yCoord = (int)Mathf.Floor((player.transform.position.z + wallThickness) / stepLength);
 
@@ -135,7 +135,7 @@ namespace Completed
         {
             Transform[] NEWS = new Transform[4];
 
-            int stepLength = m_RoomLength + 2 * (int)wallThickness;
+            float stepLength = m_RoomLength + 2 * wallThickness;
             int xCoord = (int)Mathf.Floor((room.transform.position.x + wallThickness) / stepLength);
             int yCoord = (int)Mathf.Floor((room.transform.position.z + wallThickness) / stepLength);
 
@@ -183,7 +183,7 @@ namespace Completed
             {
                 numberOfRooms = floorChart.GetLength(0) * floorChart.GetLength(1);
             }
-            numberOfRooms = 12;
+            numberOfRooms = 2;
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));
@@ -319,7 +319,6 @@ namespace Completed
             else
             {
                 colorMain = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-                Debug.Log("no");
             }
             if (Resources.Load(fileLoc + "/accent"))
             {
@@ -332,13 +331,13 @@ namespace Completed
         }
 
         // Sets up each room dependent on floorChart.
-        private void SetUpFloor(int level)
+        private void SetUpFloor()
         {
             // Create the level GameObject.
-            levelHolder = new GameObject("Level " + level);
+            levelHolder = new GameObject("Level " + Level);
 
             // Set up the floor chart.
-            InstantiateFloorChart(level);
+            InstantiateFloorChart(Level);
 
             // Iterate through the floorChart and place rooms when enabled.
             for (int row = 0; row < floorChart.GetLength(0); row++)
@@ -363,25 +362,20 @@ namespace Completed
                         // Set coop.
                         roomHolder.gameObject.GetComponent<RoomManager>().coop = coop;
 
-                        // If this is the starting room and level 1, TODO: place the instructions as the obstacle course.
-                        if (new Vector2(row, column) == firstRoomCoordinate && level == 1)
-                        {
-                            // Call the RoomManager function for a room with instructions and instantiate respective variables.
-                            roomHolder.GetComponent<RoomManager>().SetUpRoom
-                                (roomHolder, Level, blockMaterials, floorMaterials, NEWSWall(row, column), GM);
-                            roomHolder.GetComponent<RoomManager>().CreateStartingRoomWithInstructions();
-                            roomHolder.GetComponent<RoomManager>().levelScript = this;
-                            roomHolder.GetComponent<RoomManager>().m_camera = m_camera;
-                            currentRoom = roomHolder;
-                        }
-                        // If this is the starting room, place nothing.
-                        //TODO: could be vector2
-                        else if (new Vector2(row, column) == firstRoomCoordinate)
+                        // If this is the starting room, TODO: place the instructions as the obstacle course if level 1.
+                        if (new Vector2(row, column) == firstRoomCoordinate)
                         {
                             // Call the RoomManager function for an empty room and instantiate respective variables.
                             roomHolder.GetComponent<RoomManager>().SetUpRoom
                                 (roomHolder, Level, blockMaterials, floorMaterials, NEWSWall(row, column), GM);
-                            roomHolder.GetComponent<RoomManager>().CreateStartingRoom();
+                            if (Level == 1)
+                            {
+                                roomHolder.GetComponent<RoomManager>().CreateStartingRoomWithInstructions();
+                            }
+                            else
+                            {
+                                roomHolder.GetComponent<RoomManager>().CreateStartingRoom();
+                            }
                             roomHolder.GetComponent<RoomManager>().levelScript = this;
                             roomHolder.GetComponent<RoomManager>().m_camera = m_camera;
                             currentRoom = roomHolder;
@@ -507,6 +501,7 @@ namespace Completed
         // SetupScene initializes our level and calls the previous functions to lay out the game board
         public void SetupScene(int level)
         {
+            Level = level;
             // Get the players.
             playersLeft = 1;
             foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
@@ -532,7 +527,7 @@ namespace Completed
             SetColors();
 
             // Sets up each room dependent on floorChart.
-            SetUpFloor(level);
+            SetUpFloor();
             
 
             pause.enabled = true;

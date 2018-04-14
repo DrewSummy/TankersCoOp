@@ -15,12 +15,12 @@ namespace Completed
         private Vector3 m_target;
 
         private float m_RoomLength = 23;
-        private float m_WallThickness = 1;
+        private float m_WallThickness = 1.75f;
         private float stepLength = 25;
         private Vector3 centerOfRoom = new Vector3(6, 0, 6);
 
         private Vector3 m_cameraAngle = new Vector3(80, 0, 0);
-        private Vector3 cameraOffset = Vector3.Normalize(new Vector3(0, 22, 2));
+        private Vector3 cameraOffset = Vector3.Normalize(new Vector3(0, 22, -2));
         private float patrolOffset = 27;
         private float battleOffset = 21;
         private float deadOffset = 35;

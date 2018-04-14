@@ -59,4 +59,5 @@ bugs:
     https://assetstore.unity.com/packages/2d/textures-materials/floors/cracked-stone-filled-with-lava-8294
     https://assetstore.unity.com/packages/2d/textures-materials/floors/hand-painted-stone-texture-73949
     https://assetstore.unity.com/packages/2d/textures-materials/floors/five-seamless-tileable-ground-textures-57060
+    https://opengameart.org/content/controller-icons for tutorial layout pixart
 */
