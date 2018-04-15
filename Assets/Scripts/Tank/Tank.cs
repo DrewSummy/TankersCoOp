@@ -229,4 +229,12 @@ abstract public class Tank : MonoBehaviour {
         }
         tower.rotation = Quaternion.LookRotation(toEnemy);
     }
+
+
+    // Prevents tanks from sliding after collision.
+    protected void OnCollisionExit(Collision collisionInfo)
+    {
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+        GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+    }
 }

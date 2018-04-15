@@ -2,6 +2,7 @@
 using Completed;
 using System.Collections;
 using System.Threading;
+using UnityEngine.UI;
 
 public class GameMaster : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class GameMaster : MonoBehaviour
     public GUI_MiniMap minimapGUI;                             // GUI
     public GUI_Pause pauseGUI;
     public GUI_Controller controllerGUI;
+    public Transform panel;
 
     private LevelManager levelScript;                          // Store a reference to our LevelManager which will set up the level.
     private int Level = 1;                                      // Current level number.
@@ -133,13 +135,13 @@ public class GameMaster : MonoBehaviour
         // Prepare the GUIs.
         prepareGUIs();
 
-        // Fade from black.
+        // Create level.
         createLevel();
     }
     
     public void endGame()
     {
-        Debug.Log("ending");
+        Debug.Log("end");
         clearGame();
         displaymenuGUI();
     }
@@ -147,10 +149,44 @@ public class GameMaster : MonoBehaviour
     public void restart()
     {
         clearGame();
-
         startGame();
         camera.SetActive(true);
     }
+
+    // Fade panel to black.
+    private IEnumerator fadeFromBlack()
+    {
+        // Decrement the alpha until invisible.
+        float alpha = 1;
+        float increment = .08f;
+        Image imageAlpha = panel.GetComponent<Image>();
+        while (alpha > 0)
+        {
+            Debug.Log(alpha);
+            alpha -= increment;
+            imageAlpha.color = new Color(0, 0, 0, alpha);
+            yield return new WaitForSeconds(.01f);
+        }
+        alpha = 0;
+        //imageAlpha.color = new Color(0, 0, 0, alpha);
+    }
+    private IEnumerator fadeToBlack()
+    {
+        // Increment alpha until visible.
+        float alpha = 0;
+        float increment = .03f;
+        Image imageAlpha = panel.GetComponent<Image>();
+        imageAlpha.color = Color.black;
+        while (alpha < 1)
+        {
+            alpha += increment;
+            imageAlpha.color = new Color(0, 0, 0, alpha);
+            yield return new WaitForSeconds(.01f);
+        }
+        alpha = 1;
+        imageAlpha.color = new Color(0, 0, 0, alpha);
+    }
+
 
     public void nextLevel()
     {

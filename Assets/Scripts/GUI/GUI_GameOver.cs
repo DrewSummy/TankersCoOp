@@ -84,20 +84,51 @@ namespace Completed
         }
 
         // End and restart game.
-        protected override void endGame()
+        /*protected override void endGame()
         {
+            StartCoroutine(endGameHelper());
+        }
+        private IEnumerator endGameHelper()
+        {
+            yield return fadeToBlack();
+            Debug.Log("hmm");
+
             currentButton = Restart.GetComponent<Button>();
             Unpause();
             GM.endGame();
         }
         protected override void restartGame()
         {
+            StartCoroutine(restartGameHelper());
+        }
+        private IEnumerator restartGameHelper()
+        {
+            yield return fadeToBlack();
+
             RemoveMap();
             guiMiniMap.clearMap();
             currentButton = Restart.GetComponent<Button>();
             Unpause();
             GM.restart();
         }
+        // Fade panel from black.
+        private IEnumerator fadeToBlack()
+        {
+            // Increment alpha until visible.
+            float alpha = 0;
+            float increment = .03f;
+            Image imageAlpha = panel.GetComponent<Image>();
+            imageAlpha.color = Color.black;
+            while (alpha < 1)
+            {
+                alpha += increment;
+                imageAlpha.color = new Color(0, 0, 0, alpha);
+                yield return new WaitForSeconds(.01f);
+            }
+            alpha = 1;
+            imageAlpha.color = new Color(0, 0, 0, alpha);
+        }*/
+
 
         // Functions called by GUI_Controller
         public override void back()
@@ -117,6 +148,7 @@ namespace Completed
         }
         public override void select()
         {
+            Debug.Log(currentButton);
             if (currentButton.GetComponent<Button>() == Restart.GetComponent<Button>())
             {
                 currentButton = RestartYes.GetComponent<Button>();
@@ -140,6 +172,7 @@ namespace Completed
             }
             else if (currentButton.GetComponent<Button>() == QuitYes.GetComponent<Button>())
             {
+                Debug.Log(currentButton);
                 Quit.GetComponent<Button>().Select();
                 currentButton = Restart.GetComponent<Button>();
                 currentButton.Select();

@@ -7,6 +7,10 @@ namespace Completed
 {
     public class GUI_Menu : MonoBehaviour
     {
+        public bool test;
+
+
+
         public bool active = false;
         public GameMaster GM;
         public Transform panel;                                    //
@@ -154,6 +158,8 @@ namespace Completed
             float alpha = 1;
             float increment = .08f;
             Image imageAlpha = panel.GetComponent<Image>();
+            imageAlpha.color = Color.black;
+            yield return new WaitForSeconds(1f);
             while (alpha > 0)
             {
                 alpha -= increment;
@@ -350,7 +356,6 @@ namespace Completed
         // Functions called by GUI_Controller
         public void back()
         {
-            Debug.Log("is this called");
             if (currentButton == solo || currentButton == coop || currentButton == settings)
             {
                 // Do nothing
@@ -407,6 +412,15 @@ namespace Completed
             StartCoroutine(startGameCoopCoroutine());
             
             active = false;
+        }
+
+        public IEnumerator endGameCoroutine()
+        {
+            // Fade from black.
+            Debug.Log("end");
+            yield return new WaitForSeconds(.01f);
+            yield return fadeFromBlack();
+            Debug.Log("game");
         }
 
         // Helper for disableCamera.
