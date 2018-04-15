@@ -1194,6 +1194,9 @@ namespace Completed
             // Remove projectiles from the player and put them into their animation.
             removeProjectiles();
 
+            // Place the level image.
+            GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().PlaceLevel(m_level);
+
             // Ending coroutines.
             removeDoors();
             removeObstacles();

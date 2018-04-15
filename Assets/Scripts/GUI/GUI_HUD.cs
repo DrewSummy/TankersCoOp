@@ -23,6 +23,7 @@ namespace Completed
 
         public GameObject projectilePanel;
         public GameObject enemyPanel;
+        public GameObject levelPanel;
 
         private int P1ProjectileMax;                // The maximum number of player 1's projectiles at a time.
         private int P1ProjectileCount;              // The current amount of player 1's projectiles available to fire.
@@ -30,13 +31,13 @@ namespace Completed
         private int P2ProjectileCount;              // The current amount of player 1's projectiles available to fire.
         public RectTransform projectileHolder1;     // Transform for holding projectiles and projectileEmptys.
         public RectTransform projectileHolder2;     // Transform for holding projectiles and projectileEmptys.
-        //private Transform enemyHolder;              // Transform for holding tanks.
         public Transform enemyHolder;              // Temp
         public Transform countdownHolder;          // Transform for holding countDownSprites.
         public Transform bannerHolder;
         private GameObject P1;                      // Reference to the player 1 game object.
         private GameObject P2;                      // Reference to the player 2 game object.
         private float iconDistance = 15;
+        public Text levelText;
 
         // Coroutine
         Coroutine countDown;
@@ -196,6 +197,15 @@ namespace Completed
             PlaceP2Projectiles();
         }
 
+        public void PlaceLevel(int level)
+        {
+            //TODO:update level number
+            levelText.text = level.ToString();
+
+            //TODO: show level
+            levelPanel.SetActive(true);
+        }
+
         public void PlaceEnemies(Transform eH)
         {
             // Place sprites for enemyGameObjectHolder.
@@ -213,6 +223,9 @@ namespace Completed
                     currentChild++;
                 }
             }
+
+            //TODO: hide level
+            levelPanel.SetActive(false);
         }
 
         public void UpdateEnemies(Transform eH)

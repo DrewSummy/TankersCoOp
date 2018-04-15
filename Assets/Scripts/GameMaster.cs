@@ -9,7 +9,7 @@ public class GameMaster : MonoBehaviour
 
     public static GameMaster instance = null;                  // Static instance of GameMaster which allows it to be accessed by any other script.
     public GameObject playerTemplate;                          // The game object for instantiating player tanks.
-    public GameObject camera;
+    public GameObject cam;
     public GameObject menu;
     public GUI_Menu menuGUI;                                   // GUI
     public GUI_HUD HUDGUI;                                     // GUI
@@ -19,7 +19,7 @@ public class GameMaster : MonoBehaviour
     public Transform panel;
 
     private LevelManager levelScript;                          // Store a reference to our LevelManager which will set up the level.
-    private int Level = 1;                                      // Current level number.
+    private int Level = 1;                                     // Current level number.
     private bool coop = false;                                 // Makes a player 2 if true.
 
 
@@ -56,10 +56,10 @@ public class GameMaster : MonoBehaviour
         levelScript = GetComponent<LevelManager>();
 
         // Call the InitGame function to initialize the first level.
-        displaymenuGUI();
+        //displaymenuGUI();
 
         //Temporary for testing.
-        //CreateSoloGame();
+        CreateSoloGame();
         //CreateCoopGame();
     }
 
@@ -100,7 +100,7 @@ public class GameMaster : MonoBehaviour
 
     private void displaymenuGUI()
     {
-        camera.SetActive(false);
+        cam.SetActive(false);
         menu.SetActive(true);
         menuGUI.gameObject.SetActive(true);
         menuGUI.initialDisplay();
@@ -130,7 +130,7 @@ public class GameMaster : MonoBehaviour
         PlacePlayers();
 
         // Place camera.
-        camera.SetActive(true);
+        cam.SetActive(true);
 
         // Prepare the GUIs.
         prepareGUIs();
@@ -141,7 +141,6 @@ public class GameMaster : MonoBehaviour
     
     public void endGame()
     {
-        Debug.Log("end");
         clearGame();
         displaymenuGUI();
     }
@@ -150,7 +149,7 @@ public class GameMaster : MonoBehaviour
     {
         clearGame();
         startGame();
-        camera.SetActive(true);
+        cam.SetActive(true);
     }
 
     // Fade panel to black.
@@ -197,7 +196,7 @@ public class GameMaster : MonoBehaviour
 
     private void clearGame()
     {
-        camera.SetActive(false);
+        cam.SetActive(false);
 
         levelScript.endLevel();
 
@@ -229,7 +228,7 @@ public class GameMaster : MonoBehaviour
 
         // Call the SetupScene function of the LevelManager script, pass it current level number.
         levelScript.coop = coop;
-        levelScript.m_camera = camera;
+        levelScript.m_camera = cam;
         levelScript.SetupScene(Level);
 
         // Pass the LevelManager to each tank and each tank to the LevelManager.
