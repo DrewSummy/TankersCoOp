@@ -445,7 +445,6 @@ namespace Completed
         // Used by RoomManager to prevent tanks from shooting at the end of a battle.
         public void disableShoot(bool b)
         {
-            //TODO: update GUI_HUD
             if (b)
             {
                 projectileCount = 0;

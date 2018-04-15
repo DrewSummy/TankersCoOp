@@ -62,6 +62,8 @@ namespace Completed
             }
         }
         private List<obstacleCourse> obstacleCourses = new List<obstacleCourse>();// A list of obstacle courses.
+        private Vector3 maxObstacleVelocity = new Vector3(3, 10, 3);
+        private Vector3 minObstacleVelocity = new Vector3(-3, 0, -3);
         private bool[] m_NEWSWall = new bool[4];                                 // An array of bools to represent if the wall is open.
 
         private Gate doorScript;                                                 // Store a reference to the Gate.
@@ -102,26 +104,6 @@ namespace Completed
             obstacleCourse roomChart1 = new obstacleCourse
             {
                 room = new int[31, 31] {
-                {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -131,8 +113,28 @@ namespace Completed
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2}, }
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, }
             };
             obstacleCourses.Add(roomChart1);
 
@@ -613,16 +615,16 @@ namespace Completed
             }
 
             courseHolder.gameObject.SetActive(false);
-            foreach (MeshRenderer b in courseHolder.GetComponentsInChildren<MeshRenderer>())
+            ColorizeObstacles();
+        }
+        private void ColorizeObstacles()
+        {
+            for (int i = 0; i < courseHolder.GetComponentsInChildren<MeshRenderer>().Length; i++)
             {
-                // Set the texture of the blocks depending on the level.
-                //b.GetComponent<MeshRenderer>().material = blockMaterials[m_level];
-                //b.GetComponent<MeshRenderer>().material.SetTextureScale("_MainTex", new Vector2(.01f, .01f));
-                // Set a random offset on the texture.
-                //b.GetComponent<MeshRenderer>().material.SetTextureOffset("_MainTex", new Vector2((float)Random.Range(0, m_RoomLength) / (float)m_RoomLength, (float)Random.Range(0, m_RoomLength) / (float)m_RoomLength));
+                courseHolder.GetComponentsInChildren<MeshRenderer>()[i].material = blockMaterials[Random.Range(0, blockMaterials.Length)];
             }
         }
-        
+
         // TODO: Sets the texture distribution for this room dependent on the level.
         private void SetTextureDistribution()
         {
@@ -1192,31 +1194,18 @@ namespace Completed
             // Remove projectiles from the player and put them into their animation.
             removeProjectiles();
 
-            // Disable shooting.
-            if (player1) player1.GetComponent<TankPlayer>().disableShoot(true);
-            if (coop)
-            {
-                if (player2) player2.GetComponent<TankPlayer>().disableShoot(true);
-            }
-
             // Ending coroutines.
             removeDoors();
             removeObstacles();
             StartCoroutine(FlickerLights());
+            StartCoroutine(TemparilyDisableShoot());
+            StartCoroutine(SlowGame());            
 
             //TODO: should play ending audio
 
             // Wait for camera to stop shaking.
             StartCoroutine(m_camera.GetComponent<CameraControl>().endBattleCamera());
-
-
-            // Undisable shooting.
-            if (player1) player1.GetComponent<TankPlayer>().disableShoot(false);
-            if (coop)
-            {
-                if (player2) player2.GetComponent<TankPlayer>().disableShoot(false);
-            }
-
+            
             //TODO: make roomIdle obsolete
             roomIdle = true;
             roomCompleted = true;
@@ -1233,7 +1222,50 @@ namespace Completed
         }
 
         // Helpers for the end of a battle.
-        //TODO: make lowerDoorFast() and lowerDoorLastRoom() a coroutine
+        private IEnumerator TemparilyDisableShoot()
+        {
+            // Freeze tanks.
+            player1.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            player1.GetComponent<Rigidbody>().freezeRotation = true;
+            if (coop)
+            {
+                if (player2)
+                {
+                    player2.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    player2.GetComponent<Rigidbody>().freezeRotation = true;
+                }
+            }
+
+            // Disable shooting.
+            if (player1) player1.GetComponent<TankPlayer>().disableShoot(true);
+            if (coop)
+            {
+                if (player2) player2.GetComponent<TankPlayer>().disableShoot(true);
+            }
+
+            yield return new WaitForSeconds(.8f);
+
+            // Undisable shooting.
+            if (player1) player1.GetComponent<TankPlayer>().disableShoot(false);
+            if (coop)
+            {
+                if (player2) player2.GetComponent<TankPlayer>().disableShoot(false);
+            }
+        }
+        private IEnumerator SlowGame()
+        {
+            float normalGameSpeed = 1;
+            float slowGameSpeed = .25f;
+            float epsilon = .01f;
+
+            Time.timeScale = slowGameSpeed;
+
+            while (Time.timeScale < normalGameSpeed)
+            {
+                Time.timeScale += epsilon;
+                yield return new WaitForSeconds(epsilon);
+            }
+        }
         private void removeDoors()
         {
             for (int door = 0; door < m_doors.Length; door++)
@@ -1283,10 +1315,27 @@ namespace Completed
             // Remove obstacles.
             foreach (Transform block in courseHolder)
             {
-                StartCoroutine(removeSingleObstacle(block));
+                //StartCoroutine(removeSingleObstacle(block));
+                StartCoroutine(dropObstacle(block));
             }
         }
         // Helper to remove one obstacle.
+        private IEnumerator dropObstacle(Transform b)
+        {
+            // Add gravity.
+            b.gameObject.AddComponent<Rigidbody>();
+            b.GetComponent<Rigidbody>().useGravity = true;
+            // Add random force.
+            b.GetComponent<Rigidbody>().velocity = new Vector3(Random.Range(minObstacleVelocity.x, maxObstacleVelocity.x),
+                Random.Range(minObstacleVelocity.y, maxObstacleVelocity.y),
+                Random.Range(minObstacleVelocity.z, maxObstacleVelocity.z));
+            // Make incorporeal.
+            b.GetComponentInChildren<BoxCollider>().enabled = false;
+
+            // Destroy after time limit.
+            yield return new WaitForSeconds(4);
+            Destroy(b.gameObject);
+        }
         private IEnumerator removeSingleObstacle(Transform b)
         {
             float speed = 40f;

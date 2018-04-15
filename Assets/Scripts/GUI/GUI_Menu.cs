@@ -44,6 +44,7 @@ namespace Completed
         private Transform coopHolder;                              // Holds the buttons of coop.
         private Transform settingsHolder;                          // Holds the buttons of settings.
         private float raiseTime = 2.0f;
+        private bool LogoDisplayed = false;
 
         private float[] delayRange = new float[2];
 
@@ -71,24 +72,29 @@ namespace Completed
         // Displays the logo.
         private IEnumerator displayLogo()
         {
-            // Hold black.
-            panelLogo.gameObject.SetActive(true);
-            yield return new WaitForSeconds(1f);
-            //TODO: yield return playLogoAudio();
+            if (!LogoDisplayed)
+            {
+                LogoDisplayed = true;
 
-            // Fade from black.
-            yield return fadeLogoFromBlack();
+                // Hold black.
+                panelLogo.gameObject.SetActive(true);
+                yield return new WaitForSeconds(1f);
+                //TODO: yield return playLogoAudio();
 
-            // Hold the logo and play audio.
-            yield return new WaitForSeconds(1f);
-            //TODO: audio, maybe the logo pronounced wrong
+                // Fade from black.
+                yield return fadeLogoFromBlack();
 
-            // Fade to black.
-            yield return fadeLogoToBlack();
+                // Hold the logo and play audio.
+                yield return new WaitForSeconds(1f);
+                //TODO: audio, maybe the logo pronounced wrong
 
-            // Hold black background then set inactive.
-            yield return new WaitForSeconds(1f);
-            panelLogo.gameObject.SetActive(false);
+                // Fade to black.
+                yield return fadeLogoToBlack();
+
+                // Hold black background then set inactive.
+                yield return new WaitForSeconds(1f);
+                panelLogo.gameObject.SetActive(false);
+            }
         }
 
         // Fade the logo from black.
@@ -261,6 +267,7 @@ namespace Completed
         {
             if (!menu.GetComponent<Menu>().containerMoving && active)
             {
+                Application.Quit();             // Doesn't work in editor.
                 menu.GetComponent<Menu>().containerMoving = true;
                 Debug.Log("selected Settings");
                 menu.GetComponent<Menu>().placeSettings();

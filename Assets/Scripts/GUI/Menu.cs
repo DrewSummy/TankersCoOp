@@ -97,7 +97,7 @@ public class Menu : MonoBehaviour {
         blocks[1].GetComponent<UIBlock>().unHighlight();
         blocks[1].name = "Block Co-op";
         blocks[1].transform.rotation = Quaternion.identity;
-        blocks[2].GetComponent<UIBlock>().setText("SETTINGS");
+        blocks[2].GetComponent<UIBlock>().setText("QUIT");
         blocks[2].GetComponent<UIBlock>().unHighlight();
         blocks[2].name = "Block Settings";
         blocks[2].transform.rotation = Quaternion.identity;
@@ -123,7 +123,7 @@ public class Menu : MonoBehaviour {
         blocks[6].transform.rotation = Quaternion.identity;
 
         // Settings
-        blocks[7].GetComponent<UIBlock>().setText("SETTING 1");
+        blocks[7].GetComponent<UIBlock>().setText("this is for nothings");
         blocks[7].GetComponent<UIBlock>().unHighlight();
         blocks[7].name = "Block Setting 1";
         blocks[7].transform.rotation = Quaternion.identity;
