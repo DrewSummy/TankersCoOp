@@ -183,7 +183,7 @@ namespace Completed
             {
                 numberOfRooms = floorChart.GetLength(0) * floorChart.GetLength(1);
             }
-            //numberOfRooms = 3;
+            numberOfRooms = 3;
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));
@@ -642,7 +642,7 @@ namespace Completed
             currentRoom.GetComponent<RoomManager>().endRoom();
 
 
-            gameoverGUI.Pause();
+            gameoverGUI.Pause(TeamUtility.IO.PlayerID.One);
         }
 
         // End level.

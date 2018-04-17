@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using Completed;
+using TeamUtility.IO;
 
 namespace Completed
 {
@@ -14,7 +15,7 @@ namespace Completed
         private float panelAlpha = .34f;
         
 
-        public override void Pause()
+        public override void Pause(PlayerID pid)
         {
             if (enabled)
             {

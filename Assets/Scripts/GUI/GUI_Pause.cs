@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using Completed;
+using TeamUtility.IO;
 
 namespace Completed
 {
@@ -296,7 +297,7 @@ namespace Completed
             }
         }
 
-        public virtual void Pause()
+        public virtual void Pause(PlayerID pid)
         {
             if (enabled)
             {
@@ -316,6 +317,7 @@ namespace Completed
 
                 // Enable the controller.
                 controllerGUI.enabled = true;
+                controllerGUI.PID = pid;
             }
         }
 

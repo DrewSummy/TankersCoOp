@@ -6,6 +6,7 @@ using Completed;
 
 public class GUI_Controller : MonoBehaviour
 {
+    public PlayerID PID;
     private Coroutine currentCoroutine;
 
     // Button/Joystick Names
@@ -36,7 +37,7 @@ public class GUI_Controller : MonoBehaviour
     // Store the value of the input axes while exculding based on deadzones.
     private void TakeControllerInputs()
     {
-        PlayerID PID = TeamUtility.IO.PlayerID.One;
+        //PlayerID PID = TeamUtility.IO.PlayerID.One;
 
         // Left Joystick
         jsLeftVerticalValue = -InputManager.GetAxis(jsLeftVerticalName, PID);

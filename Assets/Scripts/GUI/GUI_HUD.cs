@@ -328,7 +328,13 @@ namespace Completed
 
         public void resetHUD()
         {
-            levelPanel.SetActive(false);
+            //StopCoroutine(countDown);
+
+            /*oreach (Transform child in countdownHolder.transform)
+            {
+                GameObject.Destroy(child.gameObject);
+            }*/
+
             foreach (Transform child in enemyHolder.transform)
             {
                 GameObject.Destroy(child.gameObject);

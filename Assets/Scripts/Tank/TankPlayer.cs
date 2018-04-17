@@ -41,7 +41,7 @@ namespace Completed
         public GameObject currentRoom;
         private int maxTimeApart = 3;               // Max amount of time players can be seperated.
         private bool startedTimer = false;
-        private Vector3 center = new Vector3(25f, 0, 25f);    // Distance to center of room for teleporting.
+        private Vector3 center = new Vector3(11.5f, 0, 11.5f);    // Distance to center of room for teleporting.
         public bool battling = false;               // Boolean indicating the tank is battling; needed for relocating.
         public LevelManager LM;
 
@@ -332,7 +332,7 @@ namespace Completed
             {
                 if (m_PauseValue)
                 {
-                    pauseGUI.Pause();
+                    pauseGUI.Pause(PID);
 
                     paused = true;
                 }

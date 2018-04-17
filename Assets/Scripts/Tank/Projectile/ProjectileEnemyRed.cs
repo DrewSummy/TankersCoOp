@@ -6,6 +6,6 @@ public class ProjectileEnemyRed : ProjectileEnemy
     protected override void resetVariables()
     {
         maxCollisions = 1;
-        projectileSpeed = 10.5f;
+        projectileSpeed = 7.5f;
     }
 }
