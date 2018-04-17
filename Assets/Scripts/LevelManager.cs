@@ -183,7 +183,7 @@ namespace Completed
             {
                 numberOfRooms = floorChart.GetLength(0) * floorChart.GetLength(1);
             }
-            numberOfRooms = 12;
+            //numberOfRooms = 3;
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));
@@ -636,6 +636,7 @@ namespace Completed
         {
             //TODO: this should also create some GUI and disable pause
             Debug.Log("GameOver");
+            GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().PlaceLevel(Level);
             m_camera.GetComponent<CameraControl>().gameOverCamera();
             
             currentRoom.GetComponent<RoomManager>().endRoom();

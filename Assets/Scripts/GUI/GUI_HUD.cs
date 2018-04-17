@@ -199,11 +199,38 @@ namespace Completed
 
         public void PlaceLevel(int level)
         {
-            //TODO:update level number
+            // Update level number
             levelText.text = level.ToString();
 
-            //TODO: show level
+            // Show level
             levelPanel.SetActive(true);
+
+            StartCoroutine(animateLevel());
+        }
+
+        private IEnumerator animateLevel()
+        {
+            float scale = 1.5f;
+            levelText.GetComponent<RectTransform>().localScale = new Vector3(scale, scale, scale);
+            float alpha = 0;
+            levelText.color = new Color(1, 1, 1, alpha);
+            float epsilon = .03f;
+
+            while (levelText.GetComponent<RectTransform>().localScale.x > 1)
+            {
+                scale -= epsilon;
+                levelText.GetComponent<RectTransform>().localScale = new Vector3(scale, scale, scale);
+
+                alpha += epsilon;
+                levelText.color = new Color(1, 1, 1, alpha);
+
+                yield return new WaitForSeconds(epsilon);
+            }
+
+            scale = 1;
+            levelText.GetComponent<RectTransform>().localScale = new Vector3(scale, scale, scale);
+
+            yield return new WaitForSeconds(1f);
         }
 
         public void PlaceEnemies(Transform eH)
@@ -224,8 +251,11 @@ namespace Completed
                 }
             }
 
-            //TODO: hide level
-            levelPanel.SetActive(false);
+            // Hide the level if the tanks are done.
+            if (currentChild > 0)
+            {
+                levelPanel.SetActive(false);
+            }
         }
 
         public void UpdateEnemies(Transform eH)
@@ -236,7 +266,7 @@ namespace Completed
             {
                 GameObject.Destroy(enemyImage.gameObject);
             }
-
+            
             PlaceEnemies(eH);
         }
 
@@ -298,13 +328,7 @@ namespace Completed
 
         public void resetHUD()
         {
-            //StopCoroutine(countDown);
-
-            /*oreach (Transform child in countdownHolder.transform)
-            {
-                GameObject.Destroy(child.gameObject);
-            }*/
-
+            levelPanel.SetActive(false);
             foreach (Transform child in enemyHolder.transform)
             {
                 GameObject.Destroy(child.gameObject);
