@@ -119,7 +119,6 @@ namespace Completed
         }
         public override void select()
         {
-            Debug.Log(currentButton);
             if (currentButton.GetComponent<Button>() == Restart.GetComponent<Button>())
             {
                 currentButton = RestartYes.GetComponent<Button>();

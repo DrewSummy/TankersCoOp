@@ -188,7 +188,7 @@ namespace Completed
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));
-            //firstRoomCoordinate = new Vector2(0, 1);
+            //firstRoomCoordinate = new Vector2(0, 0);
             floorChart[(int)firstRoomCoordinate.x, (int)firstRoomCoordinate.y] = true;
 
 

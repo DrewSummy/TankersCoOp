@@ -69,6 +69,7 @@ public class TankEnemyBlack : TankEnemy
     {
         while (alive)
         {
+            Debug.Log(state);
             trackPlayer();
             switch (state)
             {

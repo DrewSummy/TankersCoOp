@@ -19,6 +19,7 @@ namespace Completed
         public GameObject wallClosed;                                            // The GameObject of the closed wall.
         public GameObject edges;
         public GameObject tutorial;
+        public GameObject indicator;
         public GameObject m_camera;
         public Vector2 coordinate;
         public bool coop;
@@ -69,11 +70,8 @@ namespace Completed
         }
         private List<obstacleCourse> obstacleCourses = new List<obstacleCourse>();// A list of obstacle courses.
 
-        private List<List<int>> coursesDistribution = new List<List<int>>
-        { new List<int>{ 0, 5 },
-        new List<int>{ 2, 7 },
-        new List<int>{ 7, 12 },
-        new List<int>{ 12, 17 } };
+        private List<List<obstacleCourse>> coursesDistribution = new List<List<obstacleCourse>>();
+        private List<int> levelToDistribution = new List<int> { 0, 4, 7, 11, 14 };
 
         private Vector3 maxObstacleVelocity = new Vector3(3, 10, 3);
         private Vector3 minObstacleVelocity = new Vector3(-3, 0, -3);
@@ -87,6 +85,7 @@ namespace Completed
         private bool battleEnsuing = false;                                      // Boolean for if battle is going on.
         private bool roomIdle = false;                                           // Boolean for if the room is in idle.
         private Transform lightHolder;                                           // A variable to store a reference to the transform of the light holder object.
+        private Transform indicatorHolder;
         private Light example;                                                   // Boolean for if the.
         private Transform[] NEWSRoom;                                            // sdsdsdStore a reference to our TankPlayer of player 1.
         public Transform roomTo;                                                 // TODO: might not need public. A variable to store a reference to the transform of the next room object.
@@ -789,6 +788,40 @@ namespace Completed
             obstacleCourses.Add(roomChart16);
             obstacleCourses.Add(roomChart17);
             obstacleCourses.Add(roomChart18);
+
+            List<obstacleCourse> sec1 = new List<obstacleCourse>();
+            sec1.Add(roomChart1);
+            sec1.Add(roomChart2);
+            sec1.Add(roomChart3);
+            sec1.Add(roomChart4);
+            sec1.Add(roomChart5);
+            List<obstacleCourse> sec2 = new List<obstacleCourse>();
+            sec2.Add(roomChart3);
+            sec2.Add(roomChart4);
+            sec2.Add(roomChart5);
+            sec2.Add(roomChart6);
+            sec2.Add(roomChart7);
+            sec2.Add(roomChart8);
+            List<obstacleCourse> sec3 = new List<obstacleCourse>();
+            sec3.Add(roomChart8);
+            sec3.Add(roomChart9);
+            sec3.Add(roomChart10);
+            sec3.Add(roomChart11);
+            sec3.Add(roomChart12);
+            sec3.Add(roomChart13);
+            List<obstacleCourse> sec4 = new List<obstacleCourse>();
+            sec4.Add(roomChart12);
+            sec4.Add(roomChart13);
+            sec4.Add(roomChart14);
+            sec4.Add(roomChart15);
+            sec4.Add(roomChart16);
+            sec4.Add(roomChart17);
+            sec4.Add(roomChart18);
+
+            coursesDistribution.Add(sec1);
+            coursesDistribution.Add(sec2);
+            coursesDistribution.Add(sec3);
+            coursesDistribution.Add(sec4);
         }
 
         private IEnumerator BeginSetUp()
@@ -909,24 +942,33 @@ namespace Completed
 
             for (int location = 0; location < enemyLocations.Count; location++)
             {
-                GameObject enemy = new GameObject();
+                GameObject[] listToChooseFrom = enemyList;
                 if (enemySpawnLocationsNonChase.Contains(enemyLocations[location]))
                 {
-                    enemy = Instantiate(enemyListNonChase[Random.Range(0, enemyListNonChase.Length)]) as GameObject;
+                    listToChooseFrom = enemyListNonChase;
                 }
                 else if (enemySpawnLocationsStagnant.Contains(enemyLocations[location]))
                 {
-                    enemy = Instantiate(enemyListStagnant[Random.Range(0, enemyListStagnant.Length)]) as GameObject;
+                    listToChooseFrom = enemyListStagnant;
                 }
                 else if (enemySpawnLocationsNonStagnant.Contains(enemyLocations[location]))
                 {
-                    enemy = Instantiate(enemyListNonStagnant[Random.Range(0, enemyListNonStagnant.Length)]) as GameObject;
+                    listToChooseFrom = enemyListNonStagnant;
                 }
                 else
                 {
-                    int enemyIndex = Mathf.Min(enemyList.Length, m_level);
-                    enemy = Instantiate(enemyList[Random.Range(0, enemyIndex)]) as GameObject;
+                    listToChooseFrom = enemyList;
                 }
+
+                int distI = 0;
+                while (m_level > levelToDistribution[distI])
+                {
+                    distI++;
+                }
+                int enemyIndex = Mathf.Min(listToChooseFrom.Length, distI);
+                GameObject enemy = Instantiate(listToChooseFrom[Random.Range(0, enemyIndex)]) as GameObject;
+
+
                 enemy.transform.position = enemyLocations[location];
                 enemy.transform.SetParent(enemyHolder);
 
@@ -1120,7 +1162,7 @@ namespace Completed
         }
 
         // Places the desired obstacle course as the child of parentObject.
-        private void PlaceObstacleCourse(int roomChartNumber)
+        private void PlaceObstacleCourse(obstacleCourse course)
         {
             // 0 = empty
             // 1 = tall block
@@ -1133,7 +1175,7 @@ namespace Completed
             // 8 = stagnant enemy spawn point
             // 9 = non-stagnent enemy spawn point
 
-            int[,] grid = obstacleCourses[roomChartNumber].get();
+            int[,] grid = course.get();
 
             // Create an object to make the parent of each object.
             for (int row = 0; row < grid.GetLength(0); row++)
@@ -1249,6 +1291,7 @@ namespace Completed
             wallClosed = Resources.Load("Prefab/GameObjectPrefab/Room/WallClosed") as GameObject;
             edges = Resources.Load("Prefab/GameObjectPrefab/Room/Edges") as GameObject;
             tutorial = Resources.Load("Prefab/GameObjectPrefab/Room/FloorMaterials/Tutorial/Tutorial") as GameObject;
+            indicator = Resources.Load("Prefab/GameObjectPrefab/Room/DoorIndicator") as GameObject;
             blockMaterials = Resources.LoadAll<Material>("Prefab/GameObjectPrefab/Room/BlockMaterials/" + m_level);
             int levelDifference = 0;
             while (blockMaterials.Length == 0)
@@ -1272,6 +1315,12 @@ namespace Completed
             lightHolder = new GameObject("LightHolder").transform;
             lightHolder.transform.SetParent(m_room);
             lightHolder.position = m_room.position;
+
+            // Create lightHolder for this room.
+            indicatorHolder = new GameObject("IndicatorHolder").transform;
+            indicatorHolder.transform.SetParent(m_room);
+            indicatorHolder.position = m_room.position;
+            indicatorHolder.gameObject.SetActive(false);
 
             // Create lightHolder for this room.
             wallHolder = new GameObject("WallHolder").transform;
@@ -1352,6 +1401,11 @@ namespace Completed
                 example.color = Color.red; example.range = 35; example.intensity = 5; example.type = LightType.Spot;
                 northWallLight.transform.rotation = Quaternion.Euler(32, 0, 0);
                 example.enabled = false;
+                // Place indicator.
+                GameObject northIndicator = Instantiate(indicator) as GameObject;
+                northIndicator.transform.SetParent(indicatorHolder);
+                northIndicator.transform.position = placeNorthWall.transform.position + new Vector3(0, 1, -2.85f);
+                northIndicator.transform.rotation = Quaternion.Euler(0, 0, 0);
             }
             else
             {
@@ -1384,6 +1438,11 @@ namespace Completed
                 light.color = Color.red; light.range = 35; light.intensity = 5; light.type = LightType.Spot;
                 northEastLight.transform.rotation = Quaternion.Euler(32, 90, 0);
                 light.enabled = false;
+                // Place indicator.
+                GameObject eastIndicator = Instantiate(indicator) as GameObject;
+                eastIndicator.transform.SetParent(indicatorHolder);
+                eastIndicator.transform.position = placeEastWall.transform.position + new Vector3(-2.85f, 1, 0);
+                eastIndicator.transform.rotation = Quaternion.Euler(0, 90, 0);
             }
             else
             {
@@ -1415,6 +1474,11 @@ namespace Completed
                 light.color = Color.red; light.range = 35; light.intensity = 5; light.type = LightType.Spot;
                 westWallLight.transform.rotation = Quaternion.Euler(32, 270, 0);
                 light.enabled = false;
+                // Place indicator.
+                GameObject westIndicator = Instantiate(indicator) as GameObject;
+                westIndicator.transform.SetParent(indicatorHolder);
+                westIndicator.transform.position = placeWestWall.transform.position + new Vector3(2.85f, 1, 0);
+                westIndicator.transform.rotation = Quaternion.Euler(0, -90, 0);
             }
             else
             {
@@ -1446,6 +1510,11 @@ namespace Completed
                 light.color = Color.red; light.range = 35; light.intensity = 5; light.type = LightType.Spot;
                 southWallLight.transform.rotation = Quaternion.Euler(32, 180, 180);
                 light.enabled = false;
+                // Place indicator.
+                GameObject southIndicator = Instantiate(indicator) as GameObject;
+                southIndicator.transform.SetParent(indicatorHolder);
+                southIndicator.transform.position = placeSouthWall.transform.position + new Vector3(0, 1, 2.85f);
+                southIndicator.transform.rotation = Quaternion.Euler(0, 180, 0);
             }
             else
             {
@@ -1485,8 +1554,33 @@ namespace Completed
         {
             // Place a random obstacle course based on the level and course distrubution.
             SetObstacleCourses();
-            int randomCourseIndex = Random.Range(coursesDistribution[m_level-1][0], coursesDistribution[m_level - 1][1]);
-            PlaceObstacleCourse(randomCourseIndex);
+            int distI = GetCourse();
+            PlaceObstacleCourse(coursesDistribution[distI][Random.Range(0, coursesDistribution[distI].Count)]);
+        }
+
+        private int GetCourse()
+        {
+            int distI = 0;
+            while (m_level > levelToDistribution[distI])
+            {
+                distI++;
+            }
+            return distI - 1;
+        }
+
+        private int LevelToDistributionI(int l)
+        {
+            int index = 0;
+
+            while (index < levelToDistribution.Count)
+            {
+                if (l > levelToDistribution[index])
+                {
+                    break;
+                }
+            }
+
+            return l - 1;
         }
 
         // Creates a starting room after the room is set up.
@@ -1500,15 +1594,6 @@ namespace Completed
             else
             {
                 playerSpawnLocations.Add(new Vector3(11.85f, 0, 11.75f) + m_room.transform.position);
-            }
-            
-            if (debug)
-            {
-                playerSpawnLocations.Add(new Vector3(8f, 0, 7f) + m_room.transform.position);
-                enemySpawnLocations.Add(new Vector3(3f, 0f, 3f) + m_room.transform.position);
-
-                SetObstacleCourses();
-                PlaceObstacleCourse(3);
             }
         }
 
@@ -1545,19 +1630,22 @@ namespace Completed
 
         IEnumerator FlickerLights()
         {
-            for (int flickerAmount = 0; flickerAmount < 5; flickerAmount++)
+            for (int flickerAmount = 0; flickerAmount < 3; flickerAmount++)
             {
                 for (int i = 0; i < lightHolder.transform.childCount; i++)
                 {
                     lightHolder.GetComponentsInChildren<Light>()[i].enabled = true;
                 }
+                indicatorHolder.gameObject.SetActive(true);
                 yield return new WaitForSeconds(.1f);
                 for (int i = 0; i < lightHolder.transform.childCount; i++)
                 {
                     lightHolder.GetComponentsInChildren<Light>()[i].enabled = false;
                 }
+                indicatorHolder.gameObject.SetActive(false);
                 yield return new WaitForSeconds(.65f);
             }
+            indicatorHolder.gameObject.SetActive(true);
             for (int i = 0; i < lightHolder.transform.childCount; i++)
             {
                 lightHolder.GetComponentsInChildren<Light>()[i].enabled = true;
