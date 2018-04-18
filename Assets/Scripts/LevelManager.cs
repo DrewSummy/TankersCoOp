@@ -42,6 +42,7 @@ namespace Completed
         public bool coop;// = false;                                                // Reference to the parent tank game object.
         public GameObject m_camera;                                              // Reference to the parent tank game object.
         public Transform panel;
+        private Vector3 center = new Vector3(11.5f, 0, 11.5f);    // Distance to center of room for teleporting.
 
         public bool[,] floorChart = new bool[11, 11];                            // An array of arrays of bools if a room is enabled.
         private Transform[,] roomGrid = new Transform[11, 11];                   // An array of arrays of transforms for each room.
@@ -183,11 +184,11 @@ namespace Completed
             {
                 numberOfRooms = floorChart.GetLength(0) * floorChart.GetLength(1);
             }
-            numberOfRooms = 3;
+            //numberOfRooms = 3;
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));
-            firstRoomCoordinate = new Vector2(0, 0);
+            //firstRoomCoordinate = new Vector2(0, 1);
             floorChart[(int)firstRoomCoordinate.x, (int)firstRoomCoordinate.y] = true;
 
 
@@ -608,6 +609,47 @@ namespace Completed
             return (playersLeft > 0);
         }
 
+        public GameObject DeterminePlayerRoom(Vector3 pos)
+        {
+            float closest = float.MaxValue;
+            GameObject closestRoom = levelHolder.transform.GetChild(0).gameObject;
+
+            for (int i = 0; i < levelHolder.transform.childCount; i++)
+            {
+                Transform r = levelHolder.transform.GetChild(i);
+                if (Vector3.Distance(pos, r.transform.position + center) < closest)
+                {
+                    closest = Vector3.Distance(pos, r.position + center);
+                    closestRoom = r.gameObject;
+                }
+            }
+
+            return closestRoom;
+        }
+
+        public Vector2 DeterminePlayerCoord(Vector3 pos)
+        {
+            float closest = float.MaxValue;
+            Vector2 closestCoord = new Vector2();
+            int roomGridLength = 11;
+            for (int i = 0; i < roomGridLength; ++i)
+            {
+                for (int j = 0; j < roomGridLength; ++j)
+                {
+                    Transform room = roomGrid[i, j];
+                    if (room)
+                    {
+                        if (Vector3.Distance(pos, room.position + center) < closest)
+                        {
+                            closest = Vector3.Distance(pos, room.position + center);
+                            closestCoord = new Vector2(i, j);
+                        }
+                    }
+                }
+            }
+            return closestCoord;
+        }
+
         // Resets the player count when
         public void resetPlayers()
         {
@@ -631,7 +673,7 @@ namespace Completed
             }
         }
 
-        // Called when all players hav died.
+        // Called when all players have died.
         private void gameOver()
         {
             //TODO: this should also create some GUI and disable pause

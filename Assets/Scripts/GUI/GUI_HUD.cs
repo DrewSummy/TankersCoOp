@@ -78,13 +78,13 @@ namespace Completed
         // Enable and disable the other panels.
         private void OnEnable()
         {
-            projectileHolder1.gameObject.SetActive(true);
+            /*projectileHolder1.gameObject.SetActive(true);
             if (P2)
             {
                 projectileHolder2.gameObject.SetActive(true);
             }
 
-            enableHUD();
+            enableHUD();*/
         }
         private void OnDisable()
         {

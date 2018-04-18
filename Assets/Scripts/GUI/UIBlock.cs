@@ -11,6 +11,7 @@ public class UIBlock : MonoBehaviour
     private TextMesh[] textH;
     private GameObject unHighlighted;
     private GameObject highlighted;
+    private GameObject outline;
 
     //TODO: add audio on collision
 
@@ -19,6 +20,7 @@ public class UIBlock : MonoBehaviour
         // Set the private variables.
         unHighlighted = transform.GetChild(1).gameObject;
         highlighted = transform.GetChild(2).gameObject;
+        outline = transform.GetChild(3).gameObject;
         textU = unHighlighted.GetComponentsInChildren<TextMesh>();
         textH = highlighted.GetComponentsInChildren<TextMesh>();
     }
@@ -45,11 +47,15 @@ public class UIBlock : MonoBehaviour
         unHighlighted.SetActive(false);
 
         menuText.text = blockText;
+
+        outline.SetActive(true);
     }
 
     public void unHighlight()
     {
         highlighted.SetActive(false);
         unHighlighted.SetActive(true);
+
+        outline.SetActive(false);
     }
 }

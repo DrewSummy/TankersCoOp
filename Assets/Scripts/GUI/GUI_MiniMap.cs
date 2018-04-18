@@ -152,6 +152,7 @@ namespace Completed
             // Could make this better by having all the rooms placed but only display the 9.
 
             playerCoord = startRoom;
+            Debug.Log(startRoom);
             placeSample();
         }
 
@@ -159,6 +160,7 @@ namespace Completed
         private void placeSample()
         {
             panelSample.SetActive(true);
+            Debug.Log(playerCoord);
 
             // Iterate through the rooms within the sampleRadius.
             // Set the beginning and ending boundaries to avoid out of bound indexing.
@@ -269,6 +271,7 @@ namespace Completed
 
             // This is for sample.
             playerCoord = coord;
+            Debug.Log(coord);
             if (!selected)
             {
                 clearSample();
@@ -388,10 +391,12 @@ namespace Completed
         {
             // Do some math and get the room coordinate player1 is in.
             int stepLength = m_RoomLength + 2 * (int)wallThickness;
+            Debug.Log(P1.transform.position);
             int xCoord = (int)Mathf.Floor((P1.transform.position.x + wallThickness) / stepLength);
             int yCoord = (int)Mathf.Floor((P1.transform.position.z + wallThickness) / stepLength);
 
             playerCoord = new Vector2(xCoord, yCoord);
+            Debug.Log(playerCoord);
         }
 
         // Used by GUI_Pause to locate the player.

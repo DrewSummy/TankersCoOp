@@ -461,11 +461,23 @@ namespace Completed
         // Relocates player2 to player1's room if they are apart for too long.
         private void checkTeammateRoom()
         {
+            SetRoom();
             if (teammate.currentRoom != currentRoom && !startedTimer)
             {
                 startedTimer = true;
                 Debug.Log("start timer");
                 StartCoroutine(relocate());
+            }
+        }
+
+        // Changes the current room occupied by the tank and updates the minimap if necessary.
+        public void SetRoom()
+        {
+            GameObject room = LM.DeterminePlayerRoom(transform.position);
+            if (currentRoom != room)
+            {
+                currentRoom = room;
+                miniMapGUI.visitedRoom(LM.DeterminePlayerCoord(transform.position));
             }
         }
 
@@ -476,7 +488,6 @@ namespace Completed
             int timer = 0;
             while (teammate.currentRoom != currentRoom && timer < 3)
             {
-                Debug.Log(timer);
                 //TODO: show some type of counter, maybe sound or light blinking under tank
                 yield return new WaitForSeconds(1);
                 timer++;
