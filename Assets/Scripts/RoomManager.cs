@@ -1404,7 +1404,7 @@ namespace Completed
                 // Place indicator.
                 GameObject northIndicator = Instantiate(indicator) as GameObject;
                 northIndicator.transform.SetParent(indicatorHolder);
-                northIndicator.transform.position = placeNorthWall.transform.position + new Vector3(0, 1, -2.85f);
+                northIndicator.transform.position = placeNorthWall.transform.position + new Vector3(0, .1f, -2.85f);
                 northIndicator.transform.rotation = Quaternion.Euler(0, 0, 0);
             }
             else
@@ -1441,7 +1441,7 @@ namespace Completed
                 // Place indicator.
                 GameObject eastIndicator = Instantiate(indicator) as GameObject;
                 eastIndicator.transform.SetParent(indicatorHolder);
-                eastIndicator.transform.position = placeEastWall.transform.position + new Vector3(-2.85f, 1, 0);
+                eastIndicator.transform.position = placeEastWall.transform.position + new Vector3(-2.85f, .1f, 0);
                 eastIndicator.transform.rotation = Quaternion.Euler(0, 90, 0);
             }
             else
@@ -1477,7 +1477,7 @@ namespace Completed
                 // Place indicator.
                 GameObject westIndicator = Instantiate(indicator) as GameObject;
                 westIndicator.transform.SetParent(indicatorHolder);
-                westIndicator.transform.position = placeWestWall.transform.position + new Vector3(2.85f, 1, 0);
+                westIndicator.transform.position = placeWestWall.transform.position + new Vector3(2.85f, .1f, 0);
                 westIndicator.transform.rotation = Quaternion.Euler(0, -90, 0);
             }
             else
@@ -1513,7 +1513,7 @@ namespace Completed
                 // Place indicator.
                 GameObject southIndicator = Instantiate(indicator) as GameObject;
                 southIndicator.transform.SetParent(indicatorHolder);
-                southIndicator.transform.position = placeSouthWall.transform.position + new Vector3(0, 1, 2.85f);
+                southIndicator.transform.position = placeSouthWall.transform.position + new Vector3(0, .1f, 2.85f);
                 southIndicator.transform.rotation = Quaternion.Euler(0, 180, 0);
             }
             else

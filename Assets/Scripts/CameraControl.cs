@@ -15,7 +15,7 @@ namespace Completed
         private Vector3 m_target;
 
         private float m_RoomLength = 23;
-        private float m_WallThickness = 1.75f;
+        private float m_WallThickness = .75f;
         private float stepLength = 25;
         private Vector3 centerOfRoom = new Vector3(6, 0, 6);
 
@@ -24,6 +24,7 @@ namespace Completed
         private float patrolOffset = 27;
         private float battleOffset = 21;
         private float deadOffset = 35;
+        private Vector3 center = new Vector3(11.5f, 0, 11.5f);    // Distance to center of room for teleporting.
 
         private float cameraSpeedMinimum = 45;
         //private float cameraSpeedEnding = 5;
@@ -100,9 +101,12 @@ namespace Completed
         {
             if (m_Player1)
             {
+                GameObject room = m_Player1.GetComponent<TankPlayer>().currentRoom;
+                    ///use .currentroom
                 m_target = new Vector3(Mathf.Floor((m_Player1.transform.position.x + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2,
                         0,
                         Mathf.Floor((m_Player1.transform.position.z + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2);
+                m_target = room.transform.position + center;
                 float step = Mathf.Max(Vector3.Distance(transform.position, m_target), cameraSpeedMinimum) * Time.deltaTime;
                 transform.position = Vector3.MoveTowards(transform.position, m_target, step);
             }

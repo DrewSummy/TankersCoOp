@@ -25,10 +25,11 @@ namespace Completed
         private bool m_LockValue;                   // The value of the bool for locking the tower.
         private string m_PauseName;                 // The name of the bool for pausing.
         private bool m_PauseValue;                  // The value of the bool for the pause.
-        private Vector3 m_AimRotation;              // The target direction for the tower to point.
         private bool m_SelectValue;
         private string m_SelectName;                // The name of the bool for pausing.
         private bool m_HasShot;                     // The boolean used to permit the tank to shoot once per trigger pull.
+        private bool canFire = true;
+        private float fireDelay = .05f;
         private bool paused;                        // The boolean for if the game is paused.
         private float joystickMagnitude;            // The magnitude of the joystick for moving.
         public GUI_MiniMap miniMapGUI;
@@ -67,12 +68,9 @@ namespace Completed
             m_FireValue = 0f;
             m_LockValue = false;
             m_PauseValue = false;
-
             m_SelectValue = false;
 
-
-            // Also reset the input values.
-            //TODO maybe
+            canFire = true;
         }
 
         protected new void Start()
@@ -279,7 +277,21 @@ namespace Completed
 
         protected new void Fire()
         {
-            base.Fire();
+            if (canFire)
+            {
+                base.Fire();
+                StartCoroutine(DelayFire());
+            }
+        }
+        private IEnumerator DelayFire()
+        {
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            GetComponent<Rigidbody>().freezeRotation = true;
+            canFire = false;
+            aimOnly = true;
+            yield return new WaitForSeconds(fireDelay);
+            canFire = true;
+            aimOnly = false;
         }
 
 
