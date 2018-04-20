@@ -29,7 +29,7 @@ namespace Completed
         private string m_SelectName;                // The name of the bool for pausing.
         private bool m_HasShot;                     // The boolean used to permit the tank to shoot once per trigger pull.
         private bool canFire = true;
-        private float fireDelay = .05f;
+        private float fireDelay = .04f;
         private bool paused;                        // The boolean for if the game is paused.
         private float joystickMagnitude;            // The magnitude of the joystick for moving.
         public GUI_MiniMap miniMapGUI;

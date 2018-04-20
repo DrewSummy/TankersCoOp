@@ -102,10 +102,6 @@ namespace Completed
             if (m_Player1)
             {
                 GameObject room = m_Player1.GetComponent<TankPlayer>().currentRoom;
-                    ///use .currentroom
-                m_target = new Vector3(Mathf.Floor((m_Player1.transform.position.x + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2,
-                        0,
-                        Mathf.Floor((m_Player1.transform.position.z + m_WallThickness) / stepLength) * stepLength + m_RoomLength / 2);
                 m_target = room.transform.position + center;
                 float step = Mathf.Max(Vector3.Distance(transform.position, m_target), cameraSpeedMinimum) * Time.deltaTime;
                 transform.position = Vector3.MoveTowards(transform.position, m_target, step);

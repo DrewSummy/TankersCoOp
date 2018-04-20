@@ -6,7 +6,7 @@ public class ProjectilePlayer : Projectile
 
     // TODO: set variables dependent on player
 
-    private new void OnCollisionEnter(Collision collisionInfo)
+    /*private new void OnCollisionEnter(Collision collisionInfo)
     {
         if (collisionInfo.transform.tag == "Enemy")
         {
@@ -19,7 +19,7 @@ public class ProjectilePlayer : Projectile
         }
 
         base.OnCollisionEnter(collisionInfo);
-    }
+    }*/
 
     // Occurs on regular instances; tanks, max collisions, other projectiles.
     public override void KillProjectile()
