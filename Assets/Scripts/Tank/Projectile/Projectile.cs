@@ -82,7 +82,7 @@ public class Projectile : MonoBehaviour
         AudioSource audioSource = gameObject.GetComponent<AudioSource>();
 
         // Load in the sound being used from the Resources folder in assets.
-        ricochetAudio = Resources.Load("Prefab/Audio/RicochetSound") as AudioClip;
+        ricochetAudio = Resources.Load("Prefab/Audio/ricochet") as AudioClip;
         audioSource.clip = ricochetAudio;
 
         // Collision variables.
@@ -177,6 +177,14 @@ public class Projectile : MonoBehaviour
         if (!disabled)
         {
 
+            // If the audioclip isn't the ricochet audio make it that.
+            if (audioSource.clip != ricochetAudio)
+            {
+                audioSource.clip = ricochetAudio;
+            }
+            // Play the audio for the ricochet.
+            audioSource.Play();
+
             // Drop the current smoke trail.
             if (currentTrail)
             {
@@ -203,15 +211,6 @@ public class Projectile : MonoBehaviour
             // Update the trail.
             setTrail();
         }
-
-        // If the audioclip isn't the ricochet audio make it that.
-        if (audioSource.clip != ricochetAudio)
-        {
-            audioSource.clip = ricochetAudio;
-        }
-
-        // Play the audio for the ricochet.
-        audioSource.Play();
     }
 
     

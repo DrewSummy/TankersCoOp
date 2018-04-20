@@ -53,7 +53,7 @@ namespace Completed
 
             if (!audioPlayed)
             {
-                gateAudioSource.Play();
+                //gateAudioSource.Play();
                 audioPlayed = true;
             }
 
@@ -86,7 +86,7 @@ namespace Completed
             if (!audioPlayed)
             {
                 gateAudioSource.pitch = 2f;
-                gateAudioSource.Play();
+                //gateAudioSource.Play();
                 audioPlayed = true;
             }
 
@@ -119,7 +119,7 @@ namespace Completed
                 if (!audioPlayed)
                 {
                     gateAudioSource.clip = lastRoomAudio;
-                    gateAudioSource.Play();
+                    //gateAudioSource.Play();
                     audioPlayed = true;
                 }
 
@@ -172,7 +172,7 @@ namespace Completed
                     // Reset the current room of the tank.
                     if (!collisionInfo.transform.GetComponent<TankPlayer>().battling)
                     {
-                        collisionInfo.transform.GetComponent<TankPlayer>().currentRoom = parentRoomScript.gameObject;
+                        //collisionInfo.transform.GetComponent<TankPlayer>().currentRoom = parentRoomScript.gameObject;
                     }
 
                 }

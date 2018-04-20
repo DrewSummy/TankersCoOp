@@ -111,8 +111,6 @@ namespace Completed
             // Load in the Audio files.
             m_FireAudioSource = gameObject.GetComponents<AudioSource>()[0];
             //m_MovementAudio = gameObject.GetComponents<AudioSource>()[1];
-            m_FireAudio = Resources.Load("FireSound") as AudioClip;
-            m_EmptyFireAudio = Resources.Load("EmptyFireSound") as AudioClip;
         }
 
         private void Update()
@@ -133,6 +131,8 @@ namespace Completed
             {
                 checkTeammateRoom();
             }
+
+            updateLocation();
         }
 
         private void TakeControllerInputs()
@@ -381,9 +381,6 @@ namespace Completed
                 // Set alive to be false. Other scripts depend on this.
                 alive = false;
 
-                // Decrease LevelManager's player counter.
-                LM.playerDied();
-
                 // Set projectile count to 0.
                 projectileCount = 0;
                 GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
@@ -393,6 +390,9 @@ namespace Completed
 
                 // Move tank downward to avoid getting hit again.
                 transform.position += new Vector3(0, -10, 0);
+
+                // Decrease LevelManager's player counter.
+                LM.playerDied();
             }
         }
 
@@ -491,6 +491,12 @@ namespace Completed
                 currentRoom = room;
                 miniMapGUI.visitedRoom(LM.DeterminePlayerCoord(transform.position));
             }
+        }
+
+        private void updateLocation()
+        {
+            GameObject room = LM.DeterminePlayerRoom(transform.position);
+            currentRoom = room;
         }
 
         // Helper function for checkTeammateRoom.

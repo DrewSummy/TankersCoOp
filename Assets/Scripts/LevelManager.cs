@@ -542,12 +542,10 @@ namespace Completed
             // Set the first room coordinates.
             Transform firstRoom = roomGrid[(int)firstRoomCoordinate.x, (int)firstRoomCoordinate.y];
             // Link the players to their room and eachother.
-            player1.GetComponent<TankPlayer>().currentRoom = firstRoom.gameObject;
             if (coop)
             {
                 player1.GetComponent<TankPlayer>().teammate = player2.GetComponent<TankPlayer>();
                 player2.GetComponent<TankPlayer>().teammate = player1.GetComponent<TankPlayer>();
-                player2.GetComponent<TankPlayer>().currentRoom = firstRoom.gameObject;
             }
             m_camera.gameObject.SetActive(true);
             // Pass the colors.

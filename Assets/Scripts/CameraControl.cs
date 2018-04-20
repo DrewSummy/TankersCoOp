@@ -51,7 +51,7 @@ namespace Completed
             //Initialize();
             //placeBackground();
 
-            state = CameraControl.State.BATTLE;
+            state = CameraControl.State.PATROL;
             StartCoroutine(FSM());
         }
 
@@ -101,8 +101,12 @@ namespace Completed
         {
             if (m_Player1)
             {
+
                 GameObject room = m_Player1.GetComponent<TankPlayer>().currentRoom;
-                m_target = room.transform.position + center;
+                if (room)
+                {
+                    m_target = room.transform.position + center;
+                }
                 float step = Mathf.Max(Vector3.Distance(transform.position, m_target), cameraSpeedMinimum) * Time.deltaTime;
                 transform.position = Vector3.MoveTowards(transform.position, m_target, step);
             }

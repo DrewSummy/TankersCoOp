@@ -19,7 +19,7 @@ public class GameMaster : MonoBehaviour
     public Transform panel;
 
     private LevelManager levelScript;                          // Store a reference to our LevelManager which will set up the level.
-    private int Level = 8;                                     // Current level number.
+    private int Level = 1;                                     // Current level number.
     private bool coop = false;                                 // Makes a player 2 if true.
 
 
@@ -56,10 +56,10 @@ public class GameMaster : MonoBehaviour
         levelScript = GetComponent<LevelManager>();
 
         // Call the InitGame function to initialize the first level.
-        //displaymenuGUI();
+        displaymenuGUI();
 
         //Temporary for testing.
-        CreateSoloGame();
+        //CreateSoloGame();
         //CreateCoopGame();
     }
 
@@ -196,6 +196,7 @@ public class GameMaster : MonoBehaviour
 
     private void clearGame()
     {
+        Level = 1;
         cam.SetActive(false);
 
         levelScript.endLevel();

@@ -116,6 +116,7 @@ namespace Completed
             // Update player 1's projectiles.
             P1ProjectileMax = P1.GetComponent<TankPlayer>().getProjectileAmount();
             P1ProjectileCount = P1.GetComponent<TankPlayer>().getProjectileCount();
+            projectileHolder1.gameObject.SetActive(true);
 
             int nonEmptyProj = P1ProjectileCount;
 
@@ -140,6 +141,7 @@ namespace Completed
             // Update player 1's projectiles.
             P2ProjectileMax = P2.GetComponent<TankPlayer>().getProjectileAmount();
             P2ProjectileCount = P2.GetComponent<TankPlayer>().getProjectileCount();
+            projectileHolder2.gameObject.SetActive(true);
 
             int nonEmptyProj = P2ProjectileCount;
 

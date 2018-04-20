@@ -56,6 +56,20 @@ namespace Completed
         private Coroutine raise;
         private Coroutine lower;
 
+        private AudioSource ad;
+        private AudioClip lowClick;
+        private AudioClip click;
+        private AudioClip hiClick;
+
+        private void Awake()
+        {
+            ad = gameObject.AddComponent<AudioSource>();
+            ad.playOnAwake = false;
+
+            lowClick = Resources.Load("Prefab/Audio/lowClick") as AudioClip;
+            click = Resources.Load("Prefab/Audio/click") as AudioClip;
+            hiClick = Resources.Load("Prefab/Audio/hiClick") as AudioClip;
+        }
 
         // Use this for initializing the logo and menu.
         public void initialDisplay()
@@ -86,14 +100,14 @@ namespace Completed
                 //TODO: yield return playLogoAudio();
 
                 // Fade from black.
-                yield return fadeLogoFromBlack();
+                //yield return fadeLogoFromBlack();
 
                 // Hold the logo and play audio.
                 yield return new WaitForSeconds(1f);
                 //TODO: audio, maybe the logo pronounced wrong
 
                 // Fade to black.
-                yield return fadeLogoToBlack();
+                //yield return fadeLogoToBlack();
 
                 // Hold black background then set inactive.
                 yield return new WaitForSeconds(1f);
@@ -280,6 +294,8 @@ namespace Completed
                 currentButton = setting1;
 
                 StartCoroutine(delaySettingsOnClick());
+
+                PlayClickSound();
             }
         }
         private IEnumerator delaySettingsOnClick()
@@ -374,13 +390,14 @@ namespace Completed
                 }
             }
         }
-        private IEnumerator delayBack() 
+        private IEnumerator delayBack()
         {
             yield return new WaitForSeconds(raiseTime);
             solo.Select();
         }
         public void select()
         {
+            PlayLowClick();
             currentButton.GetComponent<Button>().onClick.Invoke();
         }
         public void up()
@@ -404,13 +421,13 @@ namespace Completed
         private void startGame()
         {
             StartCoroutine(startGameCoroutine());
-            
+
             active = false;
         }
         private void startGameCoop()
         {
             StartCoroutine(startGameCoopCoroutine());
-            
+
             active = false;
         }
 
@@ -448,7 +465,39 @@ namespace Completed
             menu.SetActive(false);
             panel.gameObject.SetActive(false);
         }
-        
+
+
+        private void PlayLowClick()
+        {
+            ad.clip = lowClick;
+            ad.Play();
+        }
+        private void PlayClick()
+        {
+            ad.clip = click;
+            ad.Play();
+        }
+        private void PlayHiClick()
+        {
+            ad.clip = hiClick;
+            ad.Play();
+        }
+        private void PlayClickSound()
+        {
+            if (currentButton == solo |
+            currentButton == settings |
+            currentButton == soloBack |
+            currentButton == settingsBack)
+            {
+                PlayLowClick();
+            }
+
+            else
+            {
+                PlayHiClick();
+            }
+
+        }
     }
 }
  

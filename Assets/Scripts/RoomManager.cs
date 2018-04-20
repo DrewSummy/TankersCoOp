@@ -95,11 +95,24 @@ namespace Completed
         private bool[] hasTriggeredNEWS = new bool[4];                           // Array of booleans representing which of hte surrounding rooms are triggered.
         public bool isLastRoom = false;                                          // Boolean for if this is the last room.
         private GameObject[] waypoints;
+        private AudioSource ad;
 
         
         private int enemyCount = 0;
         private Object enemyCounterLock = new Object();
 
+        private void Awake()
+        {
+            ad = gameObject.AddComponent<AudioSource>();
+            ad.clip = Resources.Load("Prefab/Audio/select") as AudioClip;
+            //ad.playOnAwake = false;
+            ad.volume = .25f;
+        }
+
+        public void PlayOnSelect()
+        {
+            ad.Play();
+        }
 
         // Instantiates the 2D arrays representing the room's obstacle course.
         private void SetObstacleCourses()
@@ -493,7 +506,7 @@ namespace Completed
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 5, 0, 0, 0, 2, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 5, 0, 0, 0, 2, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0},
@@ -507,7 +520,7 @@ namespace Completed
                 {0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 2, 0, 0, 0, 5, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 2, 0, 0, 0, 5, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -1805,7 +1818,7 @@ namespace Completed
                 // Set this as the current room for the tanks and the tanks to battling.
                 foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
                 {
-                    tank.GetComponent<TankPlayer>().currentRoom = gameObject;
+                    //tank.GetComponent<TankPlayer>().currentRoom = gameObject;
                     tank.GetComponent<TankPlayer>().battling = true;
                 }
                 StartCoroutine(BeginSetUp());
@@ -1869,6 +1882,8 @@ namespace Completed
         // Function called when enemyCount == 0.
         private void endBattle()
         {
+            ad.Play();
+
             // Remove projectiles from the player and put them into their animation.
             removeProjectiles();
 
