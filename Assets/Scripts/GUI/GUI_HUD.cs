@@ -214,8 +214,8 @@ namespace Completed
         {
             float scale = 1.5f;
             levelText.GetComponent<RectTransform>().localScale = new Vector3(scale, scale, scale);
-            float alpha = 0;
-            levelText.color = new Color(1, 1, 1, alpha);
+            //float alpha = 0;
+            //levelText.color = new Color(1, 1, 1, alpha);
             float epsilon = .03f;
 
             while (levelText.GetComponent<RectTransform>().localScale.x > 1)
@@ -223,8 +223,8 @@ namespace Completed
                 scale -= epsilon;
                 levelText.GetComponent<RectTransform>().localScale = new Vector3(scale, scale, scale);
 
-                alpha += epsilon;
-                levelText.color = new Color(1, 1, 1, alpha);
+                //alpha += epsilon;
+                //levelText.color = new Color(1, 1, 1, alpha);
 
                 yield return new WaitForSeconds(epsilon);
             }

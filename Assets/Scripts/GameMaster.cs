@@ -141,12 +141,14 @@ public class GameMaster : MonoBehaviour
     
     public void endGame()
     {
+        Level = 1;
         clearGame();
         displaymenuGUI();
     }
 
     public void restart()
     {
+        Level = 1;
         clearGame();
         startGame();
         cam.SetActive(true);
@@ -190,13 +192,13 @@ public class GameMaster : MonoBehaviour
     public void nextLevel()
     {
         Level++;
-
-        restart();
+        clearGame();
+        startGame();
+        cam.SetActive(true);
     }
 
     private void clearGame()
     {
-        Level = 1;
         cam.SetActive(false);
 
         levelScript.endLevel();

@@ -103,7 +103,7 @@ abstract public class Tank : MonoBehaviour {
 
     }
 
-private void ColorizeTank()
+    private void ColorizeTank()
     {
         foreach (MeshRenderer mr in this.GetComponentsInChildren(typeof(MeshRenderer)))
         {

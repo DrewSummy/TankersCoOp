@@ -43,6 +43,7 @@ namespace Completed
         public GameObject m_camera;                                              // Reference to the parent tank game object.
         public Transform panel;
         private Vector3 center = new Vector3(11.5f, 0, 11.5f);    // Distance to center of room for teleporting.
+        public BackgroundWave background;
 
         public bool[,] floorChart = new bool[11, 11];                            // An array of arrays of bools if a room is enabled.
         private Transform[,] roomGrid = new Transform[11, 11];                   // An array of arrays of transforms for each room.
@@ -184,7 +185,7 @@ namespace Completed
             {
                 numberOfRooms = floorChart.GetLength(0) * floorChart.GetLength(1);
             }
-            //numberOfRooms = 3;
+            //numberOfRooms = 2;
 
             // Enable a random first room.
             firstRoomCoordinate = new Vector2(Random.Range(0, floorChart.GetLength(0)), Random.Range(0, floorChart.GetLength(0)));
@@ -312,23 +313,17 @@ namespace Completed
         private void SetColors()
         {
             // Retrieve the colors and if main and accent are null, select random colors.
-            string fileLoc = "Prefab/GameObjectPrefab/Room/RoomColors/" + Level.ToString();
-            if (Resources.Load(fileLoc + "/main") as Material)
+
+            int levelDifference = 0;
+            blockMaterials = Resources.LoadAll<Material>("Prefab/GameObjectPrefab/Room/BlockMaterials/" + Level);
+            while (blockMaterials.Length == 0)
             {
-                colorMain = (Resources.Load(fileLoc + "/main") as Material).color;
+                levelDifference++;
+                blockMaterials = Resources.LoadAll<Material>("Prefab/GameObjectPrefab/Room/BlockMaterials/" + (Level - levelDifference));
             }
-            else
-            {
-                colorMain = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-            }
-            if (Resources.Load(fileLoc + "/accent"))
-            {
-                colorAccent = (Resources.Load(fileLoc + "/accent") as Material).color;
-            }
-            else
-            {
-                colorAccent = Random.ColorHSV(1f, 1f, 1f, 1f, 0.5f, 1f);
-            }
+            Material[] bm = blockMaterials;
+            colorMain = bm[Random.Range(0, bm.Length)].color;
+            colorAccent = bm[Random.Range(0, bm.Length)].color;
         }
 
         // Sets up each room dependent on floorChart.
@@ -527,6 +522,9 @@ namespace Completed
             // Get the main and accent color from resources depending on the level.
             SetColors();
 
+
+            background.GetComponent<BackgroundWave>().Initialize(colorMain, colorAccent);
+
             // Sets up each room dependent on floorChart.
             SetUpFloor();
             
@@ -695,7 +693,7 @@ namespace Completed
 
         public void levelSuccess()
         {
-
+            GM.nextLevel();
 
             endLevel();
         }

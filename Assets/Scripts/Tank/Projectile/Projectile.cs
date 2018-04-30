@@ -173,6 +173,7 @@ public class Projectile : MonoBehaviour
     {
         // A collsion has occured.
         collisionCounter++;
+        myCollider.enabled = false;
 
         if (!disabled)
         {
@@ -198,7 +199,6 @@ public class Projectile : MonoBehaviour
 
             // The vector normal to the collision.
             Vector3 normalCollision = ci.normal;
-
 
             // The vector the projectile reflects at.
             Vector3 newProjectileSpeedVector =

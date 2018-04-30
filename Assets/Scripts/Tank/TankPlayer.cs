@@ -486,9 +486,12 @@ namespace Completed
         public void SetRoom()
         {
             GameObject room = LM.DeterminePlayerRoom(transform.position);
+            Debug.Log(room);
+            Debug.Log(LM.DeterminePlayerCoord(transform.position));
             if (currentRoom != room)
             {
                 currentRoom = room;
+
                 miniMapGUI.visitedRoom(LM.DeterminePlayerCoord(transform.position));
             }
         }
@@ -496,7 +499,12 @@ namespace Completed
         private void updateLocation()
         {
             GameObject room = LM.DeterminePlayerRoom(transform.position);
-            currentRoom = room;
+            if (currentRoom != room)
+            {
+                currentRoom = room;
+
+                miniMapGUI.visitedRoom(LM.DeterminePlayerCoord(transform.position));
+            }
         }
 
         // Helper function for checkTeammateRoom.

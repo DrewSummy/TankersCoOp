@@ -1085,9 +1085,10 @@ public class TankEnemy : Tank
 
     public override void increaseProjCount()
     {
-        m_FireAudioSource.volume = 0;
-        base.increaseProjCount();
-        m_FireAudioSource.volume = 1;
+        if (projectileCount < projectileAmount && alive)
+        {
+            projectileCount++;
+        }
     }
 
 

@@ -67,7 +67,7 @@ namespace Completed
         private void placeBackground()
         {
             background.gameObject.SetActive(true);
-            background.GetComponent<BackgroundWave>().Initialize(colorMain, colorAccent);
+            //background.GetComponent<BackgroundWave>().Initialize(colorMain, colorAccent);
         }
 
 

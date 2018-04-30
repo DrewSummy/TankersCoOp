@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BackgroundWave : MonoBehaviour
 {
-    private bool debug = true;                     // No animations that slow the game down.
+    private bool debug = false;                     // No animations that slow the game down.
 
     public Color colorMain = Color.blue;
     public Color colorAccent = Color.white;
@@ -24,7 +24,7 @@ public class BackgroundWave : MonoBehaviour
     private float planeHeightUp = 4;
     private float planeHeightDown = -1;
     private float platformSpeed = .25f;
-    private float colorVar = .5f;
+    private float colorVar = .15f;
     private float accentProb = .005f;
 
     public bool up = false;
@@ -160,7 +160,6 @@ public class BackgroundWave : MonoBehaviour
             {
                 StopCoroutine(currentAction);
             }
-            Debug.Log("1");
             if (b)
             {
                 currentAction = StartCoroutine(activate());
@@ -188,7 +187,6 @@ public class BackgroundWave : MonoBehaviour
     }
     private IEnumerator raisePlane()
     {
-        Debug.Log("plane raising");
         float time = 0;
         while (plane.transform.localPosition.y < planeHeightUp)
         {
@@ -197,11 +195,9 @@ public class BackgroundWave : MonoBehaviour
             yield return new WaitForSeconds(.01f);
             time += .01f;
         }
-        Debug.Log("plane raised");
     }
     private IEnumerator lowerPlane()
     {
-        Debug.Log("plane lowering");
         float time = 0;
         while (plane.transform.localPosition.y > planeHeightDown)
         {
@@ -210,6 +206,5 @@ public class BackgroundWave : MonoBehaviour
             yield return new WaitForSeconds(.01f);
             time += .01f;
         }
-        Debug.Log("plane lowered");
     }
 }

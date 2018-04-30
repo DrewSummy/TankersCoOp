@@ -9,8 +9,7 @@ namespace Completed
     {
         public bool test;
 
-
-
+        
         public bool active = false;
         public GameMaster GM;
         public Transform panel;                                    //
@@ -60,15 +59,18 @@ namespace Completed
         private AudioClip lowClick;
         private AudioClip click;
         private AudioClip hiClick;
+        private AudioClip switchSound;
+        
 
         private void Awake()
         {
             ad = gameObject.AddComponent<AudioSource>();
             ad.playOnAwake = false;
 
-            lowClick = Resources.Load("Prefab/Audio/lowClick") as AudioClip;
+            lowClick = Resources.Load("Prefab/Audio/clickLow") as AudioClip;
             click = Resources.Load("Prefab/Audio/click") as AudioClip;
-            hiClick = Resources.Load("Prefab/Audio/hiClick") as AudioClip;
+            hiClick = Resources.Load("Prefab/Audio/clickHi") as AudioClip;
+            switchSound = Resources.Load("Prefab/Audio/switch") as AudioClip;
         }
 
         // Use this for initializing the logo and menu.
@@ -254,7 +256,6 @@ namespace Completed
             if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
-                Debug.Log("selected Solo");
                 menu.GetComponent<Menu>().placeSolo();
                 currentButton = soloPlay;
 
@@ -271,7 +272,6 @@ namespace Completed
             if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
-                Debug.Log("selected Coop");
                 menu.GetComponent<Menu>().placeCoop();
                 currentButton = coopPlay;
 
@@ -289,7 +289,6 @@ namespace Completed
             {
                 Application.Quit();             // Doesn't work in editor.
                 menu.GetComponent<Menu>().containerMoving = true;
-                Debug.Log("selected Settings");
                 menu.GetComponent<Menu>().placeSettings();
                 currentButton = setting1;
 
@@ -308,7 +307,6 @@ namespace Completed
             if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
-                Debug.Log("selected SoloPlay");
                 startGame();
 
                 solo.Select();
@@ -321,7 +319,6 @@ namespace Completed
             if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
-                Debug.Log("selected SoloPlay");
                 solo.Select();
                 menu.GetComponent<Menu>().placeMenu();
                 currentButton = solo;
@@ -332,7 +329,6 @@ namespace Completed
             if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
-                Debug.Log("selected CoopPlay");
                 startGameCoop();
             }
         }
@@ -341,7 +337,6 @@ namespace Completed
             if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
-                Debug.Log("selected CoopBack");
                 coop.Select();
                 menu.GetComponent<Menu>().placeMenu();
                 currentButton = solo;
@@ -352,8 +347,6 @@ namespace Completed
             if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
-                //TODO: drop a slider or a tv or something to choose the color of the tank
-                Debug.Log("selected Settings1");
                 StartCoroutine(temporarySettings1AndCoopPlay());//TODO: should display the setting
             }
         }
@@ -362,7 +355,6 @@ namespace Completed
             if (!menu.GetComponent<Menu>().containerMoving && active)
             {
                 menu.GetComponent<Menu>().containerMoving = true;
-                Debug.Log("selected SettingBack");
                 settings.Select();
                 menu.GetComponent<Menu>().placeMenu();
                 currentButton = solo;
@@ -382,11 +374,11 @@ namespace Completed
                 if (!menu.GetComponent<Menu>().containerMoving)
                 {
                     menu.GetComponent<Menu>().containerMoving = true;
-                    Debug.Log("back");
                     menu.GetComponent<Menu>().placeMenu();
                     currentButton = solo;
 
                     StartCoroutine(delayBack());
+                    PlayLowClick();
                 }
             }
         }
@@ -397,16 +389,27 @@ namespace Completed
         }
         public void select()
         {
-            PlayLowClick();
+            if (!menu.GetComponent<Menu>().containerMoving)
+            {
+                PlayClick();
+            }
             currentButton.GetComponent<Button>().onClick.Invoke();
         }
         public void up()
         {
+            if (!menu.GetComponent<Menu>().containerMoving)
+            {
+                PlaySwitchButton();
+            }
             currentButton = currentButton.GetComponent<Button>().navigation.selectOnUp;
             currentButton.Select();
         }
         public void down()
         {
+            if (!menu.GetComponent<Menu>().containerMoving)
+            {
+                PlaySwitchButton();
+            }
             currentButton = currentButton.GetComponent<Button>().navigation.selectOnDown;
             currentButton.Select();
         }
@@ -434,10 +437,8 @@ namespace Completed
         public IEnumerator endGameCoroutine()
         {
             // Fade from black.
-            Debug.Log("end");
             yield return new WaitForSeconds(.01f);
             yield return fadeFromBlack();
-            Debug.Log("game");
         }
 
         // Helper for disableCamera.
@@ -466,7 +467,11 @@ namespace Completed
             panel.gameObject.SetActive(false);
         }
 
-
+        private void PlaySwitchButton()
+        {
+            ad.clip = switchSound;
+            ad.Play();
+        }
         private void PlayLowClick()
         {
             ad.clip = lowClick;
