@@ -9,6 +9,7 @@ abstract public class Tank : MonoBehaviour {
     public AudioClip m_FireAudio;               // Reference to the audio clip used to play the shooting audio source.
     public AudioClip m_EmptyFireAudio;          // Reference to the audio clip used to play the shooting audio source.
     public AudioClip m_IdleAudio;               // Reference to the audio clip used to play the idle tank audio source.
+    public AudioClip m_ReloadFireAudio;
     protected int projectileAmount = 5;         // The maximum number of projectiles at a time.
     protected int projectileCount = 5;          // The current amount of projectiles available to fire. Starts at 5.
     public Material tankColor;                  // The material for the tank.
@@ -96,8 +97,10 @@ abstract public class Tank : MonoBehaviour {
         // Load in the Audio files.
         m_FireAudioSource = gameObject.GetComponents<AudioSource>()[0];
         //m_MovementAudio = gameObject.GetComponents<AudioSource>()[1];
-        m_FireAudio = Resources.Load("FireSound") as AudioClip;
-        m_EmptyFireAudio = Resources.Load("EmptyFireSound") as AudioClip;
+        m_FireAudio = Resources.Load("Prefab/Audio/shoot") as AudioClip;
+        m_EmptyFireAudio = Resources.Load("Prefab/Audio/empty") as AudioClip;
+        m_ReloadFireAudio = Resources.Load("Prefab/Audio/reload") as AudioClip;
+
     }
 
     private void ColorizeTank()
@@ -151,13 +154,23 @@ abstract public class Tank : MonoBehaviour {
     }
 
     // Called by Projectile.
-    public void increaseProjCount()
+    public virtual void increaseProjCount()
     {
         lock (projCounterLock)
         {
             if (projectileCount < projectileAmount && alive)
             {
                 projectileCount++;
+
+                // Play the reload audio if full.
+                if (projectileCount == projectileAmount)
+                {
+                    if (m_FireAudioSource.clip != m_ReloadFireAudio)
+                    {
+                        m_FireAudioSource.clip = m_ReloadFireAudio;
+                    }
+                    m_FireAudioSource.Play();
+                }
             }
         }
     }

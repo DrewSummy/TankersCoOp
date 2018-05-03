@@ -23,10 +23,20 @@ public class Menu : MonoBehaviour {
     private float idleRadius = .5f;
     public bool containerMoving = false;                    // Used to make sure that inputs are not taken while the container is unavailable.
 
-    //TODO: add clicking audio when raising container
 
+    private AudioSource ad;
+    private AudioClip lowerClip;
+    private AudioClip raiseClip;
 
+    private void Awake()
+    {
+        ad = gameObject.AddComponent<AudioSource>();
 
+        lowerClip = Resources.Load("Prefab/Audio/lower") as AudioClip;
+        Debug.Log(lowerClip);
+        raiseClip = Resources.Load("Prefab/Audio/raise") as AudioClip;
+        Debug.Log(raiseClip);
+    }
 
     // To send the blocks to the GUI menu.
     public void beginDisplay()
@@ -254,6 +264,7 @@ public class Menu : MonoBehaviour {
     // Animation to bring the container into display.
     public IEnumerator lowerContainer()
     {
+        PlayLower();
         idle = false;
         containerMoving = true;
         while (menu.transform.position.y > conHeight3)
@@ -305,6 +316,7 @@ public class Menu : MonoBehaviour {
     // Animation to lift the container out of display.
     private IEnumerator raiseContainer()
     {
+        PlayRaise();
         idle = false;
 
 
@@ -319,6 +331,18 @@ public class Menu : MonoBehaviour {
             yield return new WaitForSeconds(.01f);
         }
         menu.GetComponent<Rigidbody>().velocity = Vector3.zero;
+    }
+
+
+    private void PlayLower()
+    {
+        ad.clip = lowerClip;
+        ad.Play();
+    }
+    private void PlayRaise()
+    {
+        ad.clip = raiseClip;
+        ad.Play();
     }
 
     // Helper for raiseContainer.

@@ -1082,8 +1082,14 @@ public class TankEnemy : Tank
         float angle = Mathf.Acos((Vector3.Dot(from, to) / (from.magnitude + to.magnitude))) * 180 / Mathf.PI;
         return angle;
     }
-    
 
+    public override void increaseProjCount()
+    {
+        if (projectileCount < projectileAmount && alive)
+        {
+            projectileCount++;
+        }
+    }
 
 
 

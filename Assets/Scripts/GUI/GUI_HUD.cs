@@ -116,6 +116,7 @@ namespace Completed
             // Update player 1's projectiles.
             P1ProjectileMax = P1.GetComponent<TankPlayer>().getProjectileAmount();
             P1ProjectileCount = P1.GetComponent<TankPlayer>().getProjectileCount();
+            projectileHolder1.gameObject.SetActive(true);
 
             int nonEmptyProj = P1ProjectileCount;
 
@@ -140,6 +141,7 @@ namespace Completed
             // Update player 1's projectiles.
             P2ProjectileMax = P2.GetComponent<TankPlayer>().getProjectileAmount();
             P2ProjectileCount = P2.GetComponent<TankPlayer>().getProjectileCount();
+            projectileHolder2.gameObject.SetActive(true);
 
             int nonEmptyProj = P2ProjectileCount;
 
@@ -212,8 +214,8 @@ namespace Completed
         {
             float scale = 1.5f;
             levelText.GetComponent<RectTransform>().localScale = new Vector3(scale, scale, scale);
-            float alpha = 0;
-            levelText.color = new Color(1, 1, 1, alpha);
+            //float alpha = 0;
+            //levelText.color = new Color(1, 1, 1, alpha);
             float epsilon = .03f;
 
             while (levelText.GetComponent<RectTransform>().localScale.x > 1)
@@ -221,8 +223,8 @@ namespace Completed
                 scale -= epsilon;
                 levelText.GetComponent<RectTransform>().localScale = new Vector3(scale, scale, scale);
 
-                alpha += epsilon;
-                levelText.color = new Color(1, 1, 1, alpha);
+                //alpha += epsilon;
+                //levelText.color = new Color(1, 1, 1, alpha);
 
                 yield return new WaitForSeconds(epsilon);
             }

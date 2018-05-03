@@ -170,7 +170,10 @@ public class TankEnemyBlack : TankEnemy
         chaseTimerRunning = true;
         yield return new WaitForSeconds(chaseTime);
         StopCoroutine(retrieveRecentPos);
-        setToSearch();
+        if (state == State.CHASE)
+        {
+            setToSearch();
+        }
     }
     private void driveChase()
     {

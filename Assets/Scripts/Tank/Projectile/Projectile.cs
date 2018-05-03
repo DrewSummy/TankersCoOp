@@ -9,6 +9,7 @@ public class Projectile : MonoBehaviour
     public AudioSource audioSource;                // Reference to the audio source.
     public AudioClip ricochetAudio;                // The GameObject of the audio for ricochetting.
     public GameObject smokeTrail;
+    public GameObject sender;
 
     protected int maxCollisions = 1;               // The max number of collisions before the object is destroyed. 
     protected int collisionCounter = 0;            // Used to keep track of the number of collisions.
@@ -30,7 +31,24 @@ public class Projectile : MonoBehaviour
     private float horProjExplVel = 2;
     private float vertProjExplVel = 4.5f;
     private float horProjExplTor = 2;
-    
+
+
+
+
+    // Careful when setting this to true - it might cause double
+    // events to be fired - but it won't pass through the trigger
+    public bool sendTriggerMessage = false;
+
+    public LayerMask layerMask = -1; //make sure we aren't in this layer 
+    public float skinWidth = 0.1f; //probably doesn't need to be changed 
+
+    private float minimumExtent;
+    private float partialExtent;
+    private float sqrMinimumExtent;
+    private Vector3 previousPosition;
+    private Rigidbody myRigidbody;
+    private Collider myCollider;
+
 
     protected void Awake()
     {
@@ -64,8 +82,16 @@ public class Projectile : MonoBehaviour
         AudioSource audioSource = gameObject.GetComponent<AudioSource>();
 
         // Load in the sound being used from the Resources folder in assets.
-        ricochetAudio = Resources.Load("Prefab/Audio/RicochetSound") as AudioClip;
+        ricochetAudio = Resources.Load("Prefab/Audio/ricochet") as AudioClip;
         audioSource.clip = ricochetAudio;
+
+        // Collision variables.
+        myRigidbody = ProjectileRigidbody;
+        myCollider = GetComponentInChildren<Collider>();
+        previousPosition = myRigidbody.position;
+        minimumExtent = Mathf.Min(Mathf.Min(myCollider.bounds.extents.x, myCollider.bounds.extents.y), myCollider.bounds.extents.z);
+        partialExtent = minimumExtent * (1.0f - skinWidth);
+        sqrMinimumExtent = minimumExtent * minimumExtent;
     }
     
     // Used in inheritance to change projectile variables.
@@ -88,7 +114,7 @@ public class Projectile : MonoBehaviour
     }
 
 
-    protected void OnCollisionEnter(Collision collisionInfo)
+    protected void OnCollision(RaycastHit collisionInfo)
     {
         // The object has collided with another projectile.
         if (collisionInfo.transform.tag == projTag)
@@ -120,7 +146,7 @@ public class Projectile : MonoBehaviour
     lastCollision() - Kill the projectile.
     wallCollision() - Calculates a new direction based on angle of incidence, substitutes projectile trails, and plays audio.
     */
-    protected void projectileCollision()
+    public void projectileCollision()
     {
         if (!disabled)
         {
@@ -128,12 +154,13 @@ public class Projectile : MonoBehaviour
             KillProjectile();
         }
     }
-    protected void tankCollision(Collision ci)
+    protected void tankCollision(RaycastHit ci)
     {
         if (!disabled)
         {
             // Drop the current smoke trail.
-            ci.gameObject.GetComponent<Tank>().DestroyTank();
+            ci.collider.gameObject.GetComponentInParent<Tank>().DestroyTank();
+            //ci.gameObject.GetComponent<Tank>().DestroyTank();
             KillProjectile();
         }
     }
@@ -142,13 +169,23 @@ public class Projectile : MonoBehaviour
         // Drop the current smoke trail and destroy the object.
         KillProjectile();
     }
-    protected void wallCollision(Collision ci)
+    protected void wallCollision(RaycastHit ci)
     {
         // A collsion has occured.
         collisionCounter++;
+        myCollider.enabled = false;
 
         if (!disabled)
         {
+
+            // If the audioclip isn't the ricochet audio make it that.
+            if (audioSource.clip != ricochetAudio)
+            {
+                audioSource.clip = ricochetAudio;
+            }
+            // Play the audio for the ricochet.
+            audioSource.Play();
+
             // Drop the current smoke trail.
             if (currentTrail)
             {
@@ -161,7 +198,7 @@ public class Projectile : MonoBehaviour
             // Calculate the new vector follow the equation V' = 2(V.N)*N-V.
 
             // The vector normal to the collision.
-            Vector3 normalCollision = ci.contacts[0].normal;
+            Vector3 normalCollision = ci.normal;
 
             // The vector the projectile reflects at.
             Vector3 newProjectileSpeedVector =
@@ -174,18 +211,34 @@ public class Projectile : MonoBehaviour
             // Update the trail.
             setTrail();
         }
-
-        // If the audioclip isn't the ricochet audio make it that.
-        if (audioSource.clip != ricochetAudio)
-        {
-            audioSource.clip = ricochetAudio;
-        }
-
-        // Play the audio for the ricochet.
-        audioSource.Play();
     }
 
+    
 
+    void FixedUpdate()
+    {
+        //have we moved more than our minimum extent? 
+        Vector3 movementThisStep = myRigidbody.position - previousPosition;
+        float movementSqrMagnitude = movementThisStep.sqrMagnitude;
+
+        if (movementSqrMagnitude > sqrMinimumExtent)
+        {
+            float movementMagnitude = Mathf.Sqrt(movementSqrMagnitude);
+            RaycastHit hitInfo;
+
+            //check for obstructions we might have missed 
+            if (Physics.Raycast(transform.position, movementThisStep, out hitInfo, movementMagnitude, layerMask.value))
+            {
+                if (!hitInfo.collider)
+                    return;
+                if (hitInfo.collider != myCollider)
+                {
+                    OnCollision(hitInfo);
+                }
+            }
+        }
+        previousPosition = myRigidbody.position;
+    }
 
     public virtual void KillProjectile()
     {
@@ -223,6 +276,9 @@ public class Projectile : MonoBehaviour
         // Makes projectiles fall at the completion of a room.
         ProjectileRigidbody.useGravity = true;
         disabled = true;
+
+        // Get rid of projectile sender.
+        sender.SetActive(false);
 
         // Add random force and torque to projectile.
         ProjectileRigidbody.velocity = new Vector3(Random.Range(-horProjExplVel, horProjExplVel), vertProjExplVel, Random.Range(-horProjExplVel, horProjExplVel));
@@ -264,5 +320,18 @@ public class Projectile : MonoBehaviour
         }
 
         collisionCounter = maxCollisions;
+    }
+
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Projectile")
+        {
+            projectileCollision();
+        }
+        else if (collisionCounter >= maxCollisions & disabled)
+        {
+            lastCollision();
+        }
     }
 }

@@ -95,11 +95,28 @@ namespace Completed
         private bool[] hasTriggeredNEWS = new bool[4];                           // Array of booleans representing which of hte surrounding rooms are triggered.
         public bool isLastRoom = false;                                          // Boolean for if this is the last room.
         private GameObject[] waypoints;
+        private AudioSource ad;
+        private AudioClip beginningSound;
+        private AudioClip endingSound;
 
-        
+
+
         private int enemyCount = 0;
         private Object enemyCounterLock = new Object();
 
+        private void Awake()
+        {
+            ad = gameObject.AddComponent<AudioSource>();
+            endingSound = Resources.Load("Prefab/Audio/success") as AudioClip;
+            beginningSound = Resources.Load("Prefab/Audio/countdown") as AudioClip;
+            ad.playOnAwake = false;
+            ad.volume = .25f;
+        }
+
+        public void PlayOnSelect()
+        {
+            ad.Play();
+        }
 
         // Instantiates the 2D arrays representing the room's obstacle course.
         private void SetObstacleCourses()
@@ -493,7 +510,7 @@ namespace Completed
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 5, 0, 0, 0, 2, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 5, 0, 0, 0, 2, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0},
@@ -507,7 +524,7 @@ namespace Completed
                 {0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 2, 0, 0, 0, 5, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 2, 0, 0, 0, 5, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -838,9 +855,7 @@ namespace Completed
             {
                 // Place the enemy sprite HUD based on the enemies in the room.
                 GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().PlaceEnemies(enemyHolder);
-
-                //GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().PlayCountDown();
-
+                
 
                 yield return StartCoroutine(Countdown());
 
@@ -852,18 +867,15 @@ namespace Completed
 
         private IEnumerator Countdown()
         {
+            PlayBeginning();
+
             foreach (EdgeCountdown edge in edgeHolder.GetComponentsInChildren<EdgeCountdown>())
             {
                 edge.Pulse();
 
-                PlayAudio();
+                //PlayAudio();
             }
-            yield return new WaitForSeconds(4);
-        }
-
-        private void PlayAudio()
-        {
-            //TODO: Play
+            yield return new WaitForSeconds(3);
         }
 
         public void PlacePlayers()
@@ -1393,14 +1405,14 @@ namespace Completed
                 doorScript = placeNorthWall.GetComponentInChildren<Gate>();
                 doorScript.parentRoomScript = this;
                 // Place light.
-                GameObject northWallLight = new GameObject();
+                /*GameObject northWallLight = new GameObject();
                 northWallLight.name = "NorthLight";
                 northWallLight.transform.SetParent(lightHolder);
                 northWallLight.transform.position = placeNorthWall.transform.position + new Vector3(0, 10, -20);
                 example = northWallLight.AddComponent<Light>(); //Light light = northWallLight.AddComponent<Light>();
                 example.color = Color.red; example.range = 35; example.intensity = 5; example.type = LightType.Spot;
                 northWallLight.transform.rotation = Quaternion.Euler(32, 0, 0);
-                example.enabled = false;
+                example.enabled = false;*/
                 // Place indicator.
                 GameObject northIndicator = Instantiate(indicator) as GameObject;
                 northIndicator.transform.SetParent(indicatorHolder);
@@ -1430,14 +1442,14 @@ namespace Completed
                 doorScript = placeEastWall.GetComponentsInChildren<Transform>()[1].GetComponent<Gate>();
                 doorScript.parentRoomScript = this;
                 // Place light.
-                GameObject northEastLight = new GameObject();
+                /*GameObject northEastLight = new GameObject();
                 northEastLight.name = "EastLight";
                 northEastLight.transform.SetParent(lightHolder);
                 northEastLight.transform.position = placeEastWall.transform.position + new Vector3(-20, 10, 0);
                 Light light = northEastLight.AddComponent<Light>();
                 light.color = Color.red; light.range = 35; light.intensity = 5; light.type = LightType.Spot;
                 northEastLight.transform.rotation = Quaternion.Euler(32, 90, 0);
-                light.enabled = false;
+                light.enabled = false;*/
                 // Place indicator.
                 GameObject eastIndicator = Instantiate(indicator) as GameObject;
                 eastIndicator.transform.SetParent(indicatorHolder);
@@ -1466,14 +1478,14 @@ namespace Completed
                 doorScript = placeWestWall.GetComponentsInChildren<Transform>()[1].GetComponent<Gate>();
                 doorScript.parentRoomScript = this;
                 // Place light.
-                GameObject westWallLight = new GameObject();
+                /*GameObject westWallLight = new GameObject();
                 westWallLight.name = "WestLight";
                 westWallLight.transform.SetParent(lightHolder);
                 westWallLight.transform.position = placeWestWall.transform.position + new Vector3(20, 10, 0);
                 Light light = westWallLight.AddComponent<Light>();
                 light.color = Color.red; light.range = 35; light.intensity = 5; light.type = LightType.Spot;
                 westWallLight.transform.rotation = Quaternion.Euler(32, 270, 0);
-                light.enabled = false;
+                light.enabled = false;*/
                 // Place indicator.
                 GameObject westIndicator = Instantiate(indicator) as GameObject;
                 westIndicator.transform.SetParent(indicatorHolder);
@@ -1502,14 +1514,14 @@ namespace Completed
                 doorScript = placeSouthWall.GetComponentsInChildren<Transform>()[1].GetComponent<Gate>();
                 doorScript.parentRoomScript = this;
                 // Place light.
-                GameObject southWallLight = new GameObject();
+                /*GameObject southWallLight = new GameObject();
                 southWallLight.name = "SouthLight";
                 southWallLight.transform.SetParent(lightHolder);
                 southWallLight.transform.position = placeSouthWall.transform.position + new Vector3(0, 10, 20);
                 Light light = southWallLight.AddComponent<Light>();
                 light.color = Color.red; light.range = 35; light.intensity = 5; light.type = LightType.Spot;
                 southWallLight.transform.rotation = Quaternion.Euler(32, 180, 180);
-                light.enabled = false;
+                light.enabled = false;*/
                 // Place indicator.
                 GameObject southIndicator = Instantiate(indicator) as GameObject;
                 southIndicator.transform.SetParent(indicatorHolder);
@@ -1805,7 +1817,7 @@ namespace Completed
                 // Set this as the current room for the tanks and the tanks to battling.
                 foreach (GameObject tank in GameObject.FindGameObjectsWithTag("Player"))
                 {
-                    tank.GetComponent<TankPlayer>().currentRoom = gameObject;
+                    //tank.GetComponent<TankPlayer>().currentRoom = gameObject;
                     tank.GetComponent<TankPlayer>().battling = true;
                 }
                 StartCoroutine(BeginSetUp());
@@ -1852,7 +1864,7 @@ namespace Completed
             // Set the camera's battling variable to false;
             yield return new WaitForSeconds(.05f);
             //m_camera.GetComponent<CameraControl>().startBattleCamera(transform);
-            m_camera.GetComponent<CameraControl>().endBattleCamera();
+            StartCoroutine(m_camera.GetComponent<CameraControl>().endBattleCamera());
 
 
             //TODO: make roomIdle obsolete
@@ -1866,9 +1878,29 @@ namespace Completed
             }
         }
 
+        // Functions for playing audio.
+        private void PlayEnd()
+        {
+            if (ad.clip != endingSound)
+            {
+                ad.clip = endingSound;
+            }
+            ad.Play();
+        }
+        private void PlayBeginning()
+        {
+            if (ad.clip != beginningSound)
+            {
+                ad.clip = beginningSound;
+            }
+            ad.Play();
+        }
+
         // Function called when enemyCount == 0.
         private void endBattle()
         {
+            PlayEnd();
+
             // Remove projectiles from the player and put them into their animation.
             removeProjectiles();
 

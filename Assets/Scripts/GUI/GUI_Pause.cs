@@ -50,12 +50,24 @@ namespace Completed
 
         private Vector3 mapOffset = new Vector3(0, 0, 0);
 
+        private AudioSource ad;
+        private AudioClip lowClick;
+        private AudioClip click;
+        private AudioClip hiClick;
+
 
 
 
         void Awake()
         {
             P1 = GameObject.FindGameObjectWithTag("Player");
+
+            ad = gameObject.AddComponent<AudioSource>();
+            ad.playOnAwake = false;
+
+            lowClick = Resources.Load("Prefab/Audio/lowClick") as AudioClip;
+            click = Resources.Load("Prefab/Audio/click") as AudioClip;
+            hiClick = Resources.Load("Prefab/Audio/hiClick") as AudioClip;
         }
 
         // Use this for initialization
@@ -412,10 +424,12 @@ namespace Completed
             {
                 currentButton = RestartYes.GetComponent<Button>();
                 Restart.GetComponent<ButtonRestart>().restart();
+                PlayLowClick();
             }
             else if (currentButton.GetComponent<Button>() == Quit.GetComponent<Button>())
             {
                 currentButton = QuitYes.GetComponent<Button>();
+                PlayHiClick();
                 Quit.GetComponent<ButtonQuit>().quit();
             }
             else if (currentButton.GetComponent<Button>() == RestartYes.GetComponent<Button>())
@@ -423,23 +437,28 @@ namespace Completed
                 Restart.GetComponent<Button>().Select();
                 currentButton = Resume.GetComponent<Button>();
                 currentButton.Select();
+                PlayHiClick();
                 restartGame();
             }
             else if (currentButton.GetComponent<Button>() == RestartNo.GetComponent<Button>())
             {
                 currentButton = Restart.GetComponent<Button>();
+                PlayLowClick();
             }
             else if (currentButton.GetComponent<Button>() == QuitYes.GetComponent<Button>())
             {
                 Quit.GetComponent<Button>().Select();
                 currentButton = Resume.GetComponent<Button>();
                 currentButton.Select();
+                PlayHiClick();
                 endGame();
             }
             else if (currentButton.GetComponent<Button>() == QuitNo.GetComponent<Button>())
             {
                 currentButton = Quit.GetComponent<Button>();
+                PlayLowClick();
             }
+
 
             currentButton.Select();
         }
@@ -452,6 +471,22 @@ namespace Completed
         {
             currentButton = currentButton.GetComponent<Button>().navigation.selectOnDown;
             currentButton.Select();
+        }
+
+        private void PlayLowClick()
+        {
+            ad.clip = lowClick;
+            ad.Play();
+        }
+        private void PlayClick()
+        {
+            ad.clip = click;
+            ad.Play();
+        }
+        private void PlayHiClick()
+        {
+            ad.clip = hiClick;
+            ad.Play();
         }
     }
 }

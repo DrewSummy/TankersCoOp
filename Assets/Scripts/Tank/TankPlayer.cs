@@ -29,7 +29,7 @@ namespace Completed
         private string m_SelectName;                // The name of the bool for pausing.
         private bool m_HasShot;                     // The boolean used to permit the tank to shoot once per trigger pull.
         private bool canFire = true;
-        private float fireDelay = .05f;
+        private float fireDelay = .04f;
         private bool paused;                        // The boolean for if the game is paused.
         private float joystickMagnitude;            // The magnitude of the joystick for moving.
         public GUI_MiniMap miniMapGUI;
@@ -111,8 +111,6 @@ namespace Completed
             // Load in the Audio files.
             m_FireAudioSource = gameObject.GetComponents<AudioSource>()[0];
             //m_MovementAudio = gameObject.GetComponents<AudioSource>()[1];
-            m_FireAudio = Resources.Load("FireSound") as AudioClip;
-            m_EmptyFireAudio = Resources.Load("EmptyFireSound") as AudioClip;
         }
 
         private void Update()
@@ -133,6 +131,8 @@ namespace Completed
             {
                 checkTeammateRoom();
             }
+
+            updateLocation();
         }
 
         private void TakeControllerInputs()
@@ -381,9 +381,6 @@ namespace Completed
                 // Set alive to be false. Other scripts depend on this.
                 alive = false;
 
-                // Decrease LevelManager's player counter.
-                LM.playerDied();
-
                 // Set projectile count to 0.
                 projectileCount = 0;
                 GameObject.FindGameObjectWithTag("HUD").GetComponent<GUI_HUD>().UpdateProjectiles();
@@ -393,6 +390,9 @@ namespace Completed
 
                 // Move tank downward to avoid getting hit again.
                 transform.position += new Vector3(0, -10, 0);
+
+                // Decrease LevelManager's player counter.
+                LM.playerDied();
             }
         }
 
@@ -486,9 +486,23 @@ namespace Completed
         public void SetRoom()
         {
             GameObject room = LM.DeterminePlayerRoom(transform.position);
+            Debug.Log(room);
+            Debug.Log(LM.DeterminePlayerCoord(transform.position));
             if (currentRoom != room)
             {
                 currentRoom = room;
+
+                miniMapGUI.visitedRoom(LM.DeterminePlayerCoord(transform.position));
+            }
+        }
+
+        private void updateLocation()
+        {
+            GameObject room = LM.DeterminePlayerRoom(transform.position);
+            if (currentRoom != room)
+            {
+                currentRoom = room;
+
                 miniMapGUI.visitedRoom(LM.DeterminePlayerCoord(transform.position));
             }
         }
